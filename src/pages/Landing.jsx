@@ -22,7 +22,7 @@ export default function Landing() {
         {[
           { emoji: '⚔️', label: 'Earn XP', desc: 'Every set earns experience' },
           { emoji: '🎮', label: 'Level Up', desc: 'Grow your pixel character' },
-          { emoji: '🛒', label: 'Shop', desc: 'Spend points on gear' },
+          { emoji: '📊', label: 'Progress', desc: 'Track your gains over time' },
           { emoji: '👥', label: 'Social', desc: 'Challenge your friends' },
         ].map(f => (
           <div key={f.label} className="pixel-card p-4 text-center">
