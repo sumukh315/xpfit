@@ -2,6 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
+import db from './db.js'
 import authRoutes from './routes/auth.js'
 import workoutRoutes from './routes/workouts.js'
 import profileRoutes from './routes/profiles.js'
@@ -18,6 +19,13 @@ app.use('/uploads', express.static(join(__dirname, 'uploads')))
 // Serve built React app
 const distPath = join(__dirname, '../dist')
 app.use(express.static(distPath))
+
+// Admin: delete user by username (protected by secret)
+app.delete('/api/admin/user/:username', (req, res) => {
+  if (req.headers['x-admin-secret'] !== (process.env.ADMIN_SECRET || 'xpfit-admin')) return res.status(403).json({ error: 'Forbidden' })
+  const result = db.prepare('DELETE FROM users WHERE username = ?').run(req.params.username)
+  res.json({ deleted: result.changes })
+})
 
 app.use('/api/auth', authRoutes)
 app.use('/api/workouts', workoutRoutes)
