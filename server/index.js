@@ -25,7 +25,7 @@ app.use('/api/profiles', profileRoutes)
 app.use('/api/social', socialRoutes)
 
 // Catch-all: serve React app for any non-API route
-app.get('*', (req, res) => {
+app.get('/{*path}', (req, res) => {
   res.sendFile(join(distPath, 'index.html'))
 })
 
