@@ -20,7 +20,13 @@ app.use('/uploads', express.static(join(__dirname, 'uploads')))
 const distPath = join(__dirname, '../dist')
 app.use(express.static(distPath))
 
-// Admin: delete user by username (protected by secret)
+// Admin routes (protected by secret)
+app.get('/api/admin/users', (req, res) => {
+  if (req.headers['x-admin-secret'] !== (process.env.ADMIN_SECRET || 'xpfit-admin')) return res.status(403).json({ error: 'Forbidden' })
+  const users = db.prepare('SELECT id, username, email, created_at FROM users').all()
+  res.json(users)
+})
+
 app.delete('/api/admin/user/:username', (req, res) => {
   if (req.headers['x-admin-secret'] !== (process.env.ADMIN_SECRET || 'xpfit-admin')) return res.status(403).json({ error: 'Forbidden' })
   const result = db.prepare('DELETE FROM users WHERE username = ?').run(req.params.username)
