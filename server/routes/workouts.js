@@ -44,32 +44,6 @@ router.post('/', upload.single('photo'), (req, res) => {
 
   const workout = db.prepare('SELECT * FROM workouts WHERE id = ?').get(result.lastInsertRowid)
 
-  // After saving workout, send Discord notification
-  const userData = db.prepare('SELECT discord_webhook, username FROM users WHERE id = ?').get(req.user.id)
-  if (userData.discord_webhook) {
-    const embed = {
-      title: '💪 Workout Complete!',
-      description: `**${name}** • +${xp_earned || 0} XP${duration_minutes ? ` • ${duration_minutes} min` : ''}`,
-      color: 0x9b59b6,
-      fields: [],
-      footer: { text: 'XPFit • Keep grinding! 🎮' },
-      timestamp: new Date().toISOString(),
-    }
-    const exerciseList = JSON.parse(typeof exercises === 'string' ? exercises : JSON.stringify(exercises || []))
-    if (exerciseList.length > 0) {
-      embed.fields.push({
-        name: 'Exercises',
-        value: exerciseList.slice(0, 5).map(e => `• ${e.name}: ${e.sets}×${e.reps} @ ${e.weight}lbs`).join('\n'),
-        inline: false,
-      })
-    }
-    fetch(userData.discord_webhook, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: `${userData.username} — XPFit`, embeds: [embed] }),
-    }).catch(() => {}) // fire and forget
-  }
-
   res.json(parseWorkout(workout))
 })
 
