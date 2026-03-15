@@ -7,7 +7,8 @@ import Signup from './pages/Signup'
 import Dashboard from './pages/Dashboard'
 import WorkoutLogger from './pages/WorkoutLogger'
 import Progress from './pages/Progress'
-import Shop from './pages/Shop'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 import Social from './pages/Social'
 import Profile from './pages/Profile'
 import StylePreview from './pages/StylePreview'
@@ -41,6 +42,8 @@ function AppRoutes() {
       <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/dashboard" element={
         <ProtectedRoute><AuthLayout><Dashboard /></AuthLayout></ProtectedRoute>
       } />
@@ -53,10 +56,7 @@ function AppRoutes() {
       <Route path="/progress" element={
         <ProtectedRoute><AuthLayout><Progress /></AuthLayout></ProtectedRoute>
       } />
-      <Route path="/shop" element={
-        <ProtectedRoute><AuthLayout><Shop /></AuthLayout></ProtectedRoute>
-      } />
-      <Route path="/social" element={
+<Route path="/social" element={
         <ProtectedRoute><AuthLayout><Social /></AuthLayout></ProtectedRoute>
       } />
       <Route path="/style-preview" element={<StylePreview />} />

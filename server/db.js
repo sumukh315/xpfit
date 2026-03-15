@@ -42,6 +42,14 @@ db.exec(`
     created_at TEXT DEFAULT (datetime('now')),
     UNIQUE(user_id, friend_id)
   );
+
+  CREATE TABLE IF NOT EXISTS password_reset_tokens (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token TEXT NOT NULL UNIQUE,
+    expires_at TEXT NOT NULL,
+    used INTEGER DEFAULT 0
+  );
 `)
 
 // Add new columns if they don't exist yet

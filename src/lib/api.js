@@ -53,6 +53,10 @@ export const api = {
   searchUsers: (q) => request(`/profiles/search?q=${encodeURIComponent(q)}`),
   getProfile: (id) => request(`/profiles/${id}`),
 
+  // Auth extras
+  forgotPassword: (email) => request('/auth/forgot-password', { method: 'POST', body: { email } }),
+  resetPassword: (token, password) => request('/auth/reset-password', { method: 'POST', body: { token, password } }),
+
   // Social
   getFriends: () => request('/social/friends'),
   getFriendRequests: () => request('/social/requests'),

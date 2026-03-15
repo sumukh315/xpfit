@@ -55,6 +55,12 @@ export default function Login() {
 
           {error && <p className="text-red-400" style={{ fontSize: '12px' }}>{error}</p>}
 
+          <div className="text-right">
+            <Link to="/forgot-password" className="text-gray-500 hover:text-purple-400" style={{ fontSize: '11px' }}>
+              Forgot password?
+            </Link>
+          </div>
+
           <button
             type="submit"
             disabled={loading}

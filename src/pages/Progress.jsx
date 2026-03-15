@@ -3,9 +3,31 @@ import { useAuth } from '../contexts/AuthContext'
 import { api } from '../lib/api'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
+const MUSCLE_GROUPS = [
+  { id: 'all', label: 'All' },
+  { id: 'chest', label: 'Chest' },
+  { id: 'back', label: 'Back' },
+  { id: 'arms', label: 'Arms' },
+  { id: 'shoulders', label: 'Shoulders' },
+  { id: 'legs', label: 'Legs' },
+  { id: 'abs', label: 'Abs' },
+  { id: 'cardio', label: 'Cardio' },
+]
+
+const EXERCISES_BY_GROUP = {
+  chest: ['Bench Press','Incline Bench Press','Decline Bench Press','Dumbbell Fly','Incline Dumbbell Fly','Cable Fly','Push-Up','Chest Dip','Pec Deck','Cable Crossover','Landmine Press','Machine Chest Press'],
+  back: ['Deadlift','Barbell Row','Dumbbell Row','Pull-Up','Chin-Up','Lat Pulldown','Seated Cable Row','T-Bar Row','Face Pull','Straight-Arm Pulldown','Rack Pull','Good Morning','Hyperextension','Shrug'],
+  arms: ['Barbell Curl','Dumbbell Curl','Hammer Curl','Preacher Curl','Cable Curl','Concentration Curl','Incline Dumbbell Curl','Tricep Pushdown','Skull Crusher','Overhead Tricep Extension','Diamond Push-Up','Tricep Dip','Close-Grip Bench Press','Wrist Curl','Reverse Curl'],
+  shoulders: ['Overhead Press','Dumbbell Shoulder Press','Arnold Press','Lateral Raise','Front Raise','Rear Delt Fly','Upright Row','Cable Lateral Raise','Face Pull','Machine Shoulder Press','Landmine Lateral Raise'],
+  legs: ['Squat','Front Squat','Goblet Squat','Bulgarian Split Squat','Leg Press','Hack Squat','Romanian Deadlift','Leg Curl','Leg Extension','Hip Thrust','Glute Bridge','Lunge','Walking Lunge','Step-Up','Calf Raise','Seated Calf Raise','Sumo Deadlift','Box Jump'],
+  abs: ['Crunch','Sit-Up','Bicycle Crunch','Russian Twist','Plank','Side Plank','Leg Raise','Hanging Leg Raise','Ab Rollout','Cable Crunch','Dragon Flag','Mountain Climber','V-Up','Dead Bug'],
+  cardio: ['Running','Treadmill','Cycling','Rowing Machine','Elliptical','Jump Rope','Stair Climber','HIIT Sprint','Battle Ropes','Burpee','Box Jump','Sled Push'],
+}
+
 export default function Progress() {
   const { profile } = useAuth()
   const [workouts, setWorkouts] = useState([])
+  const [selectedGroup, setSelectedGroup] = useState('all')
   const [selectedExercise, setSelectedExercise] = useState('')
   const [exerciseHistory, setExerciseHistory] = useState([])
   const [allExercises, setAllExercises] = useState([])
@@ -27,6 +49,16 @@ export default function Progress() {
     } catch (e) { console.error(e) }
   }
 
+  const filteredExercises = selectedGroup === 'all'
+    ? allExercises
+    : allExercises.filter(name => EXERCISES_BY_GROUP[selectedGroup]?.includes(name))
+
+  useEffect(() => {
+    if (filteredExercises.length > 0 && !filteredExercises.includes(selectedExercise)) {
+      setSelectedExercise(filteredExercises[0])
+    }
+  }, [selectedGroup, filteredExercises])
+
   useEffect(() => {
     if (!selectedExercise || !workouts.length) return
     const history = []
@@ -37,17 +69,12 @@ export default function Progress() {
         const totalReps = (ex.sets || []).reduce((a, s) => a + (parseInt(s.reps) || 0), 0)
         history.push({
           date: new Date(w.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-          weight: maxWeight, reps: totalReps, volume: maxWeight * totalReps,
+          weight: maxWeight, reps: totalReps,
         })
       }
     })
     setExerciseHistory(history)
   }, [selectedExercise, workouts])
-
-  const xpHistory = workouts.map((w, i) => ({
-    date: new Date(w.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-    xp: workouts.slice(0, i + 1).reduce((a, w) => a + (w.xp_earned || 0), 0),
-  }))
 
   const monthlyVolume = workouts.reduce((acc, w) => {
     const month = new Date(w.created_at).toLocaleDateString('en-US', { month: 'short' })
@@ -77,25 +104,31 @@ export default function Progress() {
       ) : (
         <>
           <div className="pixel-card p-4 mb-6">
-            <h2 className="pixel-font text-purple-400 mb-4" style={{ fontSize: '10px' }}>XP Over Time</h2>
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={xpHistory}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2d2d4e" />
-                <XAxis dataKey="date" tick={{ fill: '#6b7280', fontSize: 10 }} />
-                <YAxis tick={{ fill: '#6b7280', fontSize: 10 }} />
-                <Tooltip content={<CustomTooltip />} />
-                <Line type="monotone" dataKey="xp" stroke="#a855f7" strokeWidth={2} dot={{ fill: '#a855f7', r: 3 }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div className="pixel-card p-4 mb-6">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
               <h2 className="pixel-font text-purple-400" style={{ fontSize: '10px' }}>Exercise Progress</h2>
-              <select value={selectedExercise} onChange={e => setSelectedExercise(e.target.value)}
-                className="bg-black/40 border border-gray-700 text-white px-2 py-1 text-sm focus:border-purple-500 outline-none">
-                {allExercises.map(name => <option key={name} value={name}>{name}</option>)}
-              </select>
+              <div className="flex flex-wrap gap-2 items-center">
+                {/* Muscle group tabs */}
+                <div className="flex flex-wrap gap-1">
+                  {MUSCLE_GROUPS.map(g => (
+                    <button key={g.id} onClick={() => setSelectedGroup(g.id)}
+                      className={`px-2 py-1 pixel-font border transition-all ${
+                        selectedGroup === g.id
+                          ? 'border-purple-500 bg-purple-900/40 text-purple-300'
+                          : 'border-gray-700 text-gray-500 hover:border-gray-500'
+                      }`} style={{ fontSize: '7px' }}>
+                      {g.label}
+                    </button>
+                  ))}
+                </div>
+                {/* Exercise dropdown */}
+                <select value={selectedExercise} onChange={e => setSelectedExercise(e.target.value)}
+                  className="bg-black/40 border border-gray-700 text-white px-2 py-1 text-sm focus:border-purple-500 outline-none">
+                  {filteredExercises.length === 0
+                    ? <option>No data for this group</option>
+                    : filteredExercises.map(name => <option key={name} value={name}>{name}</option>)
+                  }
+                </select>
+              </div>
             </div>
             {exerciseHistory.length > 0 ? (
               <ResponsiveContainer width="100%" height={200}>
@@ -113,7 +146,7 @@ export default function Progress() {
           </div>
 
           <div className="pixel-card p-4 mb-6">
-            <h2 className="pixel-font text-purple-400 mb-4" style={{ fontSize: '10px' }}>Personal Records 🏆</h2>
+            <h2 className="pixel-font text-purple-400 mb-4" style={{ fontSize: '10px' }}>Personal Records</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {allExercises.slice(0, 6).map(name => {
                 const prs = []
@@ -128,7 +161,7 @@ export default function Progress() {
                 return pr ? (
                   <div key={name} className="bg-black/30 border border-gray-800 p-3">
                     <div className="text-gray-400 text-xs mb-1 truncate">{name}</div>
-                    <div className="pixel-font text-yellow-400" style={{ fontSize: '12px' }}>{pr} lbs</div>
+                    <div className="pixel-font text-yellow-400" style={{ fontSize: '12px' }}>PR: {pr} lbs</div>
                   </div>
                 ) : null
               })}

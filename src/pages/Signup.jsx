@@ -7,12 +7,12 @@ import { CLASSES, CLASS_INFO } from '../lib/pixelCharacter'
 const STEPS = ['Account', 'Fitness Goals', 'Hero']
 
 const FITNESS_GOALS = [
-  { value: 'lose_weight', label: '🔥 Lose Weight' },
-  { value: 'build_muscle', label: '💪 Build Muscle' },
-  { value: 'increase_strength', label: '🏋️ Increase Strength' },
-  { value: 'improve_endurance', label: '🏃 Improve Endurance' },
-  { value: 'general_fitness', label: '⚡ General Fitness' },
-  { value: 'athletic_performance', label: '🏆 Athletic Performance' },
+  { value: 'lose_weight', label: 'Lose Weight' },
+  { value: 'build_muscle', label: 'Build Muscle' },
+  { value: 'increase_strength', label: 'Increase Strength' },
+  { value: 'improve_endurance', label: 'Improve Endurance' },
+  { value: 'general_fitness', label: 'General Fitness' },
+  { value: 'athletic_performance', label: 'Athletic Performance' },
 ]
 
 const EXPERIENCE_LEVELS = [
@@ -22,13 +22,13 @@ const EXPERIENCE_LEVELS = [
 ]
 
 const WORKOUT_TYPES = [
-  { value: 'weightlifting', label: '🏋️ Weightlifting' },
-  { value: 'cardio', label: '🏃 Cardio' },
-  { value: 'hiit', label: '⚡ HIIT' },
-  { value: 'yoga', label: '🧘 Yoga' },
-  { value: 'bodyweight', label: '💪 Bodyweight' },
-  { value: 'sports', label: '⚽ Sports' },
-  { value: 'crossfit', label: '🔥 CrossFit' },
+  { value: 'weightlifting', label: 'Weightlifting' },
+  { value: 'cardio', label: 'Cardio' },
+  { value: 'hiit', label: 'HIIT' },
+  { value: 'yoga', label: 'Yoga' },
+  { value: 'bodyweight', label: 'Bodyweight' },
+  { value: 'sports', label: 'Sports' },
+  { value: 'crossfit', label: 'CrossFit' },
 ]
 
 export default function Signup() {
@@ -278,15 +278,15 @@ export default function Signup() {
                   const selected = character.charClass === cls
                   return (
                     <button key={cls} onClick={() => updateChar('charClass', cls)}
-                      className={`py-2 px-2 border-2 transition-all text-left ${
+                      className={`py-3 px-2 border-2 transition-all flex flex-col items-center gap-2 ${
                         selected
                           ? 'border-purple-400 bg-purple-900/40'
                           : 'border-gray-700 hover:border-gray-500 bg-black/20'
                       }`}>
+                      <PixelCharacter options={{ gender: character.gender, charClass: cls }} scale={0.5} />
                       <div className={`pixel-font ${selected ? 'text-purple-300' : 'text-gray-300'}`} style={{ fontSize: '8px' }}>
                         {info.label}
                       </div>
-                      <div className="text-gray-500" style={{ fontSize: '10px' }}>{info.desc}</div>
                     </button>
                   )
                 })}

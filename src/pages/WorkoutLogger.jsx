@@ -311,20 +311,32 @@ export default function WorkoutLogger() {
     }
   }
 
-  const startTimeStr = startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  const startTimeStr = startTime.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) +
+    ' ' + startTime.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toLowerCase()
+  const currentTimeStr = new Date(startTime.getTime() + elapsed).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) +
+    ' ' + new Date(startTime.getTime() + elapsed).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toLowerCase()
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 pb-32">
 
       {/* Header with timer */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="pixel-font text-purple-400" style={{ fontSize: '14px' }}>Log Workout</h1>
-          <div className="text-gray-600 text-xs mt-1">Started at {startTimeStr}</div>
-        </div>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="pixel-font text-purple-400" style={{ fontSize: '14px' }}>Log Workout</h1>
         <div className="text-center">
           <div className="pixel-font text-white tabular-nums" style={{ fontSize: '22px' }}>{formatDuration(elapsed)}</div>
           <div className="text-gray-600" style={{ fontSize: '10px' }}>elapsed</div>
+        </div>
+      </div>
+
+      {/* Time info */}
+      <div className="pixel-card p-3 mb-5 flex flex-col sm:flex-row gap-3">
+        <div className="flex-1">
+          <div className="pixel-font text-gray-500 mb-1" style={{ fontSize: '7px' }}>START TIME</div>
+          <div className="text-white" style={{ fontSize: '12px' }}>{startTimeStr}</div>
+        </div>
+        <div className="flex-1">
+          <div className="pixel-font text-gray-500 mb-1" style={{ fontSize: '7px' }}>END TIME</div>
+          <div className="text-gray-400" style={{ fontSize: '12px' }}>{currentTimeStr}</div>
         </div>
       </div>
 
@@ -360,15 +372,18 @@ export default function WorkoutLogger() {
         </>
       )}
 
-      {/* Notes + photo */}
+      {/* Notes */}
+      <div className="pixel-card p-4 mb-3">
+        <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>NOTES</label>
+        <textarea placeholder="How did it go? Any PRs? How you felt..." value={notes} onChange={e => setNotes(e.target.value)}
+          rows={3} className="w-full bg-black/40 border border-gray-700 text-white px-3 py-2 resize-none focus:border-purple-500 outline-none" />
+      </div>
+
+      {/* Photo */}
       <div className="pixel-card p-4 mb-5">
-        <textarea placeholder="Notes (optional)..." value={notes} onChange={e => setNotes(e.target.value)}
-          rows={2} className="w-full bg-black/40 border border-gray-700 text-white px-3 py-2 resize-none focus:border-purple-500 outline-none mb-3" />
-        <div>
-          <label className="pixel-font text-gray-400 block mb-2 cursor-pointer" style={{ fontSize: '8px' }}>📸 ADD PHOTO</label>
-          <input type="file" accept="image/*" onChange={e => setPhotoFile(e.target.files[0])} className="text-gray-400 text-sm" />
-          {photoFile && <p className="text-green-400 text-xs mt-1">✓ {photoFile.name}</p>}
-        </div>
+        <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>ADD PHOTO</label>
+        <input type="file" accept="image/*" onChange={e => setPhotoFile(e.target.files[0])} className="text-gray-400 text-sm" />
+        {photoFile && <p className="text-green-400 text-xs mt-1">Selected: {photoFile.name}</p>}
       </div>
 
       {/* Sticky finish bar */}
