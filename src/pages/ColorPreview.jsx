@@ -78,6 +78,17 @@ const schemes = [
     text: '#6ee7b7',
     sub: '#6b7280',
   },
+  {
+    id: 'forest-ocean',
+    name: 'Forest + Ocean (Combo)',
+    bg: 'linear-gradient(135deg, #000d0d 0%, #001a14 50%, #000d0d 100%)',
+    card: '#071412',
+    border: '#0f4f3a',
+    accent: '#34d399',
+    accent2: '#38bdf8',
+    text: '#6ee7b7',
+    sub: '#6b7280',
+  },
 ]
 
 export default function ColorPreview() {
