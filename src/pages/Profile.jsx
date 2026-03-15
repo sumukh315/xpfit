@@ -50,7 +50,7 @@ export default function Profile() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6">
-      <h1 className="pixel-font text-purple-400 mb-6" style={{ fontSize: '14px' }}>Profile</h1>
+      <h1 className="pixel-font text-sky-400 mb-6" style={{ fontSize: '14px' }}>Profile</h1>
 
       <div className="pixel-card p-6 mb-6 flex flex-col md:flex-row gap-6 items-center">
         <div className="pixel-card p-5 glow-purple">
@@ -58,7 +58,7 @@ export default function Profile() {
         </div>
         <div className="flex-1 text-center md:text-left">
           <h2 className="pixel-font text-white mb-1" style={{ fontSize: '20px' }}>{profile?.username}</h2>
-          <p className="pixel-font text-purple-400 mb-1" style={{ fontSize: '11px' }}>Level {level} · {getLevelTitle(level)}</p>
+          <p className="pixel-font text-sky-400 mb-1" style={{ fontSize: '11px' }}>Level {level} · {getLevelTitle(level)}</p>
           <p className="text-gray-400 mb-4 capitalize" style={{ fontSize: '12px' }}>
             {charOptions.gender || 'Male'} · {CLASS_INFO[charOptions.charClass]?.label || 'Warrior'}
           </p>
@@ -69,7 +69,7 @@ export default function Profile() {
               <div className="text-gray-600 text-xs">Points</div>
             </div>
             <div>
-              <div className="pixel-font text-purple-400" style={{ fontSize: '16px' }}>⭐ {profile?.total_xp || 0}</div>
+              <div className="pixel-font text-sky-400" style={{ fontSize: '16px' }}>⭐ {profile?.total_xp || 0}</div>
               <div className="text-gray-600 text-xs">Total XP</div>
             </div>
           </div>
@@ -78,10 +78,10 @@ export default function Profile() {
 
       <div className="pixel-card p-4">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="pixel-font text-purple-400" style={{ fontSize: '10px' }}>Change Character</h2>
+          <h2 className="pixel-font text-sky-400" style={{ fontSize: '10px' }}>Change Character</h2>
           {!editing ? (
             <button onClick={() => { setCharacter(profile?.character || {}); setEditing(true) }}
-              className="pixel-btn bg-purple-800 border-purple-600 text-white px-4 py-2" style={{ fontSize: '8px' }}>
+              className="pixel-btn bg-sky-800 border-sky-600 text-white px-4 py-2" style={{ fontSize: '8px' }}>
               Edit
             </button>
           ) : (
@@ -102,7 +102,7 @@ export default function Profile() {
               <div className="flex gap-2">
                 {['male', 'female'].map(g => (
                   <button key={g} onClick={() => updateChar('gender', g)}
-                    className={`px-4 py-1 capitalize text-xs border-2 ${character.gender === g ? 'border-purple-400 bg-purple-900/40 text-white' : 'border-gray-700 text-gray-500'}`}>
+                    className={`px-4 py-1 capitalize text-xs border-2 ${character.gender === g ? 'border-sky-400 bg-sky-900/40 text-white' : 'border-gray-700 text-gray-500'}`}>
                     {g === 'male' ? '⚔ Male' : '✦ Female'}
                   </button>
                 ))}
@@ -116,8 +116,8 @@ export default function Profile() {
                   const selected = character.charClass === cls
                   return (
                     <button key={cls} onClick={() => updateChar('charClass', cls)}
-                      className={`py-2 px-2 border-2 transition-all text-left ${selected ? 'border-purple-400 bg-purple-900/40' : 'border-gray-700 hover:border-gray-500 bg-black/20'}`}>
-                      <div className={`pixel-font ${selected ? 'text-purple-300' : 'text-gray-300'}`} style={{ fontSize: '8px' }}>{info.label}</div>
+                      className={`py-2 px-2 border-2 transition-all text-left ${selected ? 'border-sky-400 bg-sky-900/40' : 'border-gray-700 hover:border-gray-500 bg-black/20'}`}>
+                      <div className={`pixel-font ${selected ? 'text-sky-300' : 'text-gray-300'}`} style={{ fontSize: '8px' }}>{info.label}</div>
                       <div className="text-gray-500" style={{ fontSize: '10px' }}>{info.desc}</div>
                     </button>
                   )
@@ -143,7 +143,7 @@ export default function Profile() {
       {/* Discord Integration */}
       <div className="pixel-card p-4 mt-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="pixel-font text-purple-400" style={{ fontSize: '10px' }}>Discord Integration</h2>
+          <h2 className="pixel-font text-sky-400" style={{ fontSize: '10px' }}>Discord Integration</h2>
           <span className={`pixel-font text-xs px-2 py-1 border ${profile?.discord_webhook ? 'border-green-500 text-green-400 bg-green-900/20' : 'border-gray-700 text-gray-500'}`} style={{ fontSize: '8px' }}>
             {profile?.discord_webhook ? 'Connected' : 'Disconnected'}
           </span>
@@ -166,13 +166,13 @@ export default function Profile() {
             value={discordWebhook}
             onChange={e => setDiscordWebhook(e.target.value)}
             placeholder="https://discord.com/api/webhooks/..."
-            className="flex-1 bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-purple-500 outline-none"
+            className="flex-1 bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none"
             style={{ fontSize: '12px' }}
           />
           <button
             onClick={saveDiscordWebhook}
             disabled={savingDiscord}
-            className="pixel-btn bg-purple-800 border-purple-600 text-white px-4 py-2 disabled:opacity-50"
+            className="pixel-btn bg-sky-800 border-sky-600 text-white px-4 py-2 disabled:opacity-50"
             style={{ fontSize: '8px' }}>
             {savingDiscord ? 'Saving...' : discordSaved ? 'Saved!' : 'Save'}
           </button>

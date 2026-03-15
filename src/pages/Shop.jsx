@@ -57,7 +57,7 @@ export default function Shop() {
   return (
     <div className="max-w-5xl mx-auto px-4 py-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="pixel-font text-purple-400" style={{ fontSize: '14px' }}>Item Shop</h1>
+        <h1 className="pixel-font text-sky-400" style={{ fontSize: '14px' }}>Item Shop</h1>
         <span className="pixel-font text-yellow-400">🪙 {profile?.points || 0} Points</span>
       </div>
 
@@ -87,17 +87,17 @@ export default function Shop() {
               }
               return (
                 <div key={item.id}
-                  className={`pixel-card p-4 cursor-pointer transition-all ${isEquipped ? 'border-purple-500 glow-purple' : 'hover:border-gray-600'}`}
+                  className={`pixel-card p-4 cursor-pointer transition-all ${isEquipped ? 'border-sky-500 glow-purple' : 'hover:border-gray-600'}`}
                   onMouseEnter={() => setHoverChar(previewChar)}
                   onMouseLeave={() => setHoverChar(null)}>
                   <div className="text-2xl mb-2">{item.emoji}</div>
                   <div className="text-white font-medium text-sm mb-1">{item.name}</div>
                   <div className="text-gray-500 text-xs mb-3">{item.description}</div>
                   {isEquipped ? (
-                    <span className="pixel-font text-purple-400" style={{ fontSize: '7px' }}>✓ EQUIPPED</span>
+                    <span className="pixel-font text-sky-400" style={{ fontSize: '7px' }}>✓ EQUIPPED</span>
                   ) : owned ? (
                     <button onClick={() => handleEquip(item)}
-                      className="pixel-btn bg-purple-800 border-purple-600 text-white px-3 py-1 w-full" style={{ fontSize: '8px' }}>
+                      className="pixel-btn bg-sky-800 border-sky-600 text-white px-3 py-1 w-full" style={{ fontSize: '8px' }}>
                       Equip
                     </button>
                   ) : (

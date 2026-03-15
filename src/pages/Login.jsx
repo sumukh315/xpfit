@@ -27,7 +27,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="pixel-card p-8 w-full max-w-md">
-        <h2 className="fantasy-font text-purple-400 mb-8 text-center" style={{ fontSize: '22px' }}>
+        <h2 className="fantasy-font text-sky-400 mb-8 text-center" style={{ fontSize: '22px' }}>
           Continue Quest
         </h2>
 
@@ -38,7 +38,7 @@ export default function Login() {
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-purple-500 outline-none"
+              className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none"
               required
             />
           </div>
@@ -48,7 +48,7 @@ export default function Login() {
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
-              className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-purple-500 outline-none"
+              className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none"
               required
             />
           </div>
@@ -56,7 +56,7 @@ export default function Login() {
           {error && <p className="text-red-400" style={{ fontSize: '12px' }}>{error}</p>}
 
           <div className="text-right">
-            <Link to="/forgot-password" className="text-gray-500 hover:text-purple-400" style={{ fontSize: '11px' }}>
+            <Link to="/forgot-password" className="text-gray-500 hover:text-sky-400" style={{ fontSize: '11px' }}>
               Forgot password?
             </Link>
           </div>
@@ -64,7 +64,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="pixel-btn bg-purple-700 border-purple-500 text-white py-3 mt-2 disabled:opacity-50"
+            className="pixel-btn bg-sky-700 border-sky-500 text-white py-3 mt-2 disabled:opacity-50"
           >
             {loading ? 'Loading...' : 'Login'}
           </button>
@@ -72,7 +72,7 @@ export default function Login() {
 
         <p className="text-center text-gray-500 mt-6" style={{ fontSize: '12px' }}>
           New player?{' '}
-          <Link to="/signup" className="text-purple-400 hover:text-purple-300">
+          <Link to="/signup" className="text-sky-400 hover:text-sky-300">
             Create Account
           </Link>
         </p>

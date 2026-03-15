@@ -54,9 +54,9 @@ export default function Navbar() {
   const charOptions = profile?.character || { gender: 'male', charClass: 'warrior' }
 
   return (
-    <nav className="pixel-card border-b-2 border-purple-900/50 px-4 py-3 sticky top-0 z-50" style={{ background: '#0d0d1f' }}>
+    <nav className="pixel-card border-b-2 border-sky-900/50 px-4 py-3 sticky top-0 z-50" style={{ background: '#0d0d1f' }}>
       <div className="flex items-center justify-between">
-        <Link to="/dashboard" className="pixel-font text-purple-400 no-underline" style={{ fontSize: '14px' }}>
+        <Link to="/dashboard" className="pixel-font text-sky-400 no-underline" style={{ fontSize: '14px' }}>
           XP<span className="text-pink-400">FIT</span>
         </Link>
 
@@ -65,7 +65,7 @@ export default function Navbar() {
           {navItems.map(item => (
             <Link key={item.path} to={item.path}
               className={`px-3 py-2 pixel-font transition-colors ${
-                location.pathname === item.path ? 'bg-purple-900/60 text-purple-300' : 'hover:bg-purple-900/30 text-gray-400 hover:text-white'
+                location.pathname === item.path ? 'bg-sky-900/60 text-sky-300' : 'hover:bg-purple-900/30 text-gray-400 hover:text-white'
               }`} style={{ fontSize: '8px' }}>
               {item.label}
             </Link>
@@ -95,7 +95,7 @@ export default function Navbar() {
                     {requests.map(u => (
                       <div key={u.id} className="flex items-center justify-between bg-black/30 border border-gray-800 p-2">
                         <Link to="/social" onClick={() => setShowRequests(false)}
-                          className="text-white text-sm hover:text-purple-300">{u.username}</Link>
+                          className="text-white text-sm hover:text-sky-300">{u.username}</Link>
                         <button onClick={() => acceptRequest(u.id)}
                           className="pixel-btn bg-green-800 border-green-600 text-white px-2 py-1" style={{ fontSize: '7px' }}>
                           Accept
@@ -135,7 +135,7 @@ export default function Navbar() {
           {navItems.map(item => (
             <Link key={item.path} to={item.path}
               className={`px-3 py-3 pixel-font transition-colors ${
-                location.pathname === item.path ? 'bg-purple-900/60 text-purple-300' : 'text-gray-400'
+                location.pathname === item.path ? 'bg-sky-900/60 text-sky-300' : 'text-gray-400'
               }`} style={{ fontSize: '10px' }}>
               {item.label}
             </Link>

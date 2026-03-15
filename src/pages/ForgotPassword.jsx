@@ -25,7 +25,7 @@ export default function ForgotPassword() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="pixel-card p-8 w-full max-w-md">
-        <h2 className="fantasy-font text-purple-400 mb-2 text-center" style={{ fontSize: '22px' }}>
+        <h2 className="fantasy-font text-sky-400 mb-2 text-center" style={{ fontSize: '22px' }}>
           Forgot Password
         </h2>
         {sent ? (
@@ -33,7 +33,7 @@ export default function ForgotPassword() {
             <p className="text-green-400 mb-4" style={{ fontSize: '13px' }}>
               If that email is registered, a reset link has been sent.
             </p>
-            <Link to="/login" className="text-purple-400 hover:text-purple-300" style={{ fontSize: '12px' }}>
+            <Link to="/login" className="text-sky-400 hover:text-sky-300" style={{ fontSize: '12px' }}>
               Back to Login
             </Link>
           </div>
@@ -42,15 +42,15 @@ export default function ForgotPassword() {
             <div>
               <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>EMAIL</label>
               <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
-                className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-purple-500 outline-none" />
+                className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none" />
             </div>
             {error && <p className="text-red-400" style={{ fontSize: '12px' }}>{error}</p>}
             <button type="submit" disabled={loading}
-              className="pixel-btn bg-purple-700 border-purple-500 text-white py-3 mt-2 disabled:opacity-50">
+              className="pixel-btn bg-sky-700 border-sky-500 text-white py-3 mt-2 disabled:opacity-50">
               {loading ? 'Sending...' : 'Send Reset Link'}
             </button>
             <p className="text-center text-gray-500" style={{ fontSize: '12px' }}>
-              <Link to="/login" className="text-purple-400 hover:text-purple-300">Back to Login</Link>
+              <Link to="/login" className="text-sky-400 hover:text-sky-300">Back to Login</Link>
             </p>
           </form>
         )}

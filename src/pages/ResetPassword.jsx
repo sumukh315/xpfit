@@ -32,7 +32,7 @@ export default function ResetPassword() {
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="pixel-card p-8 w-full max-w-md text-center">
         <p className="text-red-400 mb-4">Invalid reset link.</p>
-        <Link to="/login" className="text-purple-400 hover:text-purple-300" style={{ fontSize: '12px' }}>Back to Login</Link>
+        <Link to="/login" className="text-sky-400 hover:text-sky-300" style={{ fontSize: '12px' }}>Back to Login</Link>
       </div>
     </div>
   )
@@ -40,7 +40,7 @@ export default function ResetPassword() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="pixel-card p-8 w-full max-w-md">
-        <h2 className="fantasy-font text-purple-400 mb-2 text-center" style={{ fontSize: '22px' }}>
+        <h2 className="fantasy-font text-sky-400 mb-2 text-center" style={{ fontSize: '22px' }}>
           Reset Password
         </h2>
         {done ? (
@@ -52,16 +52,16 @@ export default function ResetPassword() {
             <div>
               <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>NEW PASSWORD</label>
               <input type="password" value={password} onChange={e => setPassword(e.target.value)} required
-                className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-purple-500 outline-none" />
+                className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none" />
             </div>
             <div>
               <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>CONFIRM PASSWORD</label>
               <input type="password" value={confirm} onChange={e => setConfirm(e.target.value)} required
-                className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-purple-500 outline-none" />
+                className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none" />
             </div>
             {error && <p className="text-red-400" style={{ fontSize: '12px' }}>{error}</p>}
             <button type="submit" disabled={loading}
-              className="pixel-btn bg-purple-700 border-purple-500 text-white py-3 mt-2 disabled:opacity-50">
+              className="pixel-btn bg-sky-700 border-sky-500 text-white py-3 mt-2 disabled:opacity-50">
               {loading ? 'Updating...' : 'Set New Password'}
             </button>
           </form>

@@ -8,7 +8,7 @@ export default function XPBar({ totalXP = 0 }) {
   return (
     <div className="w-full">
       <div className="flex justify-between items-center mb-1">
-        <span className="pixel-font text-purple-400" style={{ fontSize: '9px' }}>
+        <span className="pixel-font text-sky-400" style={{ fontSize: '9px' }}>
           LVL {level} — {title}
         </span>
         <span className="pixel-font text-gray-400" style={{ fontSize: '8px' }}>

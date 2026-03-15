@@ -108,7 +108,7 @@ function ExercisePicker({ onSelect, onClose }) {
         <div className="p-4 border-b border-gray-800 flex items-center gap-3">
           <input ref={inputRef} type="text" placeholder="Search exercises..."
             value={search} onChange={e => setSearch(e.target.value)}
-            className="flex-1 bg-black/40 border border-gray-700 text-white px-3 py-2 focus:border-purple-500 outline-none"
+            className="flex-1 bg-black/40 border border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none"
             style={{ fontSize: '13px' }} />
           <button onClick={onClose} className="text-gray-500 hover:text-white text-xl px-2">✕</button>
         </div>
@@ -120,7 +120,7 @@ function ExercisePicker({ onSelect, onClose }) {
               <button key={g.id} onClick={() => setActiveGroup(g.id)}
                 className={`flex-shrink-0 px-4 py-3 pixel-font transition-all ${
                   activeGroup === g.id
-                    ? 'text-purple-300 border-b-2 border-purple-500 bg-purple-900/20'
+                    ? 'text-sky-300 border-b-2 border-sky-500 bg-sky-900/20'
                     : 'text-gray-500 hover:text-gray-300'
                 }`} style={{ fontSize: '8px' }}>
                 {g.icon} {g.label}
@@ -139,7 +139,7 @@ function ExercisePicker({ onSelect, onClose }) {
           <div className="grid grid-cols-2 gap-1">
             {filtered.map(name => (
               <button key={name} onClick={() => { onSelect(name); onClose() }}
-                className="text-left px-3 py-2.5 border border-gray-800 hover:border-purple-600 hover:bg-purple-900/20 transition-all text-gray-300 hover:text-white"
+                className="text-left px-3 py-2.5 border border-gray-800 hover:border-sky-600 hover:bg-sky-900/20 transition-all text-gray-300 hover:text-white"
                 style={{ fontSize: '12px' }}>
                 {name}
               </button>
@@ -158,11 +158,11 @@ function SetRow({ set, index, onChange, onRemove }) {
       <span className="pixel-font text-gray-600 w-6 text-center flex-shrink-0" style={{ fontSize: '8px' }}>{index + 1}</span>
       <input type="number" placeholder="lbs" value={set.weight || ''}
         onChange={e => onChange({ ...set, weight: e.target.value })}
-        className="w-20 bg-black/40 border border-gray-700 text-white px-2 py-1.5 text-sm text-center focus:border-purple-500 outline-none" />
+        className="w-20 bg-black/40 border border-gray-700 text-white px-2 py-1.5 text-sm text-center focus:border-sky-500 outline-none" />
       <span className="text-gray-600 flex-shrink-0">×</span>
       <input type="number" placeholder="reps" value={set.reps || ''}
         onChange={e => onChange({ ...set, reps: e.target.value })}
-        className="w-16 bg-black/40 border border-gray-700 text-white px-2 py-1.5 text-sm text-center focus:border-purple-500 outline-none" />
+        className="w-16 bg-black/40 border border-gray-700 text-white px-2 py-1.5 text-sm text-center focus:border-sky-500 outline-none" />
       <button onClick={onRemove} className="text-gray-700 hover:text-red-400 text-sm px-1 ml-auto">✕</button>
     </div>
   )
@@ -198,7 +198,7 @@ function ExerciseCard({ exercise, index, onChange, onRemove, recommendation }) {
       </div>
 
       {recommendation && (
-        <div className="bg-purple-900/20 border border-purple-800 p-2 mb-3 text-xs text-purple-300">
+        <div className="bg-sky-900/20 border border-sky-800 p-2 mb-3 text-xs text-sky-300">
           💡 <span className="pixel-font" style={{ fontSize: '7px' }}>TIP:</span> {recommendation.reason}
           {recommendation.weight && ` Try ${recommendation.weight}lbs × ${recommendation.reps} reps.`}
         </div>
@@ -213,7 +213,7 @@ function ExerciseCard({ exercise, index, onChange, onRemove, recommendation }) {
           <SetRow key={i} set={set} index={i} onChange={s => updateSet(i, s)} onRemove={() => removeSet(i)} />
         ))}
       </div>
-      <button onClick={addSet} className="text-purple-400 hover:text-purple-300 text-xs border border-purple-900 hover:border-purple-600 px-3 py-1 transition-all" style={{ fontSize: '11px' }}>
+      <button onClick={addSet} className="text-sky-400 hover:text-sky-300 text-xs border border-sky-900 hover:border-sky-600 px-3 py-1 transition-all" style={{ fontSize: '11px' }}>
         + Add Set
       </button>
     </div>
@@ -373,7 +373,7 @@ export default function WorkoutLogger() {
           <div className="text-5xl mb-4">💪</div>
           <h2 className="fantasy-font text-green-400 mb-1" style={{ fontSize: '24px' }}>Workout Done!</h2>
           <p className="text-gray-400 mb-2" style={{ fontSize: '13px' }}>{savedWorkout.name}</p>
-          <p className="pixel-font text-purple-400 mb-6" style={{ fontSize: '12px' }}>+{savedWorkout.xp} XP earned</p>
+          <p className="pixel-font text-sky-400 mb-6" style={{ fontSize: '12px' }}>+{savedWorkout.xp} XP earned</p>
 
           <p className="pixel-font text-gray-500 mb-3" style={{ fontSize: '8px' }}>SHARE YOUR WORKOUT</p>
           <div className="flex flex-col gap-3 mb-6">
@@ -405,7 +405,7 @@ export default function WorkoutLogger() {
 
       {/* Header with timer */}
       <div className="flex justify-between items-center mb-4">
-        <h1 className="pixel-font text-purple-400" style={{ fontSize: '14px' }}>Log Workout</h1>
+        <h1 className="pixel-font text-sky-400" style={{ fontSize: '14px' }}>Log Workout</h1>
         <div className="text-center">
           <div className="pixel-font text-white tabular-nums" style={{ fontSize: '22px' }}>{formatDuration(elapsed)}</div>
           <div className="text-gray-600" style={{ fontSize: '10px' }}>elapsed</div>
@@ -428,7 +428,7 @@ export default function WorkoutLogger() {
       <div className="pixel-card p-4 mb-5">
         <input type="text" placeholder="Workout name (e.g. Push Day, Leg Day...)"
           value={workoutName} onChange={e => setWorkoutName(e.target.value)}
-          className="w-full bg-transparent text-white text-lg border-b-2 border-gray-700 pb-2 focus:border-purple-500 outline-none" />
+          className="w-full bg-transparent text-white text-lg border-b-2 border-gray-700 pb-2 focus:border-sky-500 outline-none" />
       </div>
 
       {/* Exercise cards */}
@@ -437,7 +437,7 @@ export default function WorkoutLogger() {
           <div className="text-4xl mb-3">💪</div>
           <p className="text-gray-500 mb-4">No exercises yet</p>
           <button onClick={() => setShowPicker(true)}
-            className="pixel-btn bg-purple-700 border-purple-500 text-white px-8 py-3" style={{ fontSize: '10px' }}>
+            className="pixel-btn bg-sky-700 border-sky-500 text-white px-8 py-3" style={{ fontSize: '10px' }}>
             + Add First Exercise
           </button>
         </div>
@@ -450,7 +450,7 @@ export default function WorkoutLogger() {
               recommendation={recommendations[ex.name]} />
           ))}
           <button onClick={() => setShowPicker(true)}
-            className="w-full py-3 border-2 border-dashed border-gray-700 text-gray-400 hover:border-purple-600 hover:text-purple-400 transition-all mb-5" style={{ fontSize: '12px' }}>
+            className="w-full py-3 border-2 border-dashed border-gray-700 text-gray-400 hover:border-sky-600 hover:text-sky-400 transition-all mb-5" style={{ fontSize: '12px' }}>
             + Add Exercise
           </button>
         </>
@@ -460,7 +460,7 @@ export default function WorkoutLogger() {
       <div className="pixel-card p-4 mb-3">
         <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>NOTES</label>
         <textarea placeholder="How did it go? Any PRs? How you felt..." value={notes} onChange={e => setNotes(e.target.value)}
-          rows={3} className="w-full bg-black/40 border border-gray-700 text-white px-3 py-2 resize-none focus:border-purple-500 outline-none" />
+          rows={3} className="w-full bg-black/40 border border-gray-700 text-white px-3 py-2 resize-none focus:border-sky-500 outline-none" />
       </div>
 
       {/* Photo */}
@@ -471,13 +471,13 @@ export default function WorkoutLogger() {
       </div>
 
       {/* Sticky finish bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-purple-900/60 px-4 py-4"
+      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-sky-900/60 px-4 py-4"
         style={{ background: 'linear-gradient(to top, #0d0d1a, #12122288)' }}>
         <div className="max-w-2xl mx-auto flex items-center justify-between gap-4">
           <div>
             <div className="pixel-font text-gray-500 mb-1" style={{ fontSize: '7px' }}>YOU WILL EARN</div>
             <div className="flex gap-3">
-              <span className="pixel-font text-purple-400" style={{ fontSize: '13px' }}>+{xpPreview} XP</span>
+              <span className="pixel-font text-sky-400" style={{ fontSize: '13px' }}>+{xpPreview} XP</span>
               <span className="pixel-font text-yellow-400" style={{ fontSize: '13px' }}>+{pointsPreview} 🪙</span>
               <span className="text-gray-600" style={{ fontSize: '11px' }}>{exercises.length} exercises · {totalSets} sets</span>
             </div>

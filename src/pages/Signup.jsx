@@ -100,11 +100,11 @@ export default function Signup() {
           {STEPS.map((s, i) => (
             <div key={s} className="flex items-center gap-2">
               <div className={`w-8 h-8 flex items-center justify-center border-2 pixel-font ${
-                i <= step ? 'border-purple-400 bg-purple-900/40 text-purple-300' : 'border-gray-600 text-gray-600'
+                i <= step ? 'border-sky-400 bg-sky-900/40 text-sky-300' : 'border-gray-600 text-gray-600'
               }`} style={{ fontSize: '10px' }}>
                 {i + 1}
               </div>
-              <span className={`pixel-font hidden sm:block ${i <= step ? 'text-purple-300' : 'text-gray-600'}`} style={{ fontSize: '8px' }}>
+              <span className={`pixel-font hidden sm:block ${i <= step ? 'text-sky-300' : 'text-gray-600'}`} style={{ fontSize: '8px' }}>
                 {s}
               </span>
               {i < STEPS.length - 1 && <div className={`w-6 h-0.5 ${i < step ? 'bg-purple-500' : 'bg-gray-700'}`} />}
@@ -115,29 +115,29 @@ export default function Signup() {
         {/* Step 0: Account */}
         {step === 0 && (
           <div>
-            <h2 className="fantasy-font text-purple-400 mb-6 text-center" style={{ fontSize: '20px' }}>
+            <h2 className="fantasy-font text-sky-400 mb-6 text-center" style={{ fontSize: '20px' }}>
               Create Account
             </h2>
             <div className="flex flex-col gap-4">
               <div>
                 <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>USERNAME</label>
                 <input type="text" value={username} onChange={e => setUsername(e.target.value)}
-                  className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-purple-500 outline-none"
+                  className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none"
                   placeholder="YourHeroName" />
               </div>
               <div>
                 <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>EMAIL</label>
                 <input type="email" value={email} onChange={e => setEmail(e.target.value)}
-                  className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-purple-500 outline-none" />
+                  className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none" />
               </div>
               <div>
                 <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>PASSWORD</label>
                 <input type="password" value={password} onChange={e => setPassword(e.target.value)}
-                  className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-purple-500 outline-none" />
+                  className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none" />
               </div>
               {error && <p className="text-red-400" style={{ fontSize: '12px' }}>{error}</p>}
               <button onClick={() => { if (email && password && username) setStep(1) }}
-                className="pixel-btn bg-purple-700 border-purple-500 text-white py-3 mt-2">
+                className="pixel-btn bg-sky-700 border-sky-500 text-white py-3 mt-2">
                 Next →
               </button>
             </div>
@@ -147,7 +147,7 @@ export default function Signup() {
         {/* Step 1: Fitness Goals */}
         {step === 1 && (
           <div>
-            <h2 className="fantasy-font text-purple-400 mb-2 text-center" style={{ fontSize: '20px' }}>
+            <h2 className="fantasy-font text-sky-400 mb-2 text-center" style={{ fontSize: '20px' }}>
               Fitness Goals
             </h2>
             <p className="text-gray-500 text-center mb-6" style={{ fontSize: '11px' }}>
@@ -162,7 +162,7 @@ export default function Signup() {
                   <button key={g.value} onClick={() => toggleFitnessGoal(g.value)}
                     className={`py-2 px-3 border-2 text-left transition-all ${
                       fitnessProfile.fitnessGoals.includes(g.value)
-                        ? 'border-purple-400 bg-purple-900/40 text-purple-300'
+                        ? 'border-sky-400 bg-sky-900/40 text-sky-300'
                         : 'border-gray-700 text-gray-400 hover:border-gray-500 bg-black/20'
                     }`} style={{ fontSize: '11px' }}>
                     {g.label}
@@ -179,7 +179,7 @@ export default function Signup() {
                   <button key={lvl.value} onClick={() => updateFitness('experienceLevel', lvl.value)}
                     className={`flex-1 py-2 px-2 border-2 transition-all text-center ${
                       fitnessProfile.experienceLevel === lvl.value
-                        ? 'border-purple-400 bg-purple-900/40 text-purple-300'
+                        ? 'border-sky-400 bg-sky-900/40 text-sky-300'
                         : 'border-gray-700 text-gray-400 hover:border-gray-500 bg-black/20'
                     }`}>
                     <div className="pixel-font" style={{ fontSize: '8px' }}>{lvl.label}</div>
@@ -197,7 +197,7 @@ export default function Signup() {
                   <button key={type.value} onClick={() => toggleWorkoutType(type.value)}
                     className={`py-1.5 px-3 border-2 transition-all ${
                       fitnessProfile.workoutTypes.includes(type.value)
-                        ? 'border-purple-400 bg-purple-900/40 text-purple-300'
+                        ? 'border-sky-400 bg-sky-900/40 text-sky-300'
                         : 'border-gray-700 text-gray-400 hover:border-gray-500 bg-black/20'
                     }`} style={{ fontSize: '11px' }}>
                     {type.label}
@@ -209,14 +209,14 @@ export default function Signup() {
             {/* Days Per Week */}
             <div className="mb-6">
               <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>
-                DAYS PER WEEK: <span className="text-purple-400">{fitnessProfile.daysPerWeek}</span>
+                DAYS PER WEEK: <span className="text-sky-400">{fitnessProfile.daysPerWeek}</span>
               </label>
               <div className="flex gap-1">
                 {[1,2,3,4,5,6,7].map(d => (
                   <button key={d} onClick={() => updateFitness('daysPerWeek', d)}
                     className={`flex-1 py-2 border-2 pixel-font transition-all ${
                       fitnessProfile.daysPerWeek === d
-                        ? 'border-purple-400 bg-purple-900/40 text-purple-300'
+                        ? 'border-sky-400 bg-sky-900/40 text-sky-300'
                         : 'border-gray-700 text-gray-500 hover:border-gray-500'
                     }`} style={{ fontSize: '10px' }}>
                     {d}
@@ -228,7 +228,7 @@ export default function Signup() {
             <div className="flex gap-3">
               <button onClick={() => setStep(0)} className="pixel-btn bg-gray-800 border-gray-600 text-gray-300 py-2 px-4" style={{ fontSize: '9px' }}>← Back</button>
               <button onClick={() => setStep(2)}
-                className="flex-1 pixel-btn bg-purple-700 border-purple-500 text-white py-2" style={{ fontSize: '9px' }}>
+                className="flex-1 pixel-btn bg-sky-700 border-sky-500 text-white py-2" style={{ fontSize: '9px' }}>
                 Next →
               </button>
             </div>
@@ -238,7 +238,7 @@ export default function Signup() {
         {/* Step 2: Hero selection */}
         {step === 2 && (
           <div>
-            <h2 className="fantasy-font text-purple-400 mb-6 text-center" style={{ fontSize: '20px' }}>
+            <h2 className="fantasy-font text-sky-400 mb-6 text-center" style={{ fontSize: '20px' }}>
               Choose Your Hero
             </h2>
 
@@ -246,7 +246,7 @@ export default function Signup() {
             <div className="flex justify-center mb-6">
               <div className="pixel-card p-4 glow-purple flex flex-col items-center gap-2">
                 <PixelCharacter options={character} scale={1} />
-                <span className="pixel-font text-purple-300" style={{ fontSize: '9px' }}>
+                <span className="pixel-font text-sky-300" style={{ fontSize: '9px' }}>
                   {CLASS_INFO[character.charClass]?.label} · {character.gender === 'male' ? 'Male' : 'Female'}
                 </span>
               </div>
@@ -260,7 +260,7 @@ export default function Signup() {
                   <button key={g} onClick={() => updateChar('gender', g)}
                     className={`flex-1 py-2 capitalize border-2 pixel-font transition-all ${
                       character.gender === g
-                        ? 'border-purple-400 bg-purple-900/40 text-purple-300'
+                        ? 'border-sky-400 bg-sky-900/40 text-sky-300'
                         : 'border-gray-600 text-gray-400 hover:border-gray-400'
                     }`} style={{ fontSize: '9px' }}>
                     {g === 'male' ? '⚔ Male' : '✦ Female'}
@@ -280,11 +280,11 @@ export default function Signup() {
                     <button key={cls} onClick={() => updateChar('charClass', cls)}
                       className={`py-3 px-2 border-2 transition-all flex flex-col items-center gap-2 ${
                         selected
-                          ? 'border-purple-400 bg-purple-900/40'
+                          ? 'border-sky-400 bg-sky-900/40'
                           : 'border-gray-700 hover:border-gray-500 bg-black/20'
                       }`}>
                       <PixelCharacter options={{ gender: character.gender, charClass: cls }} scale={0.5} />
-                      <div className={`pixel-font ${selected ? 'text-purple-300' : 'text-gray-300'}`} style={{ fontSize: '8px' }}>
+                      <div className={`pixel-font ${selected ? 'text-sky-300' : 'text-gray-300'}`} style={{ fontSize: '8px' }}>
                         {info.label}
                       </div>
                     </button>
@@ -306,7 +306,7 @@ export default function Signup() {
 
         <p className="text-center text-gray-500 mt-6" style={{ fontSize: '12px' }}>
           Already have an account?{' '}
-          <Link to="/login" className="text-purple-400 hover:text-purple-300">Login</Link>
+          <Link to="/login" className="text-sky-400 hover:text-sky-300">Login</Link>
         </p>
       </div>
     </div>

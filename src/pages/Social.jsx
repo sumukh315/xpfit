@@ -118,7 +118,7 @@ export default function Social() {
     const charOptions = selectedFriend.character || { gender: 'male', charClass: 'warrior' }
     return (
       <div className="max-w-2xl mx-auto px-4 py-6">
-        <button onClick={() => setSelectedFriend(null)} className="text-purple-400 hover:text-purple-300 mb-6 flex items-center gap-2">
+        <button onClick={() => setSelectedFriend(null)} className="text-sky-400 hover:text-sky-300 mb-6 flex items-center gap-2">
           Back to Friends
         </button>
         <div className="pixel-card p-4 sm:p-6 mb-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
@@ -127,13 +127,13 @@ export default function Social() {
           </div>
           <div className="text-center sm:text-left">
             <h2 className="pixel-font text-white mb-1" style={{ fontSize: '16px' }}>{selectedFriend.username}</h2>
-            <p className="pixel-font text-purple-400 mb-3" style={{ fontSize: '10px' }}>Level {level} {getLevelTitle(level)}</p>
+            <p className="pixel-font text-sky-400 mb-3" style={{ fontSize: '10px' }}>Level {level} {getLevelTitle(level)}</p>
             <XPBar totalXP={selectedFriend.total_xp || 0} />
             <p className="text-yellow-400 pixel-font mt-2" style={{ fontSize: '9px' }}>{selectedFriend.points || 0} Points</p>
           </div>
         </div>
         <div className="pixel-card p-4">
-          <h3 className="pixel-font text-purple-400 mb-4" style={{ fontSize: '10px' }}>Recent Workouts</h3>
+          <h3 className="pixel-font text-sky-400 mb-4" style={{ fontSize: '10px' }}>Recent Workouts</h3>
           {friendWorkouts.length === 0 ? (
             <p className="text-gray-500 text-center py-4">No workouts yet.</p>
           ) : (
@@ -146,7 +146,7 @@ export default function Social() {
                       <div className="text-gray-500 text-xs">{new Date(w.created_at).toLocaleDateString()} · {w.exercises?.length || 0} exercises</div>
                       {w.notes && <div className="text-gray-400 text-xs mt-1 italic">{w.notes}</div>}
                     </div>
-                    <span className="pixel-font text-purple-400 flex-shrink-0 ml-2" style={{ fontSize: '9px' }}>+{w.xp_earned} XP</span>
+                    <span className="pixel-font text-sky-400 flex-shrink-0 ml-2" style={{ fontSize: '9px' }}>+{w.xp_earned} XP</span>
                   </div>
                   {w.photo_url && <img src={w.photo_url} alt="Workout" className="mt-3 w-full max-h-48 object-cover border border-gray-700" />}
                 </div>
@@ -160,12 +160,12 @@ export default function Social() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6">
-      <h1 className="pixel-font text-purple-400 mb-6" style={{ fontSize: '14px' }}>Friends & Social</h1>
+      <h1 className="pixel-font text-sky-400 mb-6" style={{ fontSize: '14px' }}>Friends & Social</h1>
 
       {/* Discord Connection */}
       <div className="pixel-card p-4 mb-6">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="pixel-font text-purple-400" style={{ fontSize: '10px' }}>Discord</h2>
+          <h2 className="pixel-font text-sky-400" style={{ fontSize: '10px' }}>Discord</h2>
           <span className={`pixel-font px-2 py-1 border ${profile?.discord_webhook ? 'border-green-500 text-green-400 bg-green-900/20' : 'border-gray-700 text-gray-500'}`} style={{ fontSize: '8px' }}>
             {profile?.discord_webhook ? 'Connected' : 'Not connected'}
           </span>
@@ -178,10 +178,10 @@ export default function Social() {
         <div className="flex gap-2 flex-col sm:flex-row">
           <input type="url" value={discordWebhook} onChange={e => setDiscordWebhook(e.target.value)}
             placeholder="https://discord.com/api/webhooks/..."
-            className="flex-1 bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-purple-500 outline-none"
+            className="flex-1 bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none"
             style={{ fontSize: '12px' }} />
           <button onClick={saveDiscordWebhook} disabled={savingDiscord}
-            className="pixel-btn bg-purple-800 border-purple-600 text-white px-4 py-2 disabled:opacity-50"
+            className="pixel-btn bg-sky-800 border-sky-600 text-white px-4 py-2 disabled:opacity-50"
             style={{ fontSize: '8px' }}>
             {savingDiscord ? 'Saving...' : discordSaved ? 'Saved!' : 'Save'}
           </button>
@@ -191,12 +191,12 @@ export default function Social() {
       <div className="grid md:grid-cols-2 gap-6 mb-6">
         {/* Find Players */}
         <div className="pixel-card p-4">
-          <h2 className="pixel-font text-purple-400 mb-4" style={{ fontSize: '10px' }}>Find Players</h2>
+          <h2 className="pixel-font text-sky-400 mb-4" style={{ fontSize: '10px' }}>Find Players</h2>
           <div className="flex gap-2 mb-4">
             <input type="text" placeholder="Search username..." value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && searchUsers()}
-              className="flex-1 bg-black/40 border border-gray-700 text-white px-3 py-2 focus:border-purple-500 outline-none text-sm" />
-            <button onClick={searchUsers} className="pixel-btn bg-purple-700 border-purple-500 text-white px-4 py-2" style={{ fontSize: '9px' }}>Search</button>
+              className="flex-1 bg-black/40 border border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none text-sm" />
+            <button onClick={searchUsers} className="pixel-btn bg-sky-700 border-sky-500 text-white px-4 py-2" style={{ fontSize: '9px' }}>Search</button>
           </div>
           <div className="flex flex-col gap-2">
             {searchResults.map(u => {
@@ -235,7 +235,7 @@ export default function Social() {
 
       {/* Party / Friends */}
       <div className="pixel-card p-4">
-        <h2 className="pixel-font text-purple-400 mb-4" style={{ fontSize: '10px' }}>Your Party ({friends.length})</h2>
+        <h2 className="pixel-font text-sky-400 mb-4" style={{ fontSize: '10px' }}>Your Party ({friends.length})</h2>
         {friends.length === 0 ? (
           <p className="text-gray-500 text-center py-6">No friends yet. Search for players above!</p>
         ) : (
@@ -245,13 +245,13 @@ export default function Social() {
               const charOpts = f.character || { gender: 'male', charClass: 'warrior' }
               const days = daysSince(friendLastWorkout[f.id])
               return (
-                <div key={f.id} className="pixel-card p-4 hover:border-purple-600 transition-all">
+                <div key={f.id} className="pixel-card p-4 hover:border-sky-600 transition-all">
                   <button onClick={() => viewFriend(f)} className="w-full text-left">
                     <div className="flex items-center gap-3 mb-2">
                       <PixelCharacter options={charOpts} scale={0.45} />
                       <div>
                         <div className="text-white text-sm font-medium">{f.username}</div>
-                        <div className="pixel-font text-purple-400" style={{ fontSize: '8px' }}>LVL {level}</div>
+                        <div className="pixel-font text-sky-400" style={{ fontSize: '8px' }}>LVL {level}</div>
                       </div>
                     </div>
                     <XPBar totalXP={f.total_xp || 0} />

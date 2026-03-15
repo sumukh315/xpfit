@@ -97,7 +97,7 @@ export default function Progress() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6">
-      <h1 className="pixel-font text-purple-400 mb-6" style={{ fontSize: '14px' }}>Progress & Stats</h1>
+      <h1 className="pixel-font text-sky-400 mb-6" style={{ fontSize: '14px' }}>Progress & Stats</h1>
 
       {workouts.length === 0 ? (
         <div className="pixel-card p-8 text-center text-gray-500">No workout data yet. Log some workouts to see your progress!</div>
@@ -105,7 +105,7 @@ export default function Progress() {
         <>
           <div className="pixel-card p-4 mb-6">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
-              <h2 className="pixel-font text-purple-400" style={{ fontSize: '10px' }}>Exercise Progress</h2>
+              <h2 className="pixel-font text-sky-400" style={{ fontSize: '10px' }}>Exercise Progress</h2>
               <div className="flex flex-wrap gap-2 items-center">
                 {/* Muscle group tabs */}
                 <div className="flex flex-wrap gap-1">
@@ -113,7 +113,7 @@ export default function Progress() {
                     <button key={g.id} onClick={() => setSelectedGroup(g.id)}
                       className={`px-2 py-1 pixel-font border transition-all ${
                         selectedGroup === g.id
-                          ? 'border-purple-500 bg-purple-900/40 text-purple-300'
+                          ? 'border-sky-500 bg-sky-900/40 text-sky-300'
                           : 'border-gray-700 text-gray-500 hover:border-gray-500'
                       }`} style={{ fontSize: '7px' }}>
                       {g.label}
@@ -122,7 +122,7 @@ export default function Progress() {
                 </div>
                 {/* Exercise dropdown */}
                 <select value={selectedExercise} onChange={e => setSelectedExercise(e.target.value)}
-                  className="bg-black/40 border border-gray-700 text-white px-2 py-1 text-sm focus:border-purple-500 outline-none">
+                  className="bg-black/40 border border-gray-700 text-white px-2 py-1 text-sm focus:border-sky-500 outline-none">
                   {filteredExercises.length === 0
                     ? <option>No data for this group</option>
                     : filteredExercises.map(name => <option key={name} value={name}>{name}</option>)
@@ -146,7 +146,7 @@ export default function Progress() {
           </div>
 
           <div className="pixel-card p-4 mb-6">
-            <h2 className="pixel-font text-purple-400 mb-4" style={{ fontSize: '10px' }}>Personal Records</h2>
+            <h2 className="pixel-font text-sky-400 mb-4" style={{ fontSize: '10px' }}>Personal Records</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {allExercises.slice(0, 6).map(name => {
                 const prs = []
@@ -169,7 +169,7 @@ export default function Progress() {
           </div>
 
           <div className="pixel-card p-4">
-            <h2 className="pixel-font text-purple-400 mb-4" style={{ fontSize: '10px' }}>Workouts Per Month</h2>
+            <h2 className="pixel-font text-sky-400 mb-4" style={{ fontSize: '10px' }}>Workouts Per Month</h2>
             <ResponsiveContainer width="100%" height={160}>
               <LineChart data={monthlyData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#2d2d4e" />
