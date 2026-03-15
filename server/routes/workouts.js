@@ -47,6 +47,18 @@ router.post('/', upload.single('photo'), (req, res) => {
   res.json(parseWorkout(workout))
 })
 
+router.delete('/:id', (req, res) => {
+  const workout = db.prepare('SELECT * FROM workouts WHERE id = ? AND user_id = ?').get(req.params.id, req.user.id)
+  if (!workout) return res.status(404).json({ error: 'Not found' })
+
+  // Reverse XP and points
+  db.prepare('UPDATE users SET total_xp = MAX(0, total_xp - ?), points = MAX(0, points - ?) WHERE id = ?')
+    .run(workout.xp_earned || 0, workout.points_earned || 0, req.user.id)
+
+  db.prepare('DELETE FROM workouts WHERE id = ?').run(req.params.id)
+  res.json({ success: true })
+})
+
 router.post('/import', (req, res) => {
   const { workouts } = req.body
   if (!Array.isArray(workouts)) return res.status(400).json({ error: 'workouts must be an array' })

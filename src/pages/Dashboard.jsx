@@ -152,8 +152,15 @@ export default function Dashboard() {
                     {new Date(w.created_at).toLocaleDateString()} · {w.exercises?.length || 0} exercises
                   </div>
                 </div>
-                <div className="pixel-font text-purple-400" style={{ fontSize: '9px' }}>
-                  +{w.xp_earned || 0} XP
+                <div className="flex items-center gap-3">
+                  <div className="pixel-font text-purple-400" style={{ fontSize: '9px' }}>
+                    +{w.xp_earned || 0} XP
+                  </div>
+                  <button onClick={async () => {
+                    if (!confirm('Delete this workout?')) return
+                    await api.deleteWorkout(w.id)
+                    fetchRecentWorkouts()
+                  }} className="text-gray-700 hover:text-red-400 transition-colors text-sm">✕</button>
                 </div>
               </div>
             ))}

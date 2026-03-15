@@ -47,6 +47,7 @@ export const api = {
     return request('/workouts', { method: 'POST', body: form })
   },
   importWorkouts: (workouts) => request('/workouts/import', { method: 'POST', body: { workouts } }),
+  deleteWorkout: (id) => request(`/workouts/${id}`, { method: 'DELETE' }),
 
   // Profiles
   updateProfile: (data) => request('/profiles/me', { method: 'PATCH', body: data }),
