@@ -243,6 +243,8 @@ export default function WorkoutLogger() {
   const [showPicker, setShowPicker] = useState(false)
   const [recommendations, setRecommendations] = useState({})
   const [previousWorkouts, setPreviousWorkouts] = useState({})
+  const [savedWorkout, setSavedWorkout] = useState(null)
+  const [copied, setCopied] = useState(false)
 
   // Timer
   const [startTime] = useState(() => new Date())
@@ -288,6 +290,18 @@ export default function WorkoutLogger() {
   const xpPreview = calcWorkoutXP(totalSets)
   const pointsPreview = calcWorkoutPoints(totalSets)
 
+  function buildShareText(name, exList, xp, duration) {
+    const lines = [`Workout: ${name}`]
+    if (duration) lines.push(`Duration: ${duration} min`)
+    exList.forEach(ex => {
+      const sets = (ex.sets || []).map(s => `${s.weight}lbs x${s.reps}`).join(', ')
+      lines.push(`  ${ex.name}: ${sets}`)
+    })
+    lines.push(`XP earned: +${xp}`)
+    lines.push('— XPFit')
+    return lines.join('\n')
+  }
+
   async function handleSave() {
     if (!workoutName.trim()) return alert('Give your workout a name!')
     const endTime = new Date()
@@ -302,7 +316,12 @@ export default function WorkoutLogger() {
         duration_minutes: Math.round((endTime - startTime) / 60000),
       })
       await refreshProfile()
-      navigate('/dashboard')
+      setSavedWorkout({
+        name: workoutName,
+        exercises,
+        xp: xpPreview,
+        duration: Math.round((endTime - startTime) / 60000),
+      })
     } catch (e) {
       console.error(e)
       alert('Error saving workout: ' + e.message)
@@ -311,10 +330,75 @@ export default function WorkoutLogger() {
     }
   }
 
+  async function handleDiscordShare() {
+    if (!profile?.discord_webhook) {
+      alert('Add your Discord webhook in the Friends page first.')
+      return
+    }
+    const text = buildShareText(savedWorkout.name, savedWorkout.exercises, savedWorkout.xp, savedWorkout.duration)
+    try {
+      await fetch(profile.discord_webhook, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: text }),
+      })
+    } catch (_) {}
+  }
+
+  async function handleCopy() {
+    const text = buildShareText(savedWorkout.name, savedWorkout.exercises, savedWorkout.xp, savedWorkout.duration)
+    await navigator.clipboard.writeText(text)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  async function handleNativeShare() {
+    const text = buildShareText(savedWorkout.name, savedWorkout.exercises, savedWorkout.xp, savedWorkout.duration)
+    if (navigator.share) {
+      await navigator.share({ title: savedWorkout.name, text })
+    } else {
+      handleCopy()
+    }
+  }
+
   const startTimeStr = startTime.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) +
     ' ' + startTime.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toLowerCase()
   const currentTimeStr = new Date(startTime.getTime() + elapsed).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) +
     ' ' + new Date(startTime.getTime() + elapsed).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toLowerCase()
+
+  if (savedWorkout) {
+    return (
+      <div className="max-w-md mx-auto px-4 py-12 flex flex-col items-center text-center">
+        <div className="pixel-card p-8 w-full">
+          <div className="text-5xl mb-4">💪</div>
+          <h2 className="fantasy-font text-green-400 mb-1" style={{ fontSize: '24px' }}>Workout Done!</h2>
+          <p className="text-gray-400 mb-2" style={{ fontSize: '13px' }}>{savedWorkout.name}</p>
+          <p className="pixel-font text-purple-400 mb-6" style={{ fontSize: '12px' }}>+{savedWorkout.xp} XP earned</p>
+
+          <p className="pixel-font text-gray-500 mb-3" style={{ fontSize: '8px' }}>SHARE YOUR WORKOUT</p>
+          <div className="flex flex-col gap-3 mb-6">
+            <button onClick={handleDiscordShare}
+              className="pixel-btn bg-indigo-800 border-indigo-600 text-white py-3 w-full" style={{ fontSize: '10px' }}>
+              Share to Discord
+            </button>
+            <button onClick={handleNativeShare}
+              className="pixel-btn bg-blue-800 border-blue-600 text-white py-3 w-full" style={{ fontSize: '10px' }}>
+              Share via Text / Messenger
+            </button>
+            <button onClick={handleCopy}
+              className="pixel-btn bg-gray-800 border-gray-600 text-white py-3 w-full" style={{ fontSize: '10px' }}>
+              {copied ? 'Copied!' : 'Copy to Clipboard'}
+            </button>
+          </div>
+
+          <button onClick={() => navigate('/dashboard')}
+            className="text-gray-500 hover:text-white transition-colors" style={{ fontSize: '12px' }}>
+            Skip → Go to Dashboard
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 pb-32">
