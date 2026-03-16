@@ -42,6 +42,8 @@ app.post('/api/admin/reset-password', async (req, res) => {
   res.json({ updated: rowCount })
 })
 
+app.get('/health', (req, res) => res.json({ ok: true }))
+
 app.use('/api/auth', authRoutes)
 app.use('/api/workouts', workoutRoutes)
 app.use('/api/profiles', profileRoutes)
