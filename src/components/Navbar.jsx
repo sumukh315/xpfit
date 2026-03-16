@@ -10,6 +10,7 @@ const navItems = [
   { path: '/workout/new', label: 'Workout' },
   { path: '/logs', label: 'Logs' },
   { path: '/progress', label: 'Progress' },
+  { path: '/import', label: 'Import' },
   { path: '/social', label: 'Friends' },
   { path: '/profile', label: 'Profile' },
 ]
