@@ -124,18 +124,18 @@ export default function Signup() {
               <div>
                 <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>USERNAME</label>
                 <input type="text" value={username} onChange={e => setUsername(e.target.value)}
-                  className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none"
+                  className="glass-input w-full"
                   placeholder="YourHeroName" />
               </div>
               <div>
                 <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>EMAIL</label>
                 <input type="email" value={email} onChange={e => setEmail(e.target.value)}
-                  className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none" />
+                  className="glass-input w-full" />
               </div>
               <div>
                 <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>PASSWORD</label>
                 <input type="password" value={password} onChange={e => setPassword(e.target.value)}
-                  className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none" />
+                  className="glass-input w-full" />
               </div>
               {error && <p className="text-red-400" style={{ fontSize: '12px' }}>{error}</p>}
               <button onClick={() => { if (email && password && username) setStep(1) }}
@@ -162,11 +162,8 @@ export default function Signup() {
               <div className="grid grid-cols-2 gap-2">
                 {FITNESS_GOALS.map(g => (
                   <button key={g.value} onClick={() => toggleFitnessGoal(g.value)}
-                    className={`py-2 px-3 border-2 text-left transition-all ${
-                      fitnessProfile.fitnessGoals.includes(g.value)
-                        ? 'border-sky-400 bg-sky-900/40 text-sky-300'
-                        : 'border-gray-700 text-gray-400 hover:border-gray-500 bg-black/20'
-                    }`} style={{ fontSize: '11px' }}>
+                    className={`py-2 px-3 text-left ${fitnessProfile.fitnessGoals.includes(g.value) ? 'glass-option-active text-sky-300' : 'glass-option text-gray-400'}`}
+                    style={{ fontSize: '11px' }}>
                     {g.label}
                   </button>
                 ))}
@@ -179,12 +176,8 @@ export default function Signup() {
               <div className="flex gap-2">
                 {EXPERIENCE_LEVELS.map(lvl => (
                   <button key={lvl.value} onClick={() => updateFitness('experienceLevel', lvl.value)}
-                    className={`flex-1 py-2 px-2 border-2 transition-all text-center ${
-                      fitnessProfile.experienceLevel === lvl.value
-                        ? 'border-sky-400 bg-sky-900/40 text-sky-300'
-                        : 'border-gray-700 text-gray-400 hover:border-gray-500 bg-black/20'
-                    }`}>
-                    <div className="pixel-font" style={{ fontSize: '8px' }}>{lvl.label}</div>
+                    className={`flex-1 py-2 px-2 text-center ${fitnessProfile.experienceLevel === lvl.value ? 'glass-option-active' : 'glass-option'}`}>
+                    <div className={`pixel-font ${fitnessProfile.experienceLevel === lvl.value ? 'text-sky-300' : 'text-gray-400'}`} style={{ fontSize: '8px' }}>{lvl.label}</div>
                     <div className="text-gray-500" style={{ fontSize: '9px' }}>{lvl.desc}</div>
                   </button>
                 ))}
@@ -197,11 +190,8 @@ export default function Signup() {
               <div className="flex flex-wrap gap-2">
                 {WORKOUT_TYPES.map(type => (
                   <button key={type.value} onClick={() => toggleWorkoutType(type.value)}
-                    className={`py-1.5 px-3 border-2 transition-all ${
-                      fitnessProfile.workoutTypes.includes(type.value)
-                        ? 'border-sky-400 bg-sky-900/40 text-sky-300'
-                        : 'border-gray-700 text-gray-400 hover:border-gray-500 bg-black/20'
-                    }`} style={{ fontSize: '11px' }}>
+                    className={`py-1.5 px-3 ${fitnessProfile.workoutTypes.includes(type.value) ? 'glass-option-active text-sky-300' : 'glass-option text-gray-400'}`}
+                    style={{ fontSize: '11px' }}>
                     {type.label}
                   </button>
                 ))}
@@ -216,11 +206,8 @@ export default function Signup() {
               <div className="flex gap-1">
                 {[1,2,3,4,5,6,7].map(d => (
                   <button key={d} onClick={() => updateFitness('daysPerWeek', d)}
-                    className={`flex-1 py-2 border-2 pixel-font transition-all ${
-                      fitnessProfile.daysPerWeek === d
-                        ? 'border-sky-400 bg-sky-900/40 text-sky-300'
-                        : 'border-gray-700 text-gray-500 hover:border-gray-500'
-                    }`} style={{ fontSize: '10px' }}>
+                    className={`flex-1 py-2 pixel-font ${fitnessProfile.daysPerWeek === d ? 'glass-option-active text-sky-300' : 'glass-option text-gray-500'}`}
+                    style={{ fontSize: '10px' }}>
                     {d}
                   </button>
                 ))}
@@ -263,11 +250,8 @@ export default function Signup() {
               <div className="flex gap-3">
                 {['male', 'female'].map(g => (
                   <button key={g} onClick={() => updateChar('gender', g)}
-                    className={`flex-1 py-2 capitalize border-2 pixel-font transition-all ${
-                      character.gender === g
-                        ? 'border-sky-400 bg-sky-900/40 text-sky-300'
-                        : 'border-gray-600 text-gray-400 hover:border-gray-400'
-                    }`} style={{ fontSize: '9px' }}>
+                    className={`flex-1 py-2 capitalize pixel-font ${character.gender === g ? 'glass-option-active text-sky-300' : 'glass-option text-gray-400'}`}
+                    style={{ fontSize: '9px' }}>
                     {g === 'male' ? 'Male' : 'Female'}
                   </button>
                 ))}
@@ -286,9 +270,7 @@ export default function Signup() {
                       updateChar('charClass', cls)
                       if (secondClass === cls) setSecondClass(CLASSES.find(c => c !== cls))
                     }}
-                      className={`py-3 px-2 border-2 transition-all flex flex-col items-center gap-2 ${
-                        selected ? 'border-sky-400 bg-sky-900/40' : 'border-gray-700 hover:border-gray-500 bg-black/20'
-                      }`}>
+                      className={`py-3 px-2 flex flex-col items-center gap-2 ${selected ? 'glass-option-active' : 'glass-option'}`}>
                       <PixelCharacter options={{ gender: character.gender, charClass: cls }} scale={0.4} />
                       <div className={`pixel-font ${selected ? 'text-sky-300' : 'text-gray-300'}`} style={{ fontSize: '7px' }}>{info.label}</div>
                     </button>
@@ -306,9 +288,7 @@ export default function Signup() {
                   const selected = secondClass === cls
                   return (
                     <button key={cls} onClick={() => setSecondClass(cls)}
-                      className={`py-2 px-1 border-2 transition-all flex flex-col items-center gap-1 ${
-                        selected ? 'border-yellow-400 bg-yellow-900/20' : 'border-gray-700 hover:border-gray-500 bg-black/20'
-                      }`}>
+                      className={`py-2 px-1 flex flex-col items-center gap-1 ${selected ? 'glass-option-gold' : 'glass-option'}`}>
                       <PixelCharacter options={{ gender: character.gender, charClass: cls }} scale={0.3} />
                       <div className={`pixel-font ${selected ? 'text-yellow-300' : 'text-gray-400'}`} style={{ fontSize: '6px' }}>{info.label}</div>
                     </button>

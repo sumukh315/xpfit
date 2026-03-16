@@ -102,7 +102,7 @@ export default function Profile() {
               <div className="flex gap-2">
                 {['male', 'female'].map(g => (
                   <button key={g} onClick={() => updateChar('gender', g)}
-                    className={`px-4 py-1 capitalize text-xs border-2 ${character.gender === g ? 'border-sky-400 bg-sky-900/40 text-white' : 'border-gray-700 text-gray-500'}`}>
+                    className={`px-4 py-1 capitalize text-xs ${character.gender === g ? 'glass-option-active text-sky-300' : 'glass-option text-gray-500'}`}>
                     {g === 'male' ? 'Male' : 'Female'}
                   </button>
                 ))}
@@ -120,9 +120,9 @@ export default function Profile() {
                     <button key={cls}
                       onClick={() => unlocked && updateChar('charClass', cls)}
                       disabled={!unlocked}
-                      className={`py-2 px-2 border-2 transition-all text-left relative ${
-                        !unlocked ? 'border-gray-800 bg-black/10 opacity-50 cursor-not-allowed' :
-                        selected ? 'border-sky-400 bg-sky-900/40' : 'border-gray-700 hover:border-gray-500 bg-black/20'
+                      className={`py-2 px-2 transition-all text-left relative ${
+                        !unlocked ? 'glass-option opacity-40 cursor-not-allowed' :
+                        selected ? 'glass-option-active' : 'glass-option'
                       }`}>
                       {!unlocked && (
                         <div className="absolute top-1 right-1 text-gray-600" style={{ fontSize: '9px' }}>🔒</div>
@@ -143,7 +143,7 @@ export default function Profile() {
               ['Gender', charOptions.gender],
               ['Class',  CLASS_INFO[charOptions.charClass]?.label || charOptions.charClass],
             ].map(([label, value]) => (
-              <div key={label} className="flex justify-between bg-black/30 p-2 border border-gray-800">
+              <div key={label} className="flex justify-between glass-row p-2">
                 <span className="text-gray-500 capitalize">{label}</span>
                 <span className="text-white capitalize">{value || '—'}</span>
               </div>
@@ -156,7 +156,7 @@ export default function Profile() {
       <div className="pixel-card p-4 mt-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="pixel-font text-sky-400" style={{ fontSize: '10px' }}>Discord Integration</h2>
-          <span className={`pixel-font text-xs px-2 py-1 border ${profile?.discord_webhook ? 'border-green-500 text-green-400 bg-green-900/20' : 'border-gray-700 text-gray-500'}`} style={{ fontSize: '8px' }}>
+          <span className={`pixel-font text-xs px-2 py-1 rounded-lg ${profile?.discord_webhook ? 'glass-option-active text-green-400' : 'glass-option text-gray-500'}`} style={{ fontSize: '8px' }}>
             {profile?.discord_webhook ? 'Connected' : 'Disconnected'}
           </span>
         </div>
@@ -165,7 +165,7 @@ export default function Profile() {
           Get notified in Discord every time you complete a workout. Paste your webhook URL below to connect.
         </p>
 
-        <div className="bg-black/30 border border-gray-800 p-3 mb-4 rounded">
+        <div className="glass-row p-3 mb-4 rounded">
           <p className="pixel-font text-gray-400 mb-1" style={{ fontSize: '7px' }}>HOW TO GET YOUR WEBHOOK URL</p>
           <p className="text-gray-500" style={{ fontSize: '11px' }}>
             Discord server → Channel Settings → Integrations → Webhooks → New Webhook → Copy URL
@@ -178,7 +178,7 @@ export default function Profile() {
             value={discordWebhook}
             onChange={e => setDiscordWebhook(e.target.value)}
             placeholder="https://discord.com/api/webhooks/..."
-            className="flex-1 bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none"
+            className="glass-input flex-1"
             style={{ fontSize: '12px' }}
           />
           <button

@@ -153,7 +153,7 @@ export default function Social() {
           ) : (
             <div className="flex flex-col gap-3">
               {friendWorkouts.map(w => (
-                <div key={w.id} className="bg-black/30 border border-gray-800 p-3">
+                <div key={w.id} className="glass-row p-3">
                   <div className="flex justify-between items-start">
                     <div>
                       <div className="text-white font-medium">{w.name}</div>
@@ -192,7 +192,7 @@ export default function Social() {
         <div className="flex gap-2 flex-col sm:flex-row">
           <input type="url" value={discordWebhook} onChange={e => setDiscordWebhook(e.target.value)}
             placeholder="https://discord.com/api/webhooks/..."
-            className="flex-1 bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none"
+            className="glass-input flex-1"
             style={{ fontSize: '12px' }} />
           <button onClick={saveDiscordWebhook} disabled={savingDiscord}
             className="pixel-btn bg-sky-800 border-sky-600 text-white px-4 py-2 disabled:opacity-50"
@@ -216,7 +216,7 @@ export default function Social() {
             {searchResults.map(u => {
               const charOpts = u.character || { gender: 'male', charClass: 'warrior' }
               return (
-                <div key={u.id} className="flex items-center justify-between p-2 bg-black/30 border border-gray-800">
+                <div key={u.id} className="flex items-center justify-between p-2 glass-row">
                   <div className="flex items-center gap-3">
                     <PixelCharacter options={charOpts} scale={0.35} />
                     <div>
@@ -237,7 +237,7 @@ export default function Social() {
             <h2 className="pixel-font text-yellow-400 mb-4" style={{ fontSize: '10px' }}>Requests ({requests.length})</h2>
             <div className="flex flex-col gap-2">
               {requests.map(u => (
-                <div key={u.id} className="flex items-center justify-between p-2 bg-black/30 border border-gray-800">
+                <div key={u.id} className="flex items-center justify-between p-2 glass-row">
                   <span className="text-white text-sm">{u.username}</span>
                   <button onClick={() => acceptRequest(u.id)} className="pixel-btn bg-green-800 border-green-600 text-white px-3 py-1" style={{ fontSize: '8px' }}>Accept</button>
                 </div>
@@ -271,7 +271,7 @@ export default function Social() {
               const { level } = getLevelFromXP(u.total_xp || 0)
               const charOpts = u.character || { gender: 'male', charClass: 'warrior' }
               return (
-                <div key={u.id} className="flex items-center justify-between p-3 bg-black/30 border border-gray-800">
+                <div key={u.id} className="flex items-center justify-between p-3 glass-row">
                   <div className="flex items-center gap-3">
                     <PixelCharacter options={charOpts} scale={0.35} />
                     <div>

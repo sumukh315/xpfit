@@ -52,12 +52,12 @@ export default function ResetPassword() {
             <div>
               <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>NEW PASSWORD</label>
               <input type="password" value={password} onChange={e => setPassword(e.target.value)} required
-                className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none" />
+                className="glass-input w-full" />
             </div>
             <div>
               <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>CONFIRM PASSWORD</label>
               <input type="password" value={confirm} onChange={e => setConfirm(e.target.value)} required
-                className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none" />
+                className="glass-input w-full" />
             </div>
             {error && <p className="text-red-400" style={{ fontSize: '12px' }}>{error}</p>}
             <button type="submit" disabled={loading}

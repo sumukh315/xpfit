@@ -178,7 +178,7 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete }) {
 
             {/* Time info */}
             {(workout.start_time || workout.duration_minutes) && (
-              <div className="flex gap-4 bg-black/30 border border-gray-800 p-3 text-xs text-gray-400">
+              <div className="flex gap-4 glass-row p-3 text-xs text-gray-400">
                 {workout.start_time && <span>Start: {formatTime(workout.start_time)}</span>}
                 {workout.end_time && <span>End: {formatTime(workout.end_time)}</span>}
                 {workout.duration_minutes && <span>Duration: {workout.duration_minutes} min</span>}
@@ -375,7 +375,7 @@ export default function WorkoutLogs() {
                       {w.exercises?.length > 0 && (
                         <div className="mt-2 flex flex-wrap gap-1">
                           {w.exercises.slice(0, 4).map((ex, i) => (
-                            <span key={i} className="text-gray-600 bg-black/30 border border-gray-800 px-2 py-0.5" style={{ fontSize: '10px' }}>
+                            <span key={i} className="text-gray-600 glass-row px-2 py-0.5" style={{ fontSize: '10px' }}>
                               {ex.name}
                             </span>
                           ))}

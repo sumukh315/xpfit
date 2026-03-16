@@ -42,7 +42,7 @@ export default function ForgotPassword() {
             <div>
               <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>EMAIL</label>
               <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
-                className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none" />
+                className="glass-input w-full" />
             </div>
             {error && <p className="text-red-400" style={{ fontSize: '12px' }}>{error}</p>}
             <button type="submit" disabled={loading}

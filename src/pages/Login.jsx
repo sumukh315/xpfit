@@ -38,7 +38,7 @@ export default function Login() {
               type="text"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none"
+              className="glass-input w-full"
               required
             />
           </div>
@@ -48,7 +48,7 @@ export default function Login() {
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
-              className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none"
+              className="glass-input w-full"
               required
             />
           </div>

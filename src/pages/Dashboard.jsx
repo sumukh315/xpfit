@@ -117,7 +117,7 @@ export default function Dashboard() {
           </h2>
           <div className="flex flex-col gap-3">
             {recommendations.map((rec, i) => (
-              <div key={i} className="flex gap-3 bg-black/30 border border-sky-900/40 p-3">
+              <div key={i} className="flex gap-3 glass-row p-3">
                 <div className="text-sky-400 pixel-font mt-0.5" style={{ fontSize: '12px', minWidth: '16px' }}>{i + 1}</div>
                 <div>
                   <div className="pixel-font text-white mb-1" style={{ fontSize: '9px' }}>{rec.title}</div>
@@ -144,7 +144,7 @@ export default function Dashboard() {
         ) : (
           <div className="flex flex-col gap-3">
             {recentWorkouts.map(w => (
-              <div key={w.id} className="flex items-center justify-between p-3 bg-black/30 border border-gray-800">
+              <div key={w.id} className="flex items-center justify-between p-3 glass-row">
                 <Link to="/logs" className="flex-1 min-w-0 no-underline hover:opacity-80 transition-opacity">
                   <div className="text-white font-medium">{w.name}</div>
                   <div className="text-gray-500 text-xs">

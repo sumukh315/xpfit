@@ -264,7 +264,7 @@ export default function WorkoutImport() {
               value={pasteText}
               onChange={e => { setPasteText(e.target.value); setTextParsed(null) }}
               rows={10}
-              className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none font-mono resize-y"
+              className="glass-input w-full font-mono resize-y"
               style={{ fontSize: '12px' }}
               placeholder={`March 10, 2024\nPush Day\nBench Press 3x10 135lbs\nOverhead Press 3x8 95lbs\n\nMarch 12, 2024\nLeg Day\nSquat 4x8 185lbs\nLeg Press 3x12 270lbs`}
             />
@@ -288,7 +288,7 @@ export default function WorkoutImport() {
 
           <div className="flex flex-col gap-3 mb-5 max-h-80 overflow-y-auto">
             {parsedWorkouts.map((w, i) => (
-              <div key={i} className="bg-black/30 border border-gray-800 p-3">
+              <div key={i} className="glass-row p-3">
                 <div className="flex justify-between items-start mb-1">
                   <span className="text-white font-medium" style={{ fontSize: '13px' }}>{w.name}</span>
                   <span className="text-gray-500 text-xs">{new Date(w.created_at).toLocaleDateString()}</span>

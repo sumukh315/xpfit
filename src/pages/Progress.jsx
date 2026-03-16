@@ -224,7 +224,7 @@ export default function Progress() {
             <h2 className="pixel-font text-sky-400 mb-4" style={{ fontSize: '10px' }}>Personal Records</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {Object.entries(prs).slice(0, 9).map(([name, weight]) => (
-                <div key={name} className="bg-black/30 border border-gray-800 p-3">
+                <div key={name} className="glass-row p-3">
                   <div className="text-gray-400 text-xs mb-1 truncate">{name}</div>
                   <div className="pixel-font text-yellow-400" style={{ fontSize: '12px' }}>PR: {weight} lbs</div>
                 </div>

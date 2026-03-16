@@ -601,9 +601,7 @@ export default function WorkoutLogger() {
                   const selected = pickedUnlockClass === cls
                   return (
                     <button key={cls} onClick={() => setPickedUnlockClass(cls)}
-                      className={`py-3 px-2 border-2 transition-all flex flex-col items-center gap-2 ${
-                        selected ? 'border-yellow-400 bg-yellow-900/30' : 'border-gray-700 hover:border-gray-500 bg-black/20'
-                      }`}>
+                      className={`py-3 px-2 flex flex-col items-center gap-2 ${selected ? 'glass-option-gold' : 'glass-option'}`}>
                       <PixelCharacter options={{ gender: profile?.character?.gender || 'male', charClass: cls }} scale={0.4} />
                       <div className={`pixel-font ${selected ? 'text-yellow-300' : 'text-gray-400'}`} style={{ fontSize: '7px' }}>{info.label}</div>
                     </button>
@@ -699,7 +697,7 @@ export default function WorkoutLogger() {
 
       {/* Exercise cards */}
       {exercises.length === 0 ? (
-        <div className="text-center py-10 border-2 border-dashed border-gray-800 mb-5">
+        <div className="text-center py-10 mb-5 glass-row">
 
           <p className="text-gray-500 mb-4">No exercises yet</p>
           <div className="flex gap-3 justify-center flex-wrap">
@@ -800,7 +798,7 @@ export default function WorkoutLogger() {
                     type="datetime-local"
                     value={importedStartStr}
                     onChange={e => setImportedStartStr(e.target.value)}
-                    className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none"
+                    className="glass-input w-full"
                     style={{ fontSize: '13px' }}
                   />
                 </div>
@@ -810,7 +808,7 @@ export default function WorkoutLogger() {
                     type="datetime-local"
                     value={importedEndStr}
                     onChange={e => setImportedEndStr(e.target.value)}
-                    className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none"
+                    className="glass-input w-full"
                     style={{ fontSize: '13px' }}
                   />
                 </div>
@@ -827,14 +825,14 @@ export default function WorkoutLogger() {
                     type="time"
                     value={endTime}
                     onChange={e => setEndTime(e.target.value)}
-                    className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none text-lg"
+                    className="glass-input w-full text-lg"
                   />
                 </div>
               </>
             )}
             <div className="flex gap-3">
               <button onClick={() => setShowFinish(false)}
-                className="flex-1 py-3 border border-gray-700 text-gray-400 hover:text-white transition-all" style={{ fontSize: '11px' }}>
+                className="flex-1 py-3 glass-option text-gray-400 hover:text-white transition-all" style={{ fontSize: '11px' }}>
                 Cancel
               </button>
               <button onClick={handleSave} disabled={saving}
