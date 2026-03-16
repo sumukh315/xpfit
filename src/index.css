@@ -88,47 +88,67 @@ body {
 
 /* Top-left — teal/cyan */
 .bg-orb-1 {
-  width: 900px; height: 900px;
-  top: -350px; left: -250px;
-  background: radial-gradient(circle at center, rgba(14,116,144,0.6) 0%, rgba(2,62,138,0.28) 45%, transparent 70%);
-  filter: blur(72px);
+  width: 700px; height: 700px;
+  top: -200px; left: -150px;
+  background: radial-gradient(circle at 40% 40%,
+    rgba(34,211,238,0.9) 0%,
+    rgba(14,116,144,0.55) 30%,
+    rgba(2,62,138,0.2) 55%,
+    transparent 70%);
+  filter: blur(48px);
   animation: orb-drift-1 22s ease-in-out infinite;
 }
 
 /* Bottom-right — cherry red */
 .bg-orb-2 {
-  width: 700px; height: 700px;
-  bottom: -200px; right: -150px;
-  background: radial-gradient(circle at center, rgba(230,57,70,0.45) 0%, rgba(180,30,45,0.18) 50%, transparent 70%);
-  filter: blur(80px);
+  width: 600px; height: 600px;
+  bottom: -150px; right: -100px;
+  background: radial-gradient(circle at 55% 55%,
+    rgba(251,113,133,0.85) 0%,
+    rgba(230,57,70,0.5) 28%,
+    rgba(180,30,45,0.18) 55%,
+    transparent 70%);
+  filter: blur(50px);
   animation: orb-drift-2 28s ease-in-out infinite;
 }
 
-/* Center — deep blue */
+/* Center — blue */
 .bg-orb-3 {
-  width: 600px; height: 600px;
+  width: 500px; height: 500px;
   top: 45%; left: 50%;
   transform: translate(-50%, -50%);
-  background: radial-gradient(circle at center, rgba(56,130,246,0.35) 0%, rgba(2,62,138,0.14) 55%, transparent 70%);
-  filter: blur(65px);
+  background: radial-gradient(circle at center,
+    rgba(99,179,255,0.7) 0%,
+    rgba(56,130,246,0.35) 35%,
+    rgba(2,62,138,0.12) 60%,
+    transparent 75%);
+  filter: blur(55px);
   animation: orb-drift-3 18s ease-in-out infinite;
 }
 
 /* Top-right — kiwi green */
 .bg-orb-4 {
-  width: 550px; height: 550px;
-  top: -80px; right: -100px;
-  background: radial-gradient(circle at center, rgba(106,176,76,0.42) 0%, rgba(80,140,50,0.14) 55%, transparent 70%);
-  filter: blur(75px);
+  width: 500px; height: 500px;
+  top: -60px; right: -60px;
+  background: radial-gradient(circle at 55% 40%,
+    rgba(163,230,53,0.8) 0%,
+    rgba(106,176,76,0.45) 30%,
+    rgba(80,140,50,0.15) 55%,
+    transparent 70%);
+  filter: blur(48px);
   animation: orb-drift-4 32s ease-in-out infinite;
 }
 
-/* Bottom-left — indigo accent */
+/* Bottom-left — violet */
 .bg-orb-5 {
-  width: 480px; height: 480px;
-  bottom: 10%; left: -80px;
-  background: radial-gradient(circle at center, rgba(139,92,246,0.38) 0%, rgba(99,102,241,0.14) 55%, transparent 70%);
-  filter: blur(70px);
+  width: 440px; height: 440px;
+  bottom: 8%; left: -60px;
+  background: radial-gradient(circle at 40% 55%,
+    rgba(192,132,252,0.75) 0%,
+    rgba(139,92,246,0.4) 32%,
+    rgba(99,102,241,0.12) 58%,
+    transparent 72%);
+  filter: blur(50px);
   animation: orb-drift-5 25s ease-in-out infinite;
 }
 
