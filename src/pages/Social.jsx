@@ -23,6 +23,7 @@ export default function Social() {
   const { profile, refreshProfile } = useAuth()
   const [friends, setFriends] = useState([])
   const [requests, setRequests] = useState([])
+  const [suggested, setSuggested] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState([])
   const [selectedFriend, setSelectedFriend] = useState(null)
@@ -38,6 +39,7 @@ export default function Social() {
     if (profile) {
       fetchFriends()
       fetchRequests()
+      fetchSuggested()
       setDiscordWebhook(profile.discord_webhook || '')
     }
   }, [profile])
@@ -62,6 +64,10 @@ export default function Social() {
     try { setRequests(await api.getFriendRequests()) } catch (e) { console.error(e) }
   }
 
+  async function fetchSuggested() {
+    try { setSuggested(await api.getSuggestedFriends()) } catch (e) { console.error(e) }
+  }
+
   async function searchUsers() {
     if (!searchQuery.trim()) return
     try { setSearchResults(await api.searchUsers(searchQuery)) } catch (e) { console.error(e) }
@@ -71,6 +77,7 @@ export default function Social() {
     try {
       await api.sendFriendRequest(id)
       setSearchResults(prev => prev.filter(u => u.id !== id))
+      setSuggested(prev => prev.filter(u => u.id !== id))
     } catch (e) { console.error(e) }
   }
 
@@ -232,6 +239,35 @@ export default function Social() {
           </div>
         )}
       </div>
+
+      {/* People You May Know */}
+      {suggested.length > 0 && (
+        <div className="pixel-card p-4 mb-6">
+          <h2 className="pixel-font text-yellow-400 mb-4" style={{ fontSize: '10px' }}>People You May Know</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {suggested.map(u => {
+              const { level } = getLevelFromXP(u.total_xp || 0)
+              const charOpts = u.character || { gender: 'male', charClass: 'warrior' }
+              return (
+                <div key={u.id} className="flex items-center justify-between p-3 bg-black/30 border border-gray-800">
+                  <div className="flex items-center gap-3">
+                    <PixelCharacter options={charOpts} scale={0.35} />
+                    <div>
+                      <div className="text-white text-sm">{u.username}</div>
+                      <div className="pixel-font text-sky-400" style={{ fontSize: '8px' }}>Level {level}</div>
+                      <div className="text-gray-600" style={{ fontSize: '10px' }}>Friend of a friend</div>
+                    </div>
+                  </div>
+                  <button onClick={() => sendRequest(u.id)}
+                    className="pixel-btn bg-green-800 border-green-600 text-white px-3 py-1 flex-shrink-0" style={{ fontSize: '8px' }}>
+                    + Add
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Party / Friends */}
       <div className="pixel-card p-4">

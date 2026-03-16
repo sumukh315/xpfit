@@ -44,6 +44,27 @@ router.post('/request/:friendId', (req, res) => {
   }
 })
 
+router.get('/suggested', (req, res) => {
+  // Friends of friends that the user isn't already friends with
+  const suggested = db.prepare(`
+    SELECT DISTINCT u.id, u.username, u.total_xp, u.character, u.equipped
+    FROM friendships f1
+    JOIN friendships f2 ON f2.user_id = f1.friend_id AND f2.status = 'accepted'
+    JOIN users u ON u.id = f2.friend_id
+    WHERE f1.user_id = ? AND f1.status = 'accepted'
+      AND f2.friend_id != ?
+      AND f2.friend_id NOT IN (
+        SELECT friend_id FROM friendships WHERE user_id = ?
+      )
+    LIMIT 20
+  `).all(req.user.id, req.user.id, req.user.id)
+  res.json(suggested.map(u => ({
+    ...u,
+    character: JSON.parse(u.character || '{}'),
+    equipped: JSON.parse(u.equipped || '{}'),
+  })))
+})
+
 router.post('/accept/:userId', (req, res) => {
   db.prepare(`
     UPDATE friendships SET status = 'accepted' WHERE user_id = ? AND friend_id = ?
