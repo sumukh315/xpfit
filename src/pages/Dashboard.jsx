@@ -8,7 +8,7 @@ import XPBar from '../components/XPBar'
 import PixelCharacter from '../components/PixelCharacter'
 
 export default function Dashboard() {
-  const { profile } = useAuth()
+  const { profile, refreshProfile } = useAuth()
   const [recentWorkouts, setRecentWorkouts] = useState([])
   const [weekStats, setWeekStats] = useState({ workouts: 0, sets: 0 })
   const [streak, setStreak] = useState(0)
@@ -160,6 +160,7 @@ export default function Dashboard() {
                     if (!confirm('Delete this workout?')) return
                     await api.deleteWorkout(w.id)
                     fetchRecentWorkouts()
+                    refreshProfile()
                   }} className="text-gray-700 hover:text-red-400 transition-colors text-sm">✕</button>
                 </div>
               </div>

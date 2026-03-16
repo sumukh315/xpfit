@@ -290,7 +290,7 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete }) {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function WorkoutLogs() {
-  const { profile } = useAuth()
+  const { profile, refreshProfile } = useAuth()
   const [workouts, setWorkouts] = useState([])
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState(null)
@@ -308,8 +308,9 @@ export default function WorkoutLogs() {
     }
   }
 
-  function handleDelete(id) {
+  async function handleDelete(id) {
     setWorkouts(prev => prev.filter(w => w.id !== id))
+    await refreshProfile()
   }
 
   // Group by month
