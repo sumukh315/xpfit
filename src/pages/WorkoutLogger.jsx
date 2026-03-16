@@ -87,27 +87,32 @@ const MUSCLE_GROUPS = [
 ]
 
 // ─── Workout Text Parser ──────────────────────────────────────────────────────
+const DATE_LINE_RE = /^((?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+\d{1,2},?\s+\d{4}|\d{4}-\d{2}-\d{2}|\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/i
+
 function parseWorkoutText(text) {
   const lines = text.split('\n').map(l => l.trim()).filter(Boolean)
   const exercises = []
   let current = null
+  let detectedDate = null
 
-  // Matches a set: optional bullet, weight with optional unit attached or separate, x/×, reps, optional trailing note
-  // Handles: "290lb x 5", "• 135 lbs × 10", "100 x 20 Then hold", "135x10"
   const setOnlyRe = /^[•\-\*]?\s*(\d+(?:\.\d+)?)\s*(?:lbs?|kg)?\s*[x×]\s*(\d+)(.*)$/i
-  // Matches "ExerciseName 100 x 20" — name then set inline
   const inlineRe = /^(.+?)\s{1,}(\d+(?:\.\d+)?)\s*(?:lbs?|kg)?\s*[x×]\s*(\d+)(.*)?$/i
-  // Lines to skip: dates, app attribution lines
-  const skipRe = /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|\d{1,2}[\/\-]\d{1,2}|\d{4}[-\/]\d{2}|workout\s*#?\d*|date:|notes?:|day\s*\d|logged\s+using|logged\s+with)/i
+  const skipRe = /^(workout\s*#?\d*|date:|notes?:|day\s*\d|logged\s+using|logged\s+with)/i
 
   for (const line of lines) {
+    // Try to detect a date line first
+    const dateMatch = line.match(DATE_LINE_RE)
+    if (dateMatch) {
+      const d = new Date(dateMatch[0])
+      if (!isNaN(d.getTime())) detectedDate = d
+      continue
+    }
+
     if (skipRe.test(line)) continue
 
     const setMatch = line.match(setOnlyRe)
     if (setMatch) {
       const trailingNote = setMatch[3]?.trim() || ''
-      // Only treat as a pure set line if there's no long text before the numbers
-      // i.e. the whole line starts with a number (possibly with bullet)
       const startsWithNumber = /^[•\-\*]?\s*\d/.test(line)
       if (startsWithNumber && current) {
         current.sets.push({ weight: setMatch[1], reps: setMatch[2], note: trailingNote || undefined })
@@ -120,7 +125,6 @@ function parseWorkoutText(text) {
       const name = inlineMatch[1].replace(/^[•\-\*]\s*/, '').trim()
       const trailingNote = inlineMatch[4]?.trim() || ''
       if (/^\d+$/.test(name)) {
-        // Name part is just a number — treat whole line as set
         if (current) current.sets.push({ weight: name, reps: inlineMatch[3], note: trailingNote || undefined })
       } else {
         current = { name: titleCase(name), sets: [{ weight: inlineMatch[2], reps: inlineMatch[3], note: trailingNote || undefined }] }
@@ -129,7 +133,6 @@ function parseWorkoutText(text) {
       continue
     }
 
-    // Plain text → exercise name
     const cleanName = line.replace(/^[•\-\*]\s*/, '').trim()
     if (cleanName && !/^\d+$/.test(cleanName)) {
       current = { name: titleCase(cleanName), sets: [] }
@@ -137,21 +140,28 @@ function parseWorkoutText(text) {
     }
   }
 
-  return exercises.filter(e => e.sets.length > 0)
+  return { exercises: exercises.filter(e => e.sets.length > 0), detectedDate }
 }
 
 function titleCase(str) {
   return str.replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
 }
 
+function toDatetimeLocal(date) {
+  const pad = n => String(n).padStart(2, '0')
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
+}
+
 // ─── Paste Import Modal ───────────────────────────────────────────────────────
 function PasteImportModal({ onImport, onClose }) {
   const [text, setText] = useState('')
   const [preview, setPreview] = useState(null)
+  const [workoutDate, setWorkoutDate] = useState(toDatetimeLocal(new Date()))
 
   function handleParse() {
-    const parsed = parseWorkoutText(text)
-    setPreview(parsed)
+    const { exercises, detectedDate } = parseWorkoutText(text)
+    if (detectedDate) setWorkoutDate(toDatetimeLocal(detectedDate))
+    setPreview(exercises)
   }
 
   return (
@@ -167,17 +177,11 @@ function PasteImportModal({ onImport, onClose }) {
         {!preview ? (
           <div className="p-4 flex flex-col gap-3 flex-1">
             <p className="text-gray-400" style={{ fontSize: '12px' }}>
-              Paste your workout from Rep Count, Notes, or any format. Supports:
+              Paste your workout from Rep Count, Notes, or any format.
             </p>
-            <ul className="text-gray-500 pl-4" style={{ fontSize: '11px', lineHeight: '1.8' }}>
-              <li>• Rep Count exports (• 135 lbs × 10)</li>
-              <li>• Inline: <em>Bench Press 135 x 10</em></li>
-              <li>• Name then sets below: <em>Squat</em> / <em>225 x 5</em></li>
-              <li>• Mixed formats in one paste</li>
-            </ul>
             <textarea
               autoFocus
-              placeholder={"Bench Press\n• 135 lbs × 10\n• 155 lbs × 8\n\nSquat 225 x 5\n245 x 3"}
+              placeholder={"Feb 23, 2026\n\nBench Press\n135lb x 10\n155lb x 8\n\nSquat\n225lb x 5"}
               value={text}
               onChange={e => setText(e.target.value)}
               rows={10}
@@ -201,6 +205,18 @@ function PasteImportModal({ onImport, onClose }) {
                 </p>
               ) : (
                 <>
+                  {/* Editable workout date */}
+                  <div className="mb-4 bg-black/40 border border-gray-700 p-3">
+                    <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '7px' }}>WORKOUT DATE & TIME</div>
+                    <input
+                      type="datetime-local"
+                      value={workoutDate}
+                      onChange={e => setWorkoutDate(e.target.value)}
+                      className="w-full bg-transparent text-white focus:outline-none"
+                      style={{ fontSize: '13px' }}
+                    />
+                  </div>
+
                   <p className="pixel-font text-green-400 mb-3" style={{ fontSize: '8px' }}>
                     FOUND {preview.length} EXERCISE{preview.length !== 1 ? 'S' : ''}
                   </p>
@@ -210,7 +226,7 @@ function PasteImportModal({ onImport, onClose }) {
                       <div className="flex flex-wrap gap-2">
                         {ex.sets.map((s, j) => (
                           <span key={j} className="text-sky-300 text-xs border border-sky-900 px-2 py-0.5">
-                            {s.weight}lbs × {s.reps}
+                            {s.weight}lbs × {s.reps}{s.note ? ` (${s.note})` : ''}
                           </span>
                         ))}
                       </div>
@@ -224,7 +240,7 @@ function PasteImportModal({ onImport, onClose }) {
                 className="flex-1 py-2 border border-gray-700 text-gray-400 hover:text-white transition-all" style={{ fontSize: '11px' }}>
                 ← Edit
               </button>
-              <button onClick={() => { onImport(preview); onClose() }}
+              <button onClick={() => { onImport(preview, workoutDate ? new Date(workoutDate) : null); onClose() }}
                 disabled={preview.length === 0}
                 className="flex-1 pixel-btn bg-green-700 border-green-500 text-white py-2 disabled:opacity-40" style={{ fontSize: '10px' }}>
                 Add to Workout
@@ -400,6 +416,7 @@ export default function WorkoutLogger() {
     const pad = n => String(n).padStart(2, '0')
     return `${pad(now.getHours())}:${pad(now.getMinutes())}`
   })
+  const [importedDate, setImportedDate] = useState(null)
 
   useEffect(() => { fetchPreviousData() }, [])
 
@@ -433,8 +450,9 @@ export default function WorkoutLogger() {
     setExercises(prev => [...prev, { name, sets: [{ weight: '', reps: '' }] }])
   }
 
-  function importExercises(parsed) {
+  function importExercises(parsed, date) {
     setExercises(prev => [...prev, ...parsed])
+    if (date) setImportedDate(date)
   }
 
   const totalSets = exercises.reduce((acc, e) => acc + (e.sets?.length || 0), 0)
@@ -468,14 +486,15 @@ export default function WorkoutLogger() {
     setSaving(true)
     setShowFinish(false)
     const oldLevel = getLevelFromXP(profile?.total_xp || 0).level
+    const effectiveStart = importedDate || startTime
     try {
       await api.createWorkout({
         name: workoutName, exercises, notes,
         xp_earned: xpPreview, points_earned: pointsPreview,
         photo: photoFile,
-        start_time: startTime.toISOString(),
-        end_time: end.toISOString(),
-        duration_minutes: Math.round((end - startTime) / 60000),
+        start_time: effectiveStart.toISOString(),
+        end_time: importedDate ? effectiveStart.toISOString() : end.toISOString(),
+        duration_minutes: importedDate ? null : Math.round((end - startTime) / 60000),
       })
       await refreshProfile()
       const newLevel = getLevelFromXP((profile?.total_xp || 0) + xpPreview).level
@@ -591,8 +610,14 @@ export default function WorkoutLogger() {
       <div className="flex justify-between items-center mb-4">
         <h1 className="pixel-font text-sky-400" style={{ fontSize: '14px' }}>Log Workout</h1>
         <div className="text-right">
-          <div className="pixel-font text-gray-500 mb-0.5" style={{ fontSize: '7px' }}>STARTED</div>
-          <div className="text-white" style={{ fontSize: '12px' }}>{startTimeStr}</div>
+          <div className="pixel-font text-gray-500 mb-0.5" style={{ fontSize: '7px' }}>
+            {importedDate ? 'WORKOUT DATE' : 'STARTED'}
+          </div>
+          <div className={importedDate ? 'text-yellow-400' : 'text-white'} style={{ fontSize: '12px' }}>
+            {importedDate
+              ? importedDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+              : startTimeStr}
+          </div>
         </div>
       </div>
 
