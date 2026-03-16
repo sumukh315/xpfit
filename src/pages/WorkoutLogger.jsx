@@ -375,16 +375,6 @@ function ExerciseCard({ exercise, index, onChange, onRemove, recommendation }) {
   )
 }
 
-// ─── Timer Display ────────────────────────────────────────────────────────────
-function formatDuration(ms) {
-  const totalSec = Math.floor(ms / 1000)
-  const h = Math.floor(totalSec / 3600)
-  const m = Math.floor((totalSec % 3600) / 60)
-  const s = totalSec % 60
-  if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
-  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
-}
-
 // ─── Main Logger ──────────────────────────────────────────────────────────────
 export default function WorkoutLogger() {
   const { profile, refreshProfile } = useAuth()
@@ -397,18 +387,18 @@ export default function WorkoutLogger() {
   const [saving, setSaving] = useState(false)
   const [showPicker, setShowPicker] = useState(false)
   const [showPaste, setShowPaste] = useState(false)
+  const [showFinish, setShowFinish] = useState(false)
   const [recommendations, setRecommendations] = useState({})
   const [previousWorkouts, setPreviousWorkouts] = useState({})
   const [savedWorkout, setSavedWorkout] = useState(null)
   const [copied, setCopied] = useState(false)
 
-  // Timer
   const [startTime] = useState(() => new Date())
-  const [elapsed, setElapsed] = useState(0)
-  useEffect(() => {
-    const id = setInterval(() => setElapsed(Date.now() - startTime.getTime()), 1000)
-    return () => clearInterval(id)
-  }, [startTime])
+  const [endTime, setEndTime] = useState(() => {
+    const now = new Date()
+    const pad = n => String(n).padStart(2, '0')
+    return `${pad(now.getHours())}:${pad(now.getMinutes())}`
+  })
 
   useEffect(() => { fetchPreviousData() }, [])
 
@@ -466,23 +456,31 @@ export default function WorkoutLogger() {
 
   async function handleSave() {
     if (!workoutName.trim()) return alert('Give your workout a name!')
-    const endTime = new Date()
+
+    // Parse the confirmed end time
+    const [hours, mins] = endTime.split(':').map(Number)
+    const end = new Date()
+    end.setHours(hours, mins, 0, 0)
+    // If end is before start (e.g. crossed midnight), add a day
+    if (end < startTime) end.setDate(end.getDate() + 1)
+
     setSaving(true)
+    setShowFinish(false)
     try {
       await api.createWorkout({
         name: workoutName, exercises, notes,
         xp_earned: xpPreview, points_earned: pointsPreview,
         photo: photoFile,
         start_time: startTime.toISOString(),
-        end_time: endTime.toISOString(),
-        duration_minutes: Math.round((endTime - startTime) / 60000),
+        end_time: end.toISOString(),
+        duration_minutes: Math.round((end - startTime) / 60000),
       })
       await refreshProfile()
       setSavedWorkout({
         name: workoutName,
         exercises,
         xp: xpPreview,
-        duration: Math.round((endTime - startTime) / 60000),
+        duration: Math.round((end - startTime) / 60000),
       })
     } catch (e) {
       console.error(e)
@@ -525,8 +523,6 @@ export default function WorkoutLogger() {
 
   const startTimeStr = startTime.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) +
     ' ' + startTime.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toLowerCase()
-  const currentTimeStr = new Date(startTime.getTime() + elapsed).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) +
-    ' ' + new Date(startTime.getTime() + elapsed).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toLowerCase()
 
   if (savedWorkout) {
     return (
@@ -565,24 +561,12 @@ export default function WorkoutLogger() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 pb-32">
 
-      {/* Header with timer */}
+      {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <h1 className="pixel-font text-sky-400" style={{ fontSize: '14px' }}>Log Workout</h1>
-        <div className="text-center">
-          <div className="pixel-font text-white tabular-nums" style={{ fontSize: '22px' }}>{formatDuration(elapsed)}</div>
-          <div className="text-gray-600" style={{ fontSize: '10px' }}>elapsed</div>
-        </div>
-      </div>
-
-      {/* Time info */}
-      <div className="pixel-card p-3 mb-5 flex flex-col sm:flex-row gap-3">
-        <div className="flex-1">
-          <div className="pixel-font text-gray-500 mb-1" style={{ fontSize: '7px' }}>START TIME</div>
+        <div className="text-right">
+          <div className="pixel-font text-gray-500 mb-0.5" style={{ fontSize: '7px' }}>STARTED</div>
           <div className="text-white" style={{ fontSize: '12px' }}>{startTimeStr}</div>
-        </div>
-        <div className="flex-1">
-          <div className="pixel-font text-gray-500 mb-1" style={{ fontSize: '7px' }}>END TIME</div>
-          <div className="text-gray-400" style={{ fontSize: '12px' }}>{currentTimeStr}</div>
         </div>
       </div>
 
@@ -656,7 +640,14 @@ export default function WorkoutLogger() {
               <span className="text-gray-600" style={{ fontSize: '11px' }}>{exercises.length} exercises · {totalSets} sets</span>
             </div>
           </div>
-          <button onClick={handleSave} disabled={saving || exercises.length === 0}
+          <button onClick={() => {
+            if (!workoutName.trim()) return alert('Give your workout a name!')
+            if (exercises.length === 0) return
+            const now = new Date()
+            const pad = n => String(n).padStart(2, '0')
+            setEndTime(`${pad(now.getHours())}:${pad(now.getMinutes())}`)
+            setShowFinish(true)
+          }} disabled={saving || exercises.length === 0}
             className="pixel-btn bg-green-700 border-green-500 text-white px-6 py-3 flex-shrink-0 disabled:opacity-40" style={{ fontSize: '10px' }}>
             {saving ? 'Saving...' : '✓ Finish'}
           </button>
@@ -671,6 +662,39 @@ export default function WorkoutLogger() {
       {/* Paste import modal */}
       {showPaste && (
         <PasteImportModal onImport={importExercises} onClose={() => setShowPaste(false)} />
+      )}
+
+      {/* Finish confirmation modal */}
+      {showFinish && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.85)' }}>
+          <div className="pixel-card w-full max-w-sm p-6" style={{ background: '#0d0d1f' }}>
+            <h2 className="pixel-font text-sky-400 mb-5 text-center" style={{ fontSize: '12px' }}>CONFIRM END TIME</h2>
+            <div className="mb-2">
+              <div className="pixel-font text-gray-500 mb-1" style={{ fontSize: '7px' }}>START</div>
+              <div className="text-gray-300" style={{ fontSize: '13px' }}>{startTimeStr}</div>
+            </div>
+            <div className="mb-5">
+              <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '7px' }}>END</div>
+              <input
+                type="time"
+                value={endTime}
+                onChange={e => setEndTime(e.target.value)}
+                className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none text-lg"
+              />
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => setShowFinish(false)}
+                className="flex-1 py-3 border border-gray-700 text-gray-400 hover:text-white transition-all" style={{ fontSize: '11px' }}>
+                Cancel
+              </button>
+              <button onClick={handleSave} disabled={saving}
+                className="flex-1 pixel-btn bg-green-700 border-green-500 text-white py-3 disabled:opacity-40" style={{ fontSize: '10px' }}>
+                {saving ? 'Saving...' : 'Save Workout'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
