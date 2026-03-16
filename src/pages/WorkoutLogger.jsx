@@ -163,7 +163,10 @@ function SetRow({ set, index, onChange, onRemove }) {
       <input type="number" placeholder="reps" value={set.reps || ''}
         onChange={e => onChange({ ...set, reps: e.target.value })}
         className="w-16 bg-black/40 border border-gray-700 text-white px-2 py-1.5 text-sm text-center focus:border-sky-500 outline-none" />
-      <button onClick={onRemove} className="text-gray-700 hover:text-red-400 text-sm px-1 ml-auto">✕</button>
+      <input type="text" placeholder="note..." value={set.note || ''}
+        onChange={e => onChange({ ...set, note: e.target.value })}
+        className="flex-1 bg-black/40 border border-gray-700 text-white px-2 py-1.5 text-sm focus:border-sky-500 outline-none" />
+      <button onClick={onRemove} className="text-gray-700 hover:text-red-400 text-sm px-1 flex-shrink-0">✕</button>
     </div>
   )
 }
@@ -207,6 +210,7 @@ function ExerciseCard({ exercise, index, onChange, onRemove, recommendation }) {
       <div className="flex gap-2 text-xs text-gray-600 mb-2 ml-8">
         <span className="w-20 text-center">Weight</span>
         <span className="w-16 text-center">Reps</span>
+        <span className="flex-1">Note</span>
       </div>
       <div className="flex flex-col gap-2 mb-3">
         {(exercise.sets || []).map((set, i) => (
