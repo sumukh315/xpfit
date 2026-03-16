@@ -4,7 +4,7 @@ export const XP_PER_WORKOUT = 50
 export const POINTS_PER_WORKOUT = 25
 
 export function xpForLevel(level) {
-  return Math.floor(100 * Math.pow(1.5, level - 1))
+  return Math.floor(100 * Math.pow(1.3, level - 1))
 }
 
 export function getLevelFromXP(totalXP) {

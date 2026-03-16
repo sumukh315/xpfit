@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { api } from '../lib/api'
 import { calcWorkoutXP, calcWorkoutPoints, getRecommendation, getLevelFromXP, getLevelTitle } from '../lib/xpSystem'
+import { CLASS_INFO, CLASSES } from '../lib/pixelCharacter'
 
 // ─── Exercise Library ─────────────────────────────────────────────────────────
 const MUSCLE_GROUPS = [
@@ -557,9 +558,22 @@ export default function WorkoutLogger() {
           <div className="pixel-font text-yellow-400 mb-2" style={{ fontSize: '11px', letterSpacing: '3px' }}>LEVEL UP!</div>
           <div className="fantasy-font text-white mb-1" style={{ fontSize: '48px' }}>{levelUp.newLevel}</div>
           <div className="pixel-font text-sky-400 mb-6" style={{ fontSize: '14px' }}>{levelUp.title}</div>
-          <div className="text-gray-400 mb-8" style={{ fontSize: '13px' }}>
-            You reached Level {levelUp.newLevel}.<br />Keep pushing!
-          </div>
+          {(() => {
+            const newlyUnlocked = CLASSES.filter(cls => CLASS_INFO[cls].unlockLevel === levelUp.newLevel)
+            return newlyUnlocked.length > 0 ? (
+              <div className="bg-yellow-900/30 border border-yellow-600 px-4 py-3 mb-6">
+                <div className="pixel-font text-yellow-400 mb-1" style={{ fontSize: '8px' }}>NEW CLASS UNLOCKED!</div>
+                <div className="text-white" style={{ fontSize: '13px' }}>
+                  {newlyUnlocked.map(cls => CLASS_INFO[cls].label).join(', ')}
+                </div>
+                <div className="text-gray-400 text-xs mt-1">Change your character in Profile</div>
+              </div>
+            ) : (
+              <div className="text-gray-400 mb-8" style={{ fontSize: '13px' }}>
+                You reached Level {levelUp.newLevel}. Keep pushing!
+              </div>
+            )
+          })()}
           <button onClick={() => setLevelUp(null)}
             className="pixel-btn bg-yellow-700 border-yellow-500 text-white px-10 py-4 w-full" style={{ fontSize: '11px' }}>
             Continue →

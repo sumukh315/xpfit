@@ -4,6 +4,8 @@ import { useAuth } from '../contexts/AuthContext'
 import PixelCharacter from '../components/PixelCharacter'
 import { CLASSES, CLASS_INFO } from '../lib/pixelCharacter'
 
+const SIGNUP_CLASSES = CLASSES.filter(cls => CLASS_INFO[cls].unlockLevel === 1)
+
 const STEPS = ['Account', 'Fitness Goals', 'Hero']
 
 const FITNESS_GOALS = [
@@ -272,24 +274,29 @@ export default function Signup() {
             {/* Class grid */}
             <div className="mb-6">
               <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>CLASS</label>
-              <div className="grid grid-cols-3 gap-2">
-                {CLASSES.map(cls => {
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                {SIGNUP_CLASSES.map(cls => {
                   const info = CLASS_INFO[cls]
                   const selected = character.charClass === cls
                   return (
                     <button key={cls} onClick={() => updateChar('charClass', cls)}
                       className={`py-3 px-2 border-2 transition-all flex flex-col items-center gap-2 ${
-                        selected
-                          ? 'border-sky-400 bg-sky-900/40'
-                          : 'border-gray-700 hover:border-gray-500 bg-black/20'
+                        selected ? 'border-sky-400 bg-sky-900/40' : 'border-gray-700 hover:border-gray-500 bg-black/20'
                       }`}>
                       <PixelCharacter options={{ gender: character.gender, charClass: cls }} scale={0.5} />
-                      <div className={`pixel-font ${selected ? 'text-sky-300' : 'text-gray-300'}`} style={{ fontSize: '8px' }}>
-                        {info.label}
-                      </div>
+                      <div className={`pixel-font ${selected ? 'text-sky-300' : 'text-gray-300'}`} style={{ fontSize: '8px' }}>{info.label}</div>
                     </button>
                   )
                 })}
+              </div>
+              <div className="grid grid-cols-4 gap-2">
+                {CLASSES.filter(cls => CLASS_INFO[cls].unlockLevel > 1).map(cls => (
+                  <div key={cls} className="py-2 px-1 border border-gray-800 bg-black/20 flex flex-col items-center gap-1 opacity-50">
+                    <div className="text-gray-600" style={{ fontSize: '9px' }}>🔒</div>
+                    <div className="pixel-font text-gray-600" style={{ fontSize: '7px' }}>{CLASS_INFO[cls].label}</div>
+                    <div className="text-gray-700" style={{ fontSize: '8px' }}>Lv {CLASS_INFO[cls].unlockLevel}</div>
+                  </div>
+                ))}
               </div>
             </div>
 

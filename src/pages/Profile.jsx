@@ -4,7 +4,7 @@ import { api } from '../lib/api'
 import { getLevelFromXP, getLevelTitle } from '../lib/xpSystem'
 import XPBar from '../components/XPBar'
 import PixelCharacter from '../components/PixelCharacter'
-import { CLASSES, CLASS_INFO } from '../lib/pixelCharacter'
+import { CLASSES, CLASS_INFO, getUnlockedClasses } from '../lib/pixelCharacter'
 
 export default function Profile() {
   const { profile, refreshProfile } = useAuth()
@@ -114,11 +114,22 @@ export default function Profile() {
                 {CLASSES.map(cls => {
                   const info = CLASS_INFO[cls]
                   const selected = character.charClass === cls
+                  const unlocked = info.unlockLevel <= level
                   return (
-                    <button key={cls} onClick={() => updateChar('charClass', cls)}
-                      className={`py-2 px-2 border-2 transition-all text-left ${selected ? 'border-sky-400 bg-sky-900/40' : 'border-gray-700 hover:border-gray-500 bg-black/20'}`}>
-                      <div className={`pixel-font ${selected ? 'text-sky-300' : 'text-gray-300'}`} style={{ fontSize: '8px' }}>{info.label}</div>
-                      <div className="text-gray-500" style={{ fontSize: '10px' }}>{info.desc}</div>
+                    <button key={cls}
+                      onClick={() => unlocked && updateChar('charClass', cls)}
+                      disabled={!unlocked}
+                      className={`py-2 px-2 border-2 transition-all text-left relative ${
+                        !unlocked ? 'border-gray-800 bg-black/10 opacity-50 cursor-not-allowed' :
+                        selected ? 'border-sky-400 bg-sky-900/40' : 'border-gray-700 hover:border-gray-500 bg-black/20'
+                      }`}>
+                      {!unlocked && (
+                        <div className="absolute top-1 right-1 text-gray-600" style={{ fontSize: '9px' }}>🔒</div>
+                      )}
+                      <div className={`pixel-font ${selected ? 'text-sky-300' : unlocked ? 'text-gray-300' : 'text-gray-600'}`} style={{ fontSize: '8px' }}>{info.label}</div>
+                      <div className={`${unlocked ? 'text-gray-500' : 'text-gray-700'}`} style={{ fontSize: '10px' }}>
+                        {unlocked ? info.desc : `Unlock at Lv ${info.unlockLevel}`}
+                      </div>
                     </button>
                   )
                 })}
