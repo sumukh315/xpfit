@@ -1,5 +1,6 @@
 import express from 'express'
 import cors from 'cors'
+import bcrypt from 'bcryptjs'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import db from './db.js'
@@ -31,6 +32,15 @@ app.delete('/api/admin/user/:username', (req, res) => {
   if (req.headers['x-admin-secret'] !== (process.env.ADMIN_SECRET || 'xpfit-admin')) return res.status(403).json({ error: 'Forbidden' })
   const result = db.prepare('DELETE FROM users WHERE username = ?').run(req.params.username)
   res.json({ deleted: result.changes })
+})
+
+app.post('/api/admin/reset-password', async (req, res) => {
+  if (req.headers['x-admin-secret'] !== (process.env.ADMIN_SECRET || 'xpfit-admin')) return res.status(403).json({ error: 'Forbidden' })
+  const { username, password } = req.body
+  if (!username || !password) return res.status(400).json({ error: 'Missing username or password' })
+  const hash = await bcrypt.hash(password, 10)
+  const result = db.prepare('UPDATE users SET password_hash = ? WHERE LOWER(username) = LOWER(?)').run(hash, username)
+  res.json({ updated: result.changes })
 })
 
 app.use('/api/auth', authRoutes)
