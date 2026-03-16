@@ -65,11 +65,11 @@ export default function Profile() {
           <XPBar totalXP={profile?.total_xp || 0} />
           <div className="flex gap-6 mt-4 justify-center md:justify-start">
             <div>
-              <div className="pixel-font text-yellow-400" style={{ fontSize: '16px' }}>🪙 {profile?.points || 0}</div>
+              <div className="pixel-font text-yellow-400" style={{ fontSize: '16px' }}>{profile?.points || 0}</div>
               <div className="text-gray-600 text-xs">Points</div>
             </div>
             <div>
-              <div className="pixel-font text-sky-400" style={{ fontSize: '16px' }}>⭐ {profile?.total_xp || 0}</div>
+              <div className="pixel-font text-sky-400" style={{ fontSize: '16px' }}>{profile?.total_xp || 0}</div>
               <div className="text-gray-600 text-xs">Total XP</div>
             </div>
           </div>
@@ -103,7 +103,7 @@ export default function Profile() {
                 {['male', 'female'].map(g => (
                   <button key={g} onClick={() => updateChar('gender', g)}
                     className={`px-4 py-1 capitalize text-xs border-2 ${character.gender === g ? 'border-sky-400 bg-sky-900/40 text-white' : 'border-gray-700 text-gray-500'}`}>
-                    {g === 'male' ? '⚔ Male' : '✦ Female'}
+                    {g === 'male' ? 'Male' : 'Female'}
                   </button>
                 ))}
               </div>

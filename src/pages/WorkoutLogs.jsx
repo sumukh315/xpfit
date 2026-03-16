@@ -53,7 +53,7 @@ function PhotoLightbox({ url, workoutName, discordWebhook, onClose }) {
       await fetch(discordWebhook, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: `💪 **${workoutName}**\n${window.location.origin}${url}` }),
+        body: JSON.stringify({ content: `**${workoutName}**\n${window.location.origin}${url}` }),
       })
       setDiscordSent(true)
       setTimeout(() => setDiscordSent(false), 2000)

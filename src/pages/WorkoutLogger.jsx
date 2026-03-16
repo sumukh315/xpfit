@@ -11,7 +11,6 @@ const MUSCLE_GROUPS = [
   {
     id: 'chest',
     label: 'Chest',
-    icon: '🫀',
     exercises: [
       'Bench Press', 'Incline Bench Press', 'Decline Bench Press',
       'Dumbbell Fly', 'Incline Dumbbell Fly', 'Cable Fly',
@@ -22,7 +21,6 @@ const MUSCLE_GROUPS = [
   {
     id: 'back',
     label: 'Back',
-    icon: '🔙',
     exercises: [
       'Deadlift', 'Barbell Row', 'Dumbbell Row', 'Pull-Up', 'Chin-Up',
       'Lat Pulldown', 'Seated Cable Row', 'T-Bar Row', 'Face Pull',
@@ -33,7 +31,6 @@ const MUSCLE_GROUPS = [
   {
     id: 'arms',
     label: 'Arms',
-    icon: '💪',
     exercises: [
       'Barbell Curl', 'Dumbbell Curl', 'Hammer Curl', 'Preacher Curl',
       'Cable Curl', 'Concentration Curl', 'Incline Dumbbell Curl',
@@ -45,7 +42,6 @@ const MUSCLE_GROUPS = [
   {
     id: 'shoulders',
     label: 'Shoulders',
-    icon: '🎯',
     exercises: [
       'Overhead Press', 'Dumbbell Shoulder Press', 'Arnold Press',
       'Lateral Raise', 'Front Raise', 'Rear Delt Fly',
@@ -56,7 +52,6 @@ const MUSCLE_GROUPS = [
   {
     id: 'legs',
     label: 'Legs',
-    icon: '🦵',
     exercises: [
       'Squat', 'Front Squat', 'Goblet Squat', 'Bulgarian Split Squat',
       'Leg Press', 'Hack Squat', 'Romanian Deadlift', 'Leg Curl',
@@ -68,7 +63,6 @@ const MUSCLE_GROUPS = [
   {
     id: 'abs',
     label: 'Abs',
-    icon: '⚡',
     exercises: [
       'Crunch', 'Sit-Up', 'Bicycle Crunch', 'Russian Twist',
       'Plank', 'Side Plank', 'Leg Raise', 'Hanging Leg Raise',
@@ -79,7 +73,6 @@ const MUSCLE_GROUPS = [
   {
     id: 'cardio',
     label: 'Cardio',
-    icon: '🏃',
     exercises: [
       'Running', 'Treadmill', 'Cycling', 'Rowing Machine',
       'Elliptical', 'Jump Rope', 'Stair Climber', 'HIIT Sprint',
@@ -292,7 +285,7 @@ function ExercisePicker({ onSelect, onClose }) {
                     ? 'text-sky-300 border-b-2 border-sky-500 bg-sky-900/20'
                     : 'text-gray-500 hover:text-gray-300'
                 }`} style={{ fontSize: '8px' }}>
-                {g.icon} {g.label}
+                {g.label}
               </button>
             ))}
           </div>
@@ -363,7 +356,7 @@ function ExerciseCard({ exercise, index, onChange, onRemove, recommendation }) {
         <div>
           <span className="text-white font-medium" style={{ fontSize: '15px' }}>{exercise.name}</span>
           {muscleGroup && (
-            <span className="ml-2 text-gray-600" style={{ fontSize: '11px' }}>{muscleGroup.icon} {muscleGroup.label}</span>
+            <span className="ml-2 text-gray-600" style={{ fontSize: '11px' }}>{muscleGroup.label}</span>
           )}
         </div>
         <button onClick={onRemove} className="text-gray-700 hover:text-red-400 ml-2">✕</button>
@@ -591,7 +584,7 @@ export default function WorkoutLogger() {
     return (
       <div className="max-w-md mx-auto px-4 py-12 flex flex-col items-center text-center">
         <div className="pixel-card p-8 w-full" style={{ background: 'linear-gradient(135deg, #001d3d, #0a1628)', borderColor: '#38bdf8' }}>
-          <div className="text-6xl mb-4">⭐</div>
+
           <div className="pixel-font text-yellow-400 mb-2" style={{ fontSize: '11px', letterSpacing: '3px' }}>LEVEL UP!</div>
           <div className="fantasy-font text-white mb-1" style={{ fontSize: '48px' }}>{levelUp.newLevel}</div>
           <div className="pixel-font text-sky-400 mb-6" style={{ fontSize: '14px' }}>{levelUp.title}</div>
@@ -649,7 +642,7 @@ export default function WorkoutLogger() {
     return (
       <div className="max-w-md mx-auto px-4 py-12 flex flex-col items-center text-center">
         <div className="pixel-card p-8 w-full">
-          <div className="text-5xl mb-4">💪</div>
+
           <h2 className="fantasy-font text-green-400 mb-1" style={{ fontSize: '24px' }}>Workout Done!</h2>
           <p className="text-gray-400 mb-2" style={{ fontSize: '13px' }}>{savedWorkout.name}</p>
           <p className="pixel-font text-sky-400 mb-6" style={{ fontSize: '12px' }}>+{savedWorkout.xp} XP earned</p>
@@ -707,7 +700,7 @@ export default function WorkoutLogger() {
       {/* Exercise cards */}
       {exercises.length === 0 ? (
         <div className="text-center py-10 border-2 border-dashed border-gray-800 mb-5">
-          <div className="text-4xl mb-3">💪</div>
+
           <p className="text-gray-500 mb-4">No exercises yet</p>
           <div className="flex gap-3 justify-center flex-wrap">
             <button onClick={() => setShowPicker(true)}
@@ -716,7 +709,7 @@ export default function WorkoutLogger() {
             </button>
             <button onClick={() => setShowPaste(true)}
               className="pixel-btn bg-gray-800 border-gray-600 text-white px-8 py-3" style={{ fontSize: '10px' }}>
-              📋 Paste from App
+              Paste from App
             </button>
           </div>
         </div>

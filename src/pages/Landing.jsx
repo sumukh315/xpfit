@@ -20,13 +20,12 @@ export default function Landing() {
       {/* Feature Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12 max-w-3xl w-full">
         {[
-          { emoji: '⚔️', label: 'Earn XP', desc: 'Every set earns experience' },
-          { emoji: '🎮', label: 'Level Up', desc: 'Grow your pixel character' },
-          { emoji: '📊', label: 'Progress', desc: 'Track your gains over time' },
-          { emoji: '👥', label: 'Social', desc: 'Challenge your friends' },
+          { label: 'Earn XP', desc: 'Every set earns experience' },
+          { label: 'Level Up', desc: 'Grow your pixel character' },
+          { label: 'Progress', desc: 'Track your gains over time' },
+          { label: 'Social', desc: 'Challenge your friends' },
         ].map(f => (
           <div key={f.label} className="pixel-card p-4 text-center">
-            <div className="text-3xl mb-2">{f.emoji}</div>
             <div className="pixel-font text-sky-300 mb-1" style={{ fontSize: '8px' }}>{f.label}</div>
             <div className="text-gray-400" style={{ fontSize: '11px' }}>{f.desc}</div>
           </div>

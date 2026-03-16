@@ -4,14 +4,14 @@ import { api } from '../lib/api'
 import PixelCharacter from '../components/PixelCharacter'
 
 const SHOP_ITEMS = [
-  { id: 'hair_blue', name: 'Blue Hair', description: 'Electric blue hair dye', price: 50, type: 'hair', value: 'blue', emoji: '💙' },
-  { id: 'hair_purple', name: 'Purple Hair', description: 'Mystical purple locks', price: 50, type: 'hair', value: 'purple', emoji: '💜' },
-  { id: 'hair_pink', name: 'Pink Hair', description: 'Vibrant pink hair', price: 50, type: 'hair', value: 'pink', emoji: '🌸' },
-  { id: 'hair_green', name: 'Green Hair', description: 'Forest green hair', price: 75, type: 'hair', value: 'green', emoji: '💚' },
-  { id: 'outfit_orange', name: 'Fire Outfit', description: 'Blazing orange gear', price: 100, type: 'clothing', value: 'orange', emoji: '🔥' },
-  { id: 'outfit_teal', name: 'Ocean Outfit', description: 'Cool teal training gear', price: 100, type: 'clothing', value: 'teal', emoji: '🌊' },
-  { id: 'outfit_yellow', name: 'Gold Outfit', description: 'Legendary gold gear', price: 200, type: 'clothing', value: 'yellow', emoji: '⭐' },
-  { id: 'outfit_pink', name: 'Rose Outfit', description: 'Rose pink warrior gear', price: 100, type: 'clothing', value: 'pink', emoji: '🌺' },
+  { id: 'hair_blue', name: 'Blue Hair', description: 'Electric blue hair dye', price: 50, type: 'hair', value: 'blue' },
+  { id: 'hair_purple', name: 'Purple Hair', description: 'Mystical purple locks', price: 50, type: 'hair', value: 'purple' },
+  { id: 'hair_pink', name: 'Pink Hair', description: 'Vibrant pink hair', price: 50, type: 'hair', value: 'pink' },
+  { id: 'hair_green', name: 'Green Hair', description: 'Forest green hair', price: 75, type: 'hair', value: 'green' },
+  { id: 'outfit_orange', name: 'Fire Outfit', description: 'Blazing orange gear', price: 100, type: 'clothing', value: 'orange' },
+  { id: 'outfit_teal', name: 'Ocean Outfit', description: 'Cool teal training gear', price: 100, type: 'clothing', value: 'teal' },
+  { id: 'outfit_yellow', name: 'Gold Outfit', description: 'Legendary gold gear', price: 200, type: 'clothing', value: 'yellow' },
+  { id: 'outfit_pink', name: 'Rose Outfit', description: 'Rose pink warrior gear', price: 100, type: 'clothing', value: 'pink' },
 ]
 
 export default function Shop() {
@@ -27,7 +27,7 @@ export default function Shop() {
   const previewOptions = charOptions
 
   async function handleBuy(item) {
-    if ((profile?.points || 0) < item.price) return setMessage('Not enough points! 💸')
+    if ((profile?.points || 0) < item.price) return setMessage('Not enough points!')
     if (inventory.includes(item.id)) return setMessage('Already owned!')
     setBuying(item.id)
     try {
@@ -36,7 +36,7 @@ export default function Shop() {
         inventory: [...inventory, item.id],
       })
       await refreshProfile()
-      setMessage(`Purchased ${item.name}! 🎉`)
+      setMessage(`Purchased ${item.name}!`)
     } catch { setMessage('Purchase failed.') }
     finally {
       setBuying(null)
@@ -50,7 +50,7 @@ export default function Shop() {
     if (item.type === 'clothing') newEquipped.clothingColor = item.value
     await api.updateProfile({ equipped: newEquipped })
     await refreshProfile()
-    setMessage(`${item.name} equipped! ✨`)
+    setMessage(`${item.name} equipped!`)
     setTimeout(() => setMessage(''), 2000)
   }
 
@@ -58,7 +58,7 @@ export default function Shop() {
     <div className="max-w-5xl mx-auto px-4 py-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="pixel-font text-sky-400" style={{ fontSize: '14px' }}>Item Shop</h1>
-        <span className="pixel-font text-yellow-400">🪙 {profile?.points || 0} Points</span>
+        <span className="pixel-font text-yellow-400">{profile?.points || 0} Points</span>
       </div>
 
       {message && (
@@ -90,7 +90,7 @@ export default function Shop() {
                   className={`pixel-card p-4 cursor-pointer transition-all ${isEquipped ? 'border-sky-500 glow-purple' : 'hover:border-gray-600'}`}
                   onMouseEnter={() => setHoverChar(previewChar)}
                   onMouseLeave={() => setHoverChar(null)}>
-                  <div className="text-2xl mb-2">{item.emoji}</div>
+
                   <div className="text-white font-medium text-sm mb-1">{item.name}</div>
                   <div className="text-gray-500 text-xs mb-3">{item.description}</div>
                   {isEquipped ? (
@@ -105,7 +105,7 @@ export default function Shop() {
                       disabled={buying === item.id || (profile?.points || 0) < item.price}
                       className={`pixel-btn px-3 py-1 w-full ${(profile?.points || 0) < item.price ? 'bg-gray-800 border-gray-700 text-gray-600' : 'bg-yellow-700 border-yellow-600 text-white'}`}
                       style={{ fontSize: '8px' }}>
-                      🪙 {item.price}
+                      {item.price} pts
                     </button>
                   )}
                 </div>

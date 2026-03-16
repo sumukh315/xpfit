@@ -268,7 +268,7 @@ export default function Signup() {
                         ? 'border-sky-400 bg-sky-900/40 text-sky-300'
                         : 'border-gray-600 text-gray-400 hover:border-gray-400'
                     }`} style={{ fontSize: '9px' }}>
-                    {g === 'male' ? '⚔ Male' : '✦ Female'}
+                    {g === 'male' ? 'Male' : 'Female'}
                   </button>
                 ))}
               </div>
@@ -322,7 +322,7 @@ export default function Signup() {
               <button onClick={() => setStep(1)} className="pixel-btn bg-gray-800 border-gray-600 text-gray-300 py-2 px-4">← Back</button>
               <button onClick={handleSubmit} disabled={loading}
                 className="flex-1 pixel-btn bg-green-700 border-green-500 text-white py-2 disabled:opacity-50">
-                {loading ? 'Creating...' : '🎮 Start Quest!'}
+                {loading ? 'Creating...' : 'Start Quest!'}
               </button>
             </div>
           </div>

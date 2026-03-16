@@ -76,15 +76,15 @@ export default function Dashboard() {
           <XPBar totalXP={profile?.total_xp || 0} />
           <div className="flex gap-4 mt-4 justify-center md:justify-start">
             <div className="text-center">
-              <div className="pixel-font text-yellow-400" style={{ fontSize: '14px' }}>🪙 {profile?.points || 0}</div>
+              <div className="pixel-font text-yellow-400" style={{ fontSize: '14px' }}>{profile?.points || 0}</div>
               <div className="text-gray-500 text-xs">Points</div>
             </div>
             <div className="text-center">
-              <div className="pixel-font text-orange-400" style={{ fontSize: '14px' }}>🔥 {streak}</div>
+              <div className="pixel-font text-orange-400" style={{ fontSize: '14px' }}>{streak}</div>
               <div className="text-gray-500 text-xs">Day Streak</div>
             </div>
             <div className="text-center">
-              <div className="pixel-font text-green-400" style={{ fontSize: '14px' }}>💪 {weekStats.workouts}</div>
+              <div className="pixel-font text-green-400" style={{ fontSize: '14px' }}>{weekStats.workouts}</div>
               <div className="text-gray-500 text-xs">This Week</div>
             </div>
           </div>
@@ -98,13 +98,12 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {[
-          { label: 'Total Workouts', value: recentWorkouts.length, icon: '🏋️' },
-          { label: 'Sets This Week', value: weekStats.sets, icon: '📊' },
-          { label: 'Total XP', value: profile?.total_xp || 0, icon: '⭐' },
-          { label: 'Current Level', value: level, icon: '🎯' },
+          { label: 'Total Workouts', value: recentWorkouts.length },
+          { label: 'Sets This Week', value: weekStats.sets },
+          { label: 'Total XP', value: profile?.total_xp || 0 },
+          { label: 'Current Level', value: level },
         ].map(stat => (
           <div key={stat.label} className="pixel-card p-4 text-center">
-            <div className="text-2xl mb-1">{stat.icon}</div>
             <div className="pixel-font text-white" style={{ fontSize: '16px' }}>{stat.value}</div>
             <div className="text-gray-500 text-xs mt-1">{stat.label}</div>
           </div>
@@ -114,7 +113,7 @@ export default function Dashboard() {
       {recommendations.length > 0 && (
         <div className="pixel-card p-4 mb-6" style={{ borderColor: '#0369a1' }}>
           <h2 className="pixel-font text-sky-400 mb-4" style={{ fontSize: '11px' }}>
-            ⚡ Personalized Tips
+            Personalized Tips
           </h2>
           <div className="flex flex-col gap-3">
             {recommendations.map((rec, i) => (
