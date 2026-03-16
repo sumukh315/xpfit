@@ -30,11 +30,14 @@ function PhotoLightbox({ url, workoutName, discordWebhook, onClose }) {
   const [discordSent, setDiscordSent] = useState(false)
 
   async function handleNativeShare() {
-    if (!navigator.share) return handleCopy()
-    try {
-      // Try sharing the URL as text (native share with image URL)
-      await navigator.share({ title: workoutName, text: `Check out my workout!\n${window.location.origin}${url}` })
-    } catch (_) {}
+    const shareText = `Check out my workout photo!\n${window.location.origin}${url}`
+    if (navigator.share) {
+      try { await navigator.share({ title: workoutName, text: shareText }) } catch (_) {}
+    } else {
+      await navigator.clipboard.writeText(shareText).catch(() => {})
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
   }
 
   async function handleCopy() {
@@ -105,7 +108,7 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete }) {
   async function handleNativeShare() {
     const text = buildShareText(workout)
     if (navigator.share) {
-      await navigator.share({ title: workout.name, text }).catch(() => {})
+      try { await navigator.share({ title: workout.name, text }) } catch (_) {}
     } else {
       handleCopyText()
     }

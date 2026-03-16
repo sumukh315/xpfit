@@ -515,7 +515,7 @@ export default function WorkoutLogger() {
   async function handleNativeShare() {
     const text = buildShareText(savedWorkout.name, savedWorkout.exercises, savedWorkout.xp, savedWorkout.duration)
     if (navigator.share) {
-      await navigator.share({ title: savedWorkout.name, text })
+      try { await navigator.share({ title: savedWorkout.name, text }) } catch (_) {}
     } else {
       handleCopy()
     }

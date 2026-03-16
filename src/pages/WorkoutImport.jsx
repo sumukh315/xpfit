@@ -42,92 +42,72 @@ function parseDateString(str) {
 
 // ─── Text/Paste Parser ─────────────────────────────────────────────────────────
 
-const DATE_PATTERNS = [
-  // 2024-03-10
-  /\b(\d{4}-\d{1,2}-\d{1,2})\b/,
-  // 3/10/2024 or 3/10/24
-  /\b(\d{1,2}\/\d{1,2}\/(?:\d{4}|\d{2}))\b/,
-  // March 10, 2024 or March 10
-  /\b((?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{1,2}(?:,?\s+\d{4})?)\b/i,
-  // Mon March 10
-  /\b(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)(?:day)?\s+((?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{1,2}(?:,?\s+\d{4})?)\b/i,
-]
+function titleCase(str) {
+  return str.replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+}
 
-// Exercise patterns:
-// "Bench Press 3x10 135lbs" | "bench 3x10@135" | "Squats: 3 sets of 8 at 185" | "deadlift 225 5x5"
-const EXERCISE_PATTERNS = [
-  // "Name 3x10 @ 135lbs" or "Name 3x10@135"
-  /^(.+?)\s+(\d+)\s*[xX×]\s*(\d+)\s*[@at]*\s*([\d.]+)\s*(?:lbs?|kg)?/i,
-  // "Name: 3 sets of 8 at 185"
-  /^(.+?):\s*(\d+)\s*sets?\s*(?:of\s+)?(\d+)\s*(?:reps?\s*)?(?:at|@|x)?\s*([\d.]+)\s*(?:lbs?|kg)?/i,
-  // "Name 3x10" (no weight)
-  /^(.+?)\s+(\d+)\s*[xX×]\s*(\d+)\s*$/,
-  // "Name 135 5x5" (weight before sets)
-  /^(.+?)\s+([\d.]+)\s*(?:lbs?|kg)?\s+(\d+)\s*[xX×]\s*(\d+)/i,
-]
+// Matches a date line: "Feb 23, 2026", "March 10, 2024", "2024-03-10", "3/10/2024"
+const DATE_RE = /^(?:(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+\d{1,2},?\s+\d{4}|\d{4}-\d{2}-\d{2}|\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/i
+
+// Matches a set line: "290lb x 5", "• 135 lbs × 10", "100 x 20 Then hold"
+const SET_RE = /^[•\-\*]?\s*(\d+(?:\.\d+)?)\s*(?:lbs?|kg)?\s*[x×]\s*(\d+)(.*)$/i
+
+// Lines to skip
+const SKIP_RE = /^(logged\s+using|logged\s+with|#\s)/i
 
 function parseTextImport(text) {
   const lines = text.split('\n').map(l => l.trim()).filter(Boolean)
   const workouts = []
   let current = null
-  let currentDateStr = null
+  let currentExercise = null
 
   for (const line of lines) {
-    // Check if line is a date
-    let dateFound = false
-    for (const pat of DATE_PATTERNS) {
-      const m = line.match(pat)
-      if (m) {
-        const dateStr = m[1] || m[0]
-        const parsed = new Date(dateStr)
-        const dateIso = !isNaN(parsed.getTime()) ? parsed.toISOString() : new Date().toISOString()
-        // Start new workout group for this date
-        if (currentDateStr !== dateStr) {
-          currentDateStr = dateStr
-          current = { name: `Workout — ${dateStr}`, created_at: dateIso, exercises: [] }
-          workouts.push(current)
-        }
-        dateFound = true
-        break
-      }
-    }
-    if (dateFound) continue
+    if (SKIP_RE.test(line)) continue
 
-    // If we have a current workout, try to parse exercise
-    if (current) {
-      let exerciseParsed = false
-      for (const pat of EXERCISE_PATTERNS) {
-        const m = line.match(pat)
-        if (m) {
-          // Pattern: name, sets, reps, weight   OR   name, weight, sets, reps
-          let name, sets, reps, weight
-          if (pat === EXERCISE_PATTERNS[3]) {
-            // weight before sets
-            ;[, name, weight, sets, reps] = m
-          } else {
-            ;[, name, sets, reps, weight] = m
-          }
-          current.exercises.push({
-            name: name.replace(/:$/, '').trim(),
-            sets: parseInt(sets) || 1,
-            reps: parseInt(reps) || 0,
-            weight: parseFloat(weight) || 0,
-          })
-          exerciseParsed = true
-          break
-        }
-      }
-      // If line doesn't match an exercise pattern but looks like a workout name heading
-      if (!exerciseParsed && line.length > 2 && line.length < 60 && !line.includes(':')) {
-        // Could be a workout name — update current workout name if it still has default
-        if (current.name.startsWith('Workout —')) {
-          current.name = line
-        }
-      }
+    // Date line → start a new workout
+    const dateMatch = line.match(DATE_RE)
+    if (dateMatch) {
+      const parsed = new Date(dateMatch[0])
+      const dateIso = !isNaN(parsed.getTime()) ? parsed.toISOString() : new Date().toISOString()
+      current = { name: `Workout — ${dateMatch[0]}`, created_at: dateIso, exercises: [] }
+      workouts.push(current)
+      currentExercise = null
+      continue
     }
+
+    // Ensure we have a workout to add to
+    if (!current) {
+      current = { name: 'Imported Workout', created_at: new Date().toISOString(), exercises: [] }
+      workouts.push(current)
+    }
+
+    const startsWithNumber = /^[•\-\*]?\s*\d/.test(line)
+    const setMatch = line.match(SET_RE)
+
+    if (setMatch && startsWithNumber) {
+      // It's a set line — add to current exercise
+      const note = setMatch[3]?.trim() || undefined
+      if (currentExercise) {
+        currentExercise.sets.push({ weight: setMatch[1], reps: setMatch[2], ...(note ? { note } : {}) })
+      }
+      continue
+    }
+
+    // Otherwise it's a name line — workout name or exercise name
+    const cleanName = line.replace(/^[•\-\*]\s*/, '').trim()
+    if (!cleanName || cleanName.length > 80) continue
+
+    if (current.exercises.length === 0 && current.name.startsWith('Workout —')) {
+      // First non-date, non-set line → could be workout name, but for Rep Count it's the first exercise
+      // If there's no date at all, treat as workout name; otherwise treat as exercise
+    }
+
+    // Treat as exercise name
+    currentExercise = { name: titleCase(cleanName), sets: [] }
+    current.exercises.push(currentExercise)
   }
 
-  return workouts.filter(w => w.exercises.length > 0)
+  return workouts.filter(w => w.exercises.some(e => e.sets.length > 0))
 }
 
 // ─── Component ─────────────────────────────────────────────────────────────────
@@ -317,7 +297,7 @@ export default function WorkoutImport() {
                   <div className="flex flex-col gap-0.5 mt-1">
                     {w.exercises.map((ex, j) => (
                       <div key={j} className="text-gray-400" style={{ fontSize: '11px' }}>
-                        · {ex.name} — {ex.sets}×{ex.reps}{ex.weight ? ` @ ${ex.weight}lbs` : ''}
+                        · {ex.name} — {(ex.sets || []).map(s => `${s.weight}×${s.reps}`).join(', ')}
                       </div>
                     ))}
                   </div>

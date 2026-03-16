@@ -62,13 +62,33 @@ router.delete('/:id', (req, res) => {
 router.post('/import', (req, res) => {
   const { workouts } = req.body
   if (!Array.isArray(workouts)) return res.status(400).json({ error: 'workouts must be an array' })
-  const stmt = db.prepare(`INSERT INTO workouts (user_id, name, exercises, notes, xp_earned, points_earned, created_at) VALUES (?, ?, ?, ?, 0, 0, ?)`)
+
+  const XP_PER_SET = 10
+  const XP_PER_WORKOUT = 50
+  const POINTS_PER_WORKOUT = 25
+
+  const stmt = db.prepare(`INSERT INTO workouts (user_id, name, exercises, notes, xp_earned, points_earned, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`)
   let count = 0
+  let totalXP = 0
+  let totalPoints = 0
+
   for (const w of workouts) {
-    stmt.run(req.user.id, w.name, JSON.stringify(w.exercises || []), w.notes || null, w.created_at || new Date().toISOString())
+    const exercises = w.exercises || []
+    const totalSets = exercises.reduce((acc, ex) => acc + (Array.isArray(ex.sets) ? ex.sets.length : (ex.sets || 1)), 0)
+    const xp = XP_PER_WORKOUT + totalSets * XP_PER_SET
+    const points = POINTS_PER_WORKOUT + Math.floor(totalSets / 3) * 5
+    stmt.run(req.user.id, w.name, JSON.stringify(exercises), w.notes || null, xp, points, w.created_at || new Date().toISOString())
+    totalXP += xp
+    totalPoints += points
     count++
   }
-  res.json({ imported: count })
+
+  // Award XP and points for all imported workouts
+  if (totalXP > 0) {
+    db.prepare('UPDATE users SET total_xp = total_xp + ?, points = points + ? WHERE id = ?').run(totalXP, totalPoints, req.user.id)
+  }
+
+  res.json({ imported: count, xp_earned: totalXP })
 })
 
 router.get('/user/:userId', (req, res) => {
