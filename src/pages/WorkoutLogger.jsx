@@ -68,6 +68,8 @@ const MUSCLE_GROUPS = [
       'Plank', 'Side Plank', 'Leg Raise', 'Hanging Leg Raise',
       'Ab Rollout', 'Cable Crunch', 'Dragon Flag',
       'Mountain Climber', 'V-Up', 'Dead Bug',
+      'Torso Rotation', 'Cable Woodchop', 'Landmine Rotation',
+      'Pallof Press', 'Medicine Ball Rotational Throw', 'Seated Torso Rotation',
     ],
   },
   {
