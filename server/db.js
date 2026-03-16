@@ -60,6 +60,7 @@ for (const sql of [
   "ALTER TABLE workouts ADD COLUMN start_time TEXT DEFAULT NULL",
   "ALTER TABLE workouts ADD COLUMN end_time TEXT DEFAULT NULL",
   "ALTER TABLE workouts ADD COLUMN duration_minutes INTEGER DEFAULT NULL",
+  `ALTER TABLE users ADD COLUMN unlocked_classes TEXT DEFAULT '["warrior","mage"]'`,
 ]) {
   try { db.exec(sql) } catch (_) {}
 }

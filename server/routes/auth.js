@@ -8,16 +8,19 @@ import { signToken, requireAuth } from '../middleware/auth.js'
 const router = Router()
 
 router.post('/signup', async (req, res) => {
-  const { email, password, username, character, fitnessProfile } = req.body
+  const { email, password, username, character, fitnessProfile, unlockedClasses } = req.body
   if (!email || !password || !username) return res.status(400).json({ error: 'Missing fields' })
 
   try {
     const hash = await bcrypt.hash(password, 10)
+    const initialUnlocked = Array.isArray(unlockedClasses) && unlockedClasses.length === 2
+      ? unlockedClasses
+      : ['warrior', 'mage']
     const stmt = db.prepare(`
-      INSERT INTO users (username, email, password_hash, character, equipped, inventory, total_xp, points, fitness_profile)
-      VALUES (?, ?, ?, ?, '{}', '[]', 0, 100, ?)
+      INSERT INTO users (username, email, password_hash, character, equipped, inventory, total_xp, points, fitness_profile, unlocked_classes)
+      VALUES (?, ?, ?, ?, '{}', '[]', 0, 100, ?, ?)
     `)
-    const result = stmt.run(username, email, hash, JSON.stringify(character || {}), JSON.stringify(fitnessProfile || {}))
+    const result = stmt.run(username, email, hash, JSON.stringify(character || {}), JSON.stringify(fitnessProfile || {}), JSON.stringify(initialUnlocked))
     const user = db.prepare('SELECT * FROM users WHERE id = ?').get(result.lastInsertRowid)
     const token = signToken({ id: user.id, username: user.username })
     res.json({ token, user: sanitizeUser(user) })
@@ -98,6 +101,7 @@ function sanitizeUser(user) {
     equipped: JSON.parse(safe.equipped || '{}'),
     inventory: JSON.parse(safe.inventory || '[]'),
     fitness_profile: JSON.parse(safe.fitness_profile || '{}'),
+    unlocked_classes: JSON.parse(safe.unlocked_classes || '["warrior","mage"]'),
   }
 }
 

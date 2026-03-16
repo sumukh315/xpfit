@@ -4,8 +4,6 @@ import { useAuth } from '../contexts/AuthContext'
 import PixelCharacter from '../components/PixelCharacter'
 import { CLASSES, CLASS_INFO } from '../lib/pixelCharacter'
 
-const SIGNUP_CLASSES = CLASSES.filter(cls => CLASS_INFO[cls].unlockLevel === 1)
-
 const STEPS = ['Account', 'Fitness Goals', 'Hero']
 
 const FITNESS_GOALS = [
@@ -47,6 +45,7 @@ export default function Signup() {
     gender: 'male',
     charClass: 'warrior',
   })
+  const [secondClass, setSecondClass] = useState('mage')
 
   const [fitnessProfile, setFitnessProfile] = useState({
     fitnessGoals: [],
@@ -85,7 +84,8 @@ export default function Signup() {
     setLoading(true)
     setError('')
     try {
-      await signup(email, password, username, character, fitnessProfile)
+      const unlockedClasses = Array.from(new Set([character.charClass, secondClass]))
+      await signup(email, password, username, character, fitnessProfile, unlockedClasses)
       navigate('/dashboard')
     } catch (e) {
       setError(e.message)
@@ -271,32 +271,46 @@ export default function Signup() {
               </div>
             </div>
 
-            {/* Class grid */}
-            <div className="mb-6">
-              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>CLASS</label>
-              <div className="grid grid-cols-2 gap-3 mb-3">
-                {SIGNUP_CLASSES.map(cls => {
+            {/* Starting class */}
+            <div className="mb-4">
+              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>YOUR CLASS (you'll play as this)</label>
+              <div className="grid grid-cols-3 gap-2">
+                {CLASSES.map(cls => {
                   const info = CLASS_INFO[cls]
                   const selected = character.charClass === cls
                   return (
-                    <button key={cls} onClick={() => updateChar('charClass', cls)}
+                    <button key={cls} onClick={() => {
+                      updateChar('charClass', cls)
+                      if (secondClass === cls) setSecondClass(CLASSES.find(c => c !== cls))
+                    }}
                       className={`py-3 px-2 border-2 transition-all flex flex-col items-center gap-2 ${
                         selected ? 'border-sky-400 bg-sky-900/40' : 'border-gray-700 hover:border-gray-500 bg-black/20'
                       }`}>
-                      <PixelCharacter options={{ gender: character.gender, charClass: cls }} scale={0.5} />
-                      <div className={`pixel-font ${selected ? 'text-sky-300' : 'text-gray-300'}`} style={{ fontSize: '8px' }}>{info.label}</div>
+                      <PixelCharacter options={{ gender: character.gender, charClass: cls }} scale={0.4} />
+                      <div className={`pixel-font ${selected ? 'text-sky-300' : 'text-gray-300'}`} style={{ fontSize: '7px' }}>{info.label}</div>
                     </button>
                   )
                 })}
               </div>
-              <div className="grid grid-cols-4 gap-2">
-                {CLASSES.filter(cls => CLASS_INFO[cls].unlockLevel > 1).map(cls => (
-                  <div key={cls} className="py-2 px-1 border border-gray-800 bg-black/20 flex flex-col items-center gap-1 opacity-50">
-                    <div className="text-gray-600" style={{ fontSize: '9px' }}>🔒</div>
-                    <div className="pixel-font text-gray-600" style={{ fontSize: '7px' }}>{CLASS_INFO[cls].label}</div>
-                    <div className="text-gray-700" style={{ fontSize: '8px' }}>Lv {CLASS_INFO[cls].unlockLevel}</div>
-                  </div>
-                ))}
+            </div>
+
+            {/* Second unlock */}
+            <div className="mb-6">
+              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>ALSO UNLOCK (free bonus class)</label>
+              <div className="grid grid-cols-5 gap-2">
+                {CLASSES.filter(cls => cls !== character.charClass).map(cls => {
+                  const info = CLASS_INFO[cls]
+                  const selected = secondClass === cls
+                  return (
+                    <button key={cls} onClick={() => setSecondClass(cls)}
+                      className={`py-2 px-1 border-2 transition-all flex flex-col items-center gap-1 ${
+                        selected ? 'border-yellow-400 bg-yellow-900/20' : 'border-gray-700 hover:border-gray-500 bg-black/20'
+                      }`}>
+                      <PixelCharacter options={{ gender: character.gender, charClass: cls }} scale={0.3} />
+                      <div className={`pixel-font ${selected ? 'text-yellow-300' : 'text-gray-400'}`} style={{ fontSize: '6px' }}>{info.label}</div>
+                    </button>
+                  )
+                })}
               </div>
             </div>
 

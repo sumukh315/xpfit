@@ -26,8 +26,8 @@ export function AuthProvider({ children }) {
     return user
   }
 
-  async function signup(email, password, username, character, fitnessProfile) {
-    const { token, user } = await api.signup({ email, password, username, character, fitnessProfile })
+  async function signup(email, password, username, character, fitnessProfile, unlockedClasses) {
+    const { token, user } = await api.signup({ email, password, username, character, fitnessProfile, unlockedClasses })
     localStorage.setItem('xpfit_token', token)
     setUser(user)
     return user

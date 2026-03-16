@@ -7,16 +7,12 @@
 export const CLASSES = ['warrior', 'mage', 'ranger', 'assassin', 'paladin', 'necromancer']
 
 export const CLASS_INFO = {
-  warrior:     { label: 'Warrior',     desc: 'Strength & defense',   col: 0, row: 0, unlockLevel: 1  },
-  mage:        { label: 'Mage',        desc: 'Arcane power',         col: 2, row: 0, unlockLevel: 1  },
-  ranger:      { label: 'Ranger',      desc: 'Swift & precise',      col: 0, row: 1, unlockLevel: 5  },
-  assassin:    { label: 'Assassin',    desc: 'Stealth & speed',      col: 2, row: 1, unlockLevel: 10 },
-  paladin:     { label: 'Paladin',     desc: 'Holy warrior',         col: 0, row: 2, unlockLevel: 15 },
-  necromancer: { label: 'Necromancer', desc: 'Dark arts',            col: 2, row: 2, unlockLevel: 20 },
-}
-
-export function getUnlockedClasses(level) {
-  return CLASSES.filter(cls => CLASS_INFO[cls].unlockLevel <= level)
+  warrior:     { label: 'Warrior',     desc: 'Strength & defense',   col: 0, row: 0 },
+  mage:        { label: 'Mage',        desc: 'Arcane power',         col: 2, row: 0 },
+  ranger:      { label: 'Ranger',      desc: 'Swift & precise',      col: 0, row: 1 },
+  assassin:    { label: 'Assassin',    desc: 'Stealth & speed',      col: 2, row: 1 },
+  paladin:     { label: 'Paladin',     desc: 'Holy warrior',         col: 0, row: 2 },
+  necromancer: { label: 'Necromancer', desc: 'Dark arts',            col: 2, row: 2 },
 }
 
 // Sprite sheet dimensions

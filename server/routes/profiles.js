@@ -6,7 +6,7 @@ const router = Router()
 router.use(requireAuth)
 
 router.patch('/me', (req, res) => {
-  const allowed = ['character', 'equipped', 'inventory', 'points', 'discord_webhook', 'fitness_profile']
+  const allowed = ['character', 'equipped', 'inventory', 'points', 'discord_webhook', 'fitness_profile', 'unlocked_classes']
   const updates = {}
   for (const key of allowed) {
     if (req.body[key] !== undefined) {
@@ -26,6 +26,7 @@ router.patch('/me', (req, res) => {
     equipped: JSON.parse(safe.equipped || '{}'),
     inventory: JSON.parse(safe.inventory || '[]'),
     fitness_profile: JSON.parse(safe.fitness_profile || '{}'),
+    unlocked_classes: JSON.parse(safe.unlocked_classes || '["warrior","mage"]'),
   })
 })
 

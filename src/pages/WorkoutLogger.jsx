@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { api } from '../lib/api'
 import { calcWorkoutXP, calcWorkoutPoints, getRecommendation, getLevelFromXP, getLevelTitle } from '../lib/xpSystem'
 import { CLASS_INFO, CLASSES } from '../lib/pixelCharacter'
+import PixelCharacter from '../components/PixelCharacter'
 
 // ─── Exercise Library ─────────────────────────────────────────────────────────
 const MUSCLE_GROUPS = [
@@ -410,6 +411,9 @@ export default function WorkoutLogger() {
   const [savedWorkout, setSavedWorkout] = useState(null)
   const [levelUp, setLevelUp] = useState(null) // { oldLevel, newLevel, title }
   const [copied, setCopied] = useState(false)
+  const [pickedUnlockClass, setPickedUnlockClass] = useState(null)
+  const [unlockSaving, setUnlockSaving] = useState(false)
+  const [unlockSaved, setUnlockSaved] = useState(false)
 
   const [startTime] = useState(() => new Date())
   const [endTime, setEndTime] = useState(() => {
@@ -418,6 +422,8 @@ export default function WorkoutLogger() {
     return `${pad(now.getHours())}:${pad(now.getMinutes())}`
   })
   const [importedDate, setImportedDate] = useState(null)
+  const [importedStartStr, setImportedStartStr] = useState('')
+  const [importedEndStr, setImportedEndStr] = useState('')
 
   useEffect(() => { fetchPreviousData() }, [])
 
@@ -453,16 +459,24 @@ export default function WorkoutLogger() {
 
   function importExercises(parsed, date) {
     setExercises(prev => [...prev, ...parsed])
-    if (date) setImportedDate(date)
+    if (date) {
+      setImportedDate(date)
+      const str = toDatetimeLocal(date)
+      setImportedStartStr(str)
+      setImportedEndStr(str)
+    }
   }
 
   const totalSets = exercises.reduce((acc, e) => acc + (e.sets?.length || 0), 0)
   const xpPreview = calcWorkoutXP(totalSets)
   const pointsPreview = calcWorkoutPoints(totalSets)
 
-  function buildShareText(name, exList, xp, duration) {
-    const date = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-    const lines = [date, '']
+  function buildShareText(name, exList, duration, workoutDate) {
+    const d = workoutDate || new Date()
+    const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    const lines = [dateStr]
+    if (duration && duration > 0) lines.push(`${duration} min`)
+    lines.push('')
     exList.forEach(ex => {
       lines.push(ex.name)
       ;(ex.sets || []).forEach(s => {
@@ -477,25 +491,32 @@ export default function WorkoutLogger() {
   async function handleSave() {
     if (!workoutName.trim()) return alert('Give your workout a name!')
 
-    // Parse the confirmed end time
-    const [hours, mins] = endTime.split(':').map(Number)
-    const end = new Date()
-    end.setHours(hours, mins, 0, 0)
-    // If end is before start (e.g. crossed midnight), add a day
-    if (end < startTime) end.setDate(end.getDate() + 1)
+    let effectiveStart, effectiveEnd, durationMins
+
+    if (importedDate) {
+      effectiveStart = importedStartStr ? new Date(importedStartStr) : importedDate
+      effectiveEnd = importedEndStr ? new Date(importedEndStr) : importedDate
+      durationMins = effectiveEnd > effectiveStart ? Math.round((effectiveEnd - effectiveStart) / 60000) : null
+    } else {
+      const [hours, mins] = endTime.split(':').map(Number)
+      effectiveEnd = new Date()
+      effectiveEnd.setHours(hours, mins, 0, 0)
+      if (effectiveEnd < startTime) effectiveEnd.setDate(effectiveEnd.getDate() + 1)
+      effectiveStart = startTime
+      durationMins = Math.round((effectiveEnd - effectiveStart) / 60000)
+    }
 
     setSaving(true)
     setShowFinish(false)
     const oldLevel = getLevelFromXP(profile?.total_xp || 0).level
-    const effectiveStart = importedDate || startTime
     try {
       await api.createWorkout({
         name: workoutName, exercises, notes,
         xp_earned: xpPreview, points_earned: pointsPreview,
         photo: photoFile,
         start_time: effectiveStart.toISOString(),
-        end_time: importedDate ? effectiveStart.toISOString() : end.toISOString(),
-        duration_minutes: importedDate ? null : Math.round((end - startTime) / 60000),
+        end_time: effectiveEnd.toISOString(),
+        duration_minutes: durationMins,
       })
       await refreshProfile()
       const newLevel = getLevelFromXP((profile?.total_xp || 0) + xpPreview).level
@@ -506,7 +527,8 @@ export default function WorkoutLogger() {
         name: workoutName,
         exercises,
         xp: xpPreview,
-        duration: Math.round((end - startTime) / 60000),
+        duration: durationMins,
+        workoutDate: effectiveStart,
       })
     } catch (e) {
       console.error(e)
@@ -521,7 +543,7 @@ export default function WorkoutLogger() {
       alert('Add your Discord webhook in the Friends page first.')
       return
     }
-    const text = buildShareText(savedWorkout.name, savedWorkout.exercises, savedWorkout.xp, savedWorkout.duration)
+    const text = buildShareText(savedWorkout.name, savedWorkout.exercises, savedWorkout.duration, savedWorkout.workoutDate)
     try {
       await fetch(profile.discord_webhook, {
         method: 'POST',
@@ -532,14 +554,14 @@ export default function WorkoutLogger() {
   }
 
   async function handleCopy() {
-    const text = buildShareText(savedWorkout.name, savedWorkout.exercises, savedWorkout.xp, savedWorkout.duration)
+    const text = buildShareText(savedWorkout.name, savedWorkout.exercises, savedWorkout.duration, savedWorkout.workoutDate)
     await navigator.clipboard.writeText(text)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
   async function handleNativeShare() {
-    const text = buildShareText(savedWorkout.name, savedWorkout.exercises, savedWorkout.xp, savedWorkout.duration)
+    const text = buildShareText(savedWorkout.name, savedWorkout.exercises, savedWorkout.duration, savedWorkout.workoutDate)
     if (navigator.share) {
       try { await navigator.share({ title: savedWorkout.name, text }) } catch (_) {}
     } else {
@@ -551,33 +573,73 @@ export default function WorkoutLogger() {
     ' ' + startTime.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toLowerCase()
 
   if (levelUp) {
+    const currentUnlocked = profile?.unlocked_classes || ['warrior', 'mage']
+    const lockedClasses = CLASSES.filter(c => !currentUnlocked.includes(c))
+    const canChoose = levelUp.newLevel % 5 === 0 && lockedClasses.length > 0
+
+    async function handleUnlockClass() {
+      if (!pickedUnlockClass) return
+      setUnlockSaving(true)
+      try {
+        await api.updateProfile({ unlocked_classes: [...currentUnlocked, pickedUnlockClass] })
+        await refreshProfile()
+        setUnlockSaved(true)
+      } catch (e) { console.error(e) }
+      finally { setUnlockSaving(false) }
+    }
+
     return (
       <div className="max-w-md mx-auto px-4 py-12 flex flex-col items-center text-center">
-        <div className="pixel-card p-10 w-full" style={{ background: 'linear-gradient(135deg, #001d3d, #0a1628)', borderColor: '#38bdf8' }}>
+        <div className="pixel-card p-8 w-full" style={{ background: 'linear-gradient(135deg, #001d3d, #0a1628)', borderColor: '#38bdf8' }}>
           <div className="text-6xl mb-4">⭐</div>
           <div className="pixel-font text-yellow-400 mb-2" style={{ fontSize: '11px', letterSpacing: '3px' }}>LEVEL UP!</div>
           <div className="fantasy-font text-white mb-1" style={{ fontSize: '48px' }}>{levelUp.newLevel}</div>
           <div className="pixel-font text-sky-400 mb-6" style={{ fontSize: '14px' }}>{levelUp.title}</div>
-          {(() => {
-            const newlyUnlocked = CLASSES.filter(cls => CLASS_INFO[cls].unlockLevel === levelUp.newLevel)
-            return newlyUnlocked.length > 0 ? (
-              <div className="bg-yellow-900/30 border border-yellow-600 px-4 py-3 mb-6">
-                <div className="pixel-font text-yellow-400 mb-1" style={{ fontSize: '8px' }}>NEW CLASS UNLOCKED!</div>
-                <div className="text-white" style={{ fontSize: '13px' }}>
-                  {newlyUnlocked.map(cls => CLASS_INFO[cls].label).join(', ')}
-                </div>
-                <div className="text-gray-400 text-xs mt-1">Change your character in Profile</div>
+
+          {canChoose && !unlockSaved ? (
+            <div className="mb-6">
+              <div className="bg-yellow-900/30 border border-yellow-600 px-4 py-3 mb-4">
+                <div className="pixel-font text-yellow-400 mb-1" style={{ fontSize: '8px' }}>UNLOCK A NEW CLASS!</div>
+                <div className="text-gray-300" style={{ fontSize: '12px' }}>Every 5 levels, pick one class to unlock</div>
               </div>
-            ) : (
-              <div className="text-gray-400 mb-8" style={{ fontSize: '13px' }}>
-                You reached Level {levelUp.newLevel}. Keep pushing!
+              <div className="grid grid-cols-3 gap-2 mb-4">
+                {lockedClasses.map(cls => {
+                  const info = CLASS_INFO[cls]
+                  const selected = pickedUnlockClass === cls
+                  return (
+                    <button key={cls} onClick={() => setPickedUnlockClass(cls)}
+                      className={`py-3 px-2 border-2 transition-all flex flex-col items-center gap-2 ${
+                        selected ? 'border-yellow-400 bg-yellow-900/30' : 'border-gray-700 hover:border-gray-500 bg-black/20'
+                      }`}>
+                      <PixelCharacter options={{ gender: profile?.character?.gender || 'male', charClass: cls }} scale={0.4} />
+                      <div className={`pixel-font ${selected ? 'text-yellow-300' : 'text-gray-400'}`} style={{ fontSize: '7px' }}>{info.label}</div>
+                    </button>
+                  )
+                })}
               </div>
-            )
-          })()}
-          <button onClick={() => setLevelUp(null)}
-            className="pixel-btn bg-yellow-700 border-yellow-500 text-white px-10 py-4 w-full" style={{ fontSize: '11px' }}>
-            Continue →
-          </button>
+              <button onClick={handleUnlockClass} disabled={!pickedUnlockClass || unlockSaving}
+                className="pixel-btn bg-yellow-700 border-yellow-500 text-white px-10 py-3 w-full disabled:opacity-40" style={{ fontSize: '10px' }}>
+                {unlockSaving ? 'Unlocking...' : 'Unlock Class'}
+              </button>
+            </div>
+          ) : canChoose && unlockSaved ? (
+            <div className="bg-yellow-900/30 border border-yellow-600 px-4 py-3 mb-6">
+              <div className="pixel-font text-yellow-400 mb-1" style={{ fontSize: '8px' }}>CLASS UNLOCKED!</div>
+              <div className="text-white" style={{ fontSize: '14px' }}>{CLASS_INFO[pickedUnlockClass]?.label}</div>
+              <div className="text-gray-400 text-xs mt-1">Change your character in Profile</div>
+            </div>
+          ) : (
+            <div className="text-gray-400 mb-8" style={{ fontSize: '13px' }}>
+              You reached Level {levelUp.newLevel}. Keep pushing!
+            </div>
+          )}
+
+          {(!canChoose || unlockSaved) && (
+            <button onClick={() => setLevelUp(null)}
+              className="pixel-btn bg-yellow-700 border-yellow-500 text-white px-10 py-4 w-full" style={{ fontSize: '11px' }}>
+              Continue →
+            </button>
+          )}
         </div>
       </div>
     )
@@ -734,20 +796,49 @@ export default function WorkoutLogger() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ background: 'rgba(0,0,0,0.85)' }}>
           <div className="pixel-card w-full max-w-sm p-6" style={{ background: '#0d0d1f' }}>
-            <h2 className="pixel-font text-sky-400 mb-5 text-center" style={{ fontSize: '12px' }}>CONFIRM END TIME</h2>
-            <div className="mb-2">
-              <div className="pixel-font text-gray-500 mb-1" style={{ fontSize: '7px' }}>START</div>
-              <div className="text-gray-300" style={{ fontSize: '13px' }}>{startTimeStr}</div>
-            </div>
-            <div className="mb-5">
-              <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '7px' }}>END</div>
-              <input
-                type="time"
-                value={endTime}
-                onChange={e => setEndTime(e.target.value)}
-                className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none text-lg"
-              />
-            </div>
+            <h2 className="pixel-font text-sky-400 mb-5 text-center" style={{ fontSize: '12px' }}>
+              {importedDate ? 'CONFIRM WORKOUT TIME' : 'CONFIRM END TIME'}
+            </h2>
+            {importedDate ? (
+              <>
+                <div className="mb-3">
+                  <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '7px' }}>START</div>
+                  <input
+                    type="datetime-local"
+                    value={importedStartStr}
+                    onChange={e => setImportedStartStr(e.target.value)}
+                    className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none"
+                    style={{ fontSize: '13px' }}
+                  />
+                </div>
+                <div className="mb-5">
+                  <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '7px' }}>END</div>
+                  <input
+                    type="datetime-local"
+                    value={importedEndStr}
+                    onChange={e => setImportedEndStr(e.target.value)}
+                    className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none"
+                    style={{ fontSize: '13px' }}
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="mb-2">
+                  <div className="pixel-font text-gray-500 mb-1" style={{ fontSize: '7px' }}>START</div>
+                  <div className="text-gray-300" style={{ fontSize: '13px' }}>{startTimeStr}</div>
+                </div>
+                <div className="mb-5">
+                  <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '7px' }}>END</div>
+                  <input
+                    type="time"
+                    value={endTime}
+                    onChange={e => setEndTime(e.target.value)}
+                    className="w-full bg-black/40 border-2 border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none text-lg"
+                  />
+                </div>
+              </>
+            )}
             <div className="flex gap-3">
               <button onClick={() => setShowFinish(false)}
                 className="flex-1 py-3 border border-gray-700 text-gray-400 hover:text-white transition-all" style={{ fontSize: '11px' }}>

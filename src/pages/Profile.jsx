@@ -4,7 +4,7 @@ import { api } from '../lib/api'
 import { getLevelFromXP, getLevelTitle } from '../lib/xpSystem'
 import XPBar from '../components/XPBar'
 import PixelCharacter from '../components/PixelCharacter'
-import { CLASSES, CLASS_INFO, getUnlockedClasses } from '../lib/pixelCharacter'
+import { CLASSES, CLASS_INFO } from '../lib/pixelCharacter'
 
 export default function Profile() {
   const { profile, refreshProfile } = useAuth()
@@ -114,7 +114,8 @@ export default function Profile() {
                 {CLASSES.map(cls => {
                   const info = CLASS_INFO[cls]
                   const selected = character.charClass === cls
-                  const unlocked = info.unlockLevel <= level
+                  const unlockedClasses = profile?.unlocked_classes || ['warrior', 'mage']
+                  const unlocked = unlockedClasses.includes(cls)
                   return (
                     <button key={cls}
                       onClick={() => unlocked && updateChar('charClass', cls)}
@@ -128,7 +129,7 @@ export default function Profile() {
                       )}
                       <div className={`pixel-font ${selected ? 'text-sky-300' : unlocked ? 'text-gray-300' : 'text-gray-600'}`} style={{ fontSize: '8px' }}>{info.label}</div>
                       <div className={`${unlocked ? 'text-gray-500' : 'text-gray-700'}`} style={{ fontSize: '10px' }}>
-                        {unlocked ? info.desc : `Unlock at Lv ${info.unlockLevel}`}
+                        {unlocked ? info.desc : 'Not yet unlocked'}
                       </div>
                     </button>
                   )
