@@ -19,6 +19,17 @@ router.get('/friends', (req, res) => {
   })))
 })
 
+router.get('/pending', (req, res) => {
+  // Requests YOU sent that haven't been accepted yet
+  const pending = db.prepare(`
+    SELECT u.id, u.username, u.character
+    FROM friendships f
+    JOIN users u ON u.id = f.friend_id
+    WHERE f.user_id = ? AND f.status = 'pending'
+  `).all(req.user.id)
+  res.json(pending.map(u => ({ ...u, character: JSON.parse(u.character || '{}') })))
+})
+
 router.get('/requests', (req, res) => {
   const requests = db.prepare(`
     SELECT u.id, u.username, u.total_xp, u.character

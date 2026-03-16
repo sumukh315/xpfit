@@ -23,6 +23,7 @@ export default function Social() {
   const { profile, refreshProfile } = useAuth()
   const [friends, setFriends] = useState([])
   const [requests, setRequests] = useState([])
+  const [pending, setPending] = useState([])
   const [suggested, setSuggested] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState([])
@@ -39,6 +40,7 @@ export default function Social() {
     if (profile) {
       fetchFriends()
       fetchRequests()
+      fetchPending()
       fetchSuggested()
       setDiscordWebhook(profile.discord_webhook || '')
     }
@@ -64,6 +66,10 @@ export default function Social() {
     try { setRequests(await api.getFriendRequests()) } catch (e) { console.error(e) }
   }
 
+  async function fetchPending() {
+    try { setPending(await api.getPendingRequests()) } catch (e) { console.error(e) }
+  }
+
   async function fetchSuggested() {
     try { setSuggested(await api.getSuggestedFriends()) } catch (e) { console.error(e) }
   }
@@ -73,11 +79,12 @@ export default function Social() {
     try { setSearchResults(await api.searchUsers(searchQuery)) } catch (e) { console.error(e) }
   }
 
-  async function sendRequest(id) {
+  async function sendRequest(id, username) {
     try {
       await api.sendFriendRequest(id)
       setSearchResults(prev => prev.filter(u => u.id !== id))
       setSuggested(prev => prev.filter(u => u.id !== id))
+      setPending(prev => [...prev, { id, username }])
     } catch (e) { console.error(e) }
   }
 
@@ -217,7 +224,7 @@ export default function Social() {
                       <div className="text-gray-500 text-xs">Level {getLevelFromXP(u.total_xp || 0).level}</div>
                     </div>
                   </div>
-                  <button onClick={() => sendRequest(u.id)} className="pixel-btn bg-green-800 border-green-600 text-white px-3 py-1" style={{ fontSize: '8px' }}>+ Add</button>
+                  <button onClick={() => sendRequest(u.id, u.username)} className="pixel-btn bg-green-800 border-green-600 text-white px-3 py-1" style={{ fontSize: '8px' }}>+ Add</button>
                 </div>
               )
             })}
@@ -240,6 +247,21 @@ export default function Social() {
         )}
       </div>
 
+      {/* Pending sent requests */}
+      {pending.length > 0 && (
+        <div className="pixel-card p-4 mb-6">
+          <h2 className="pixel-font text-gray-500 mb-3" style={{ fontSize: '10px' }}>WAITING FOR RESPONSE ({pending.length})</h2>
+          <div className="flex flex-wrap gap-2">
+            {pending.map(u => (
+              <div key={u.id} className="flex items-center gap-2 bg-black/40 border border-gray-800 px-3 py-2">
+                <span className="text-gray-400 text-sm">{u.username}</span>
+                <span className="pixel-font text-gray-600" style={{ fontSize: '7px' }}>Request sent</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* People You May Know */}
       {suggested.length > 0 && (
         <div className="pixel-card p-4 mb-6">
@@ -258,7 +280,7 @@ export default function Social() {
                       <div className="text-gray-600" style={{ fontSize: '10px' }}>Friend of a friend</div>
                     </div>
                   </div>
-                  <button onClick={() => sendRequest(u.id)}
+                  <button onClick={() => sendRequest(u.id, u.username)}
                     className="pixel-btn bg-green-800 border-green-600 text-white px-3 py-1 flex-shrink-0" style={{ fontSize: '8px' }}>
                     + Add
                   </button>
