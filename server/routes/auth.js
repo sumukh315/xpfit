@@ -29,8 +29,8 @@ router.post('/signup', async (req, res) => {
 
 router.post('/login', async (req, res) => {
   const { email, password } = req.body
-  const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email)
-  if (!user) return res.status(401).json({ error: 'Invalid email or password' })
+  const user = db.prepare('SELECT * FROM users WHERE email = ? OR username = ?').get(email, email)
+  if (!user) return res.status(401).json({ error: 'Invalid username/email or password' })
 
   const valid = await bcrypt.compare(password, user.password_hash)
   if (!valid) return res.status(401).json({ error: 'Invalid email or password' })
