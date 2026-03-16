@@ -240,9 +240,12 @@ export default function Signup() {
         {/* Step 2: Hero selection */}
         {step === 2 && (
           <div>
-            <h2 className="fantasy-font text-sky-400 mb-6 text-center" style={{ fontSize: '20px' }}>
+            <h2 className="fantasy-font text-sky-400 mb-2 text-center" style={{ fontSize: '20px' }}>
               Choose Your Hero
             </h2>
+            <p className="text-gray-500 text-center mb-6" style={{ fontSize: '11px' }}>
+              Pick your class and a bonus unlock. Every 5 levels you'll earn a new class choice — the more you work out, the more you unlock.
+            </p>
 
             {/* Preview */}
             <div className="flex justify-center mb-6">
@@ -296,7 +299,7 @@ export default function Signup() {
 
             {/* Second unlock */}
             <div className="mb-6">
-              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>ALSO UNLOCK (free bonus class)</label>
+              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>BONUS STARTER CLASS (unlock 1 more now, earn the rest every 5 levels)</label>
               <div className="grid grid-cols-5 gap-2">
                 {CLASSES.filter(cls => cls !== character.charClass).map(cls => {
                   const info = CLASS_INFO[cls]
