@@ -92,35 +92,38 @@ function parseWorkoutText(text) {
   const exercises = []
   let current = null
 
-  // Matches a set value: optional bullet, weight, optional unit, x/×, reps
-  // e.g. "• 135 lbs × 10", "100 x 20", "135x10", "- 45 kg × 12"
-  const setOnlyRe = /^[•\-\*]?\s*(\d+(?:\.\d+)?)\s*(?:lbs?|kg)?\s*[x×]\s*(\d+)(?:\s*reps?)?\s*$/i
+  // Matches a set: optional bullet, weight with optional unit attached or separate, x/×, reps, optional trailing note
+  // Handles: "290lb x 5", "• 135 lbs × 10", "100 x 20 Then hold", "135x10"
+  const setOnlyRe = /^[•\-\*]?\s*(\d+(?:\.\d+)?)\s*(?:lbs?|kg)?\s*[x×]\s*(\d+)(.*)$/i
   // Matches "ExerciseName 100 x 20" — name then set inline
-  const inlineRe = /^(.+?)\s{1,}(\d+(?:\.\d+)?)\s*(?:lbs?|kg)?\s*[x×]\s*(\d+)(?:\s*reps?)?\s*$/i
-  // Date/header lines to skip
-  const skipRe = /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|\d{1,2}[\/\-]\d{1,2}|\d{4}[-\/]\d{2}|workout\s*#?\d*|date:|notes?:|day\s*\d)/i
+  const inlineRe = /^(.+?)\s{1,}(\d+(?:\.\d+)?)\s*(?:lbs?|kg)?\s*[x×]\s*(\d+)(.*)?$/i
+  // Lines to skip: dates, app attribution lines
+  const skipRe = /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|\d{1,2}[\/\-]\d{1,2}|\d{4}[-\/]\d{2}|workout\s*#?\d*|date:|notes?:|day\s*\d|logged\s+using|logged\s+with)/i
 
   for (const line of lines) {
     if (skipRe.test(line)) continue
 
     const setMatch = line.match(setOnlyRe)
     if (setMatch) {
-      // Pure set line — attach to current exercise
-      if (current) {
-        current.sets.push({ weight: setMatch[1], reps: setMatch[2] })
+      const trailingNote = setMatch[3]?.trim() || ''
+      // Only treat as a pure set line if there's no long text before the numbers
+      // i.e. the whole line starts with a number (possibly with bullet)
+      const startsWithNumber = /^[•\-\*]?\s*\d/.test(line)
+      if (startsWithNumber && current) {
+        current.sets.push({ weight: setMatch[1], reps: setMatch[2], note: trailingNote || undefined })
+        continue
       }
-      continue
     }
 
     const inlineMatch = line.match(inlineRe)
     if (inlineMatch) {
-      // "ExerciseName weight x reps" — new exercise + first set
       const name = inlineMatch[1].replace(/^[•\-\*]\s*/, '').trim()
-      // Sanity check: name shouldn't be just a number
+      const trailingNote = inlineMatch[4]?.trim() || ''
       if (/^\d+$/.test(name)) {
-        if (current) current.sets.push({ weight: name, reps: inlineMatch[3] })
+        // Name part is just a number — treat whole line as set
+        if (current) current.sets.push({ weight: name, reps: inlineMatch[3], note: trailingNote || undefined })
       } else {
-        current = { name: titleCase(name), sets: [{ weight: inlineMatch[2], reps: inlineMatch[3] }] }
+        current = { name: titleCase(name), sets: [{ weight: inlineMatch[2], reps: inlineMatch[3], note: trailingNote || undefined }] }
         exercises.push(current)
       }
       continue
