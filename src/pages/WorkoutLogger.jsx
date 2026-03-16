@@ -86,6 +86,154 @@ const MUSCLE_GROUPS = [
   },
 ]
 
+// ─── Workout Text Parser ──────────────────────────────────────────────────────
+function parseWorkoutText(text) {
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean)
+  const exercises = []
+  let current = null
+
+  // Matches a set value: optional bullet, weight, optional unit, x/×, reps
+  // e.g. "• 135 lbs × 10", "100 x 20", "135x10", "- 45 kg × 12"
+  const setOnlyRe = /^[•\-\*]?\s*(\d+(?:\.\d+)?)\s*(?:lbs?|kg)?\s*[x×]\s*(\d+)(?:\s*reps?)?\s*$/i
+  // Matches "ExerciseName 100 x 20" — name then set inline
+  const inlineRe = /^(.+?)\s{1,}(\d+(?:\.\d+)?)\s*(?:lbs?|kg)?\s*[x×]\s*(\d+)(?:\s*reps?)?\s*$/i
+  // Date/header lines to skip
+  const skipRe = /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|\d{1,2}[\/\-]\d{1,2}|\d{4}[-\/]\d{2}|workout\s*#?\d*|date:|notes?:|day\s*\d)/i
+
+  for (const line of lines) {
+    if (skipRe.test(line)) continue
+
+    const setMatch = line.match(setOnlyRe)
+    if (setMatch) {
+      // Pure set line — attach to current exercise
+      if (current) {
+        current.sets.push({ weight: setMatch[1], reps: setMatch[2] })
+      }
+      continue
+    }
+
+    const inlineMatch = line.match(inlineRe)
+    if (inlineMatch) {
+      // "ExerciseName weight x reps" — new exercise + first set
+      const name = inlineMatch[1].replace(/^[•\-\*]\s*/, '').trim()
+      // Sanity check: name shouldn't be just a number
+      if (/^\d+$/.test(name)) {
+        if (current) current.sets.push({ weight: name, reps: inlineMatch[3] })
+      } else {
+        current = { name: titleCase(name), sets: [{ weight: inlineMatch[2], reps: inlineMatch[3] }] }
+        exercises.push(current)
+      }
+      continue
+    }
+
+    // Plain text → exercise name
+    const cleanName = line.replace(/^[•\-\*]\s*/, '').trim()
+    if (cleanName && !/^\d+$/.test(cleanName)) {
+      current = { name: titleCase(cleanName), sets: [] }
+      exercises.push(current)
+    }
+  }
+
+  return exercises.filter(e => e.sets.length > 0)
+}
+
+function titleCase(str) {
+  return str.replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+}
+
+// ─── Paste Import Modal ───────────────────────────────────────────────────────
+function PasteImportModal({ onImport, onClose }) {
+  const [text, setText] = useState('')
+  const [preview, setPreview] = useState(null)
+
+  function handleParse() {
+    const parsed = parseWorkoutText(text)
+    setPreview(parsed)
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+      style={{ background: 'rgba(0,0,0,0.85)' }}
+      onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="pixel-card w-full max-w-lg" style={{ background: '#12121e', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
+        <div className="p-4 border-b border-gray-800 flex justify-between items-center">
+          <span className="pixel-font text-sky-400" style={{ fontSize: '10px' }}>IMPORT FROM TEXT</span>
+          <button onClick={onClose} className="text-gray-500 hover:text-white text-xl">✕</button>
+        </div>
+
+        {!preview ? (
+          <div className="p-4 flex flex-col gap-3 flex-1">
+            <p className="text-gray-400" style={{ fontSize: '12px' }}>
+              Paste your workout from Rep Count, Notes, or any format. Supports:
+            </p>
+            <ul className="text-gray-500 pl-4" style={{ fontSize: '11px', lineHeight: '1.8' }}>
+              <li>• Rep Count exports (• 135 lbs × 10)</li>
+              <li>• Inline: <em>Bench Press 135 x 10</em></li>
+              <li>• Name then sets below: <em>Squat</em> / <em>225 x 5</em></li>
+              <li>• Mixed formats in one paste</li>
+            </ul>
+            <textarea
+              autoFocus
+              placeholder={"Bench Press\n• 135 lbs × 10\n• 155 lbs × 8\n\nSquat 225 x 5\n245 x 3"}
+              value={text}
+              onChange={e => setText(e.target.value)}
+              rows={10}
+              className="w-full bg-black/40 border border-gray-700 text-white px-3 py-2 resize-none focus:border-sky-500 outline-none font-mono"
+              style={{ fontSize: '12px' }}
+            />
+            <button
+              onClick={handleParse}
+              disabled={!text.trim()}
+              className="pixel-btn bg-sky-700 border-sky-500 text-white py-3 disabled:opacity-40"
+              style={{ fontSize: '10px' }}>
+              Parse Workout →
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col flex-1 overflow-hidden">
+            <div className="overflow-y-auto flex-1 p-4">
+              {preview.length === 0 ? (
+                <p className="text-red-400 text-center py-8" style={{ fontSize: '13px' }}>
+                  Couldn't parse any exercises. Try a different format.
+                </p>
+              ) : (
+                <>
+                  <p className="pixel-font text-green-400 mb-3" style={{ fontSize: '8px' }}>
+                    FOUND {preview.length} EXERCISE{preview.length !== 1 ? 'S' : ''}
+                  </p>
+                  {preview.map((ex, i) => (
+                    <div key={i} className="bg-black/40 border border-gray-800 p-3 mb-2">
+                      <div className="text-white font-medium mb-1" style={{ fontSize: '13px' }}>{ex.name}</div>
+                      <div className="flex flex-wrap gap-2">
+                        {ex.sets.map((s, j) => (
+                          <span key={j} className="text-sky-300 text-xs border border-sky-900 px-2 py-0.5">
+                            {s.weight}lbs × {s.reps}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
+            <div className="p-4 border-t border-gray-800 flex gap-3">
+              <button onClick={() => setPreview(null)}
+                className="flex-1 py-2 border border-gray-700 text-gray-400 hover:text-white transition-all" style={{ fontSize: '11px' }}>
+                ← Edit
+              </button>
+              <button onClick={() => { onImport(preview); onClose() }}
+                disabled={preview.length === 0}
+                className="flex-1 pixel-btn bg-green-700 border-green-500 text-white py-2 disabled:opacity-40" style={{ fontSize: '10px' }}>
+                Add to Workout
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ─── Exercise Picker Modal ────────────────────────────────────────────────────
 function ExercisePicker({ onSelect, onClose }) {
   const [activeGroup, setActiveGroup] = useState('chest')
@@ -245,6 +393,7 @@ export default function WorkoutLogger() {
   const [photoFile, setPhotoFile] = useState(null)
   const [saving, setSaving] = useState(false)
   const [showPicker, setShowPicker] = useState(false)
+  const [showPaste, setShowPaste] = useState(false)
   const [recommendations, setRecommendations] = useState({})
   const [previousWorkouts, setPreviousWorkouts] = useState({})
   const [savedWorkout, setSavedWorkout] = useState(null)
@@ -288,6 +437,10 @@ export default function WorkoutLogger() {
 
   function addExercise(name) {
     setExercises(prev => [...prev, { name, sets: [{ weight: '', reps: '' }] }])
+  }
+
+  function importExercises(parsed) {
+    setExercises(prev => [...prev, ...parsed])
   }
 
   const totalSets = exercises.reduce((acc, e) => acc + (e.sets?.length || 0), 0)
@@ -440,10 +593,16 @@ export default function WorkoutLogger() {
         <div className="text-center py-10 border-2 border-dashed border-gray-800 mb-5">
           <div className="text-4xl mb-3">💪</div>
           <p className="text-gray-500 mb-4">No exercises yet</p>
-          <button onClick={() => setShowPicker(true)}
-            className="pixel-btn bg-sky-700 border-sky-500 text-white px-8 py-3" style={{ fontSize: '10px' }}>
-            + Add First Exercise
-          </button>
+          <div className="flex gap-3 justify-center flex-wrap">
+            <button onClick={() => setShowPicker(true)}
+              className="pixel-btn bg-sky-700 border-sky-500 text-white px-8 py-3" style={{ fontSize: '10px' }}>
+              + Add Exercise
+            </button>
+            <button onClick={() => setShowPaste(true)}
+              className="pixel-btn bg-gray-800 border-gray-600 text-white px-8 py-3" style={{ fontSize: '10px' }}>
+              📋 Paste from App
+            </button>
+          </div>
         </div>
       ) : (
         <>
@@ -453,10 +612,16 @@ export default function WorkoutLogger() {
               onRemove={() => setExercises(prev => prev.filter((_, idx) => idx !== i))}
               recommendation={recommendations[ex.name]} />
           ))}
-          <button onClick={() => setShowPicker(true)}
-            className="w-full py-3 border-2 border-dashed border-gray-700 text-gray-400 hover:border-sky-600 hover:text-sky-400 transition-all mb-5" style={{ fontSize: '12px' }}>
-            + Add Exercise
-          </button>
+          <div className="flex gap-2 mb-5">
+            <button onClick={() => setShowPicker(true)}
+              className="flex-1 py-3 border-2 border-dashed border-gray-700 text-gray-400 hover:border-sky-600 hover:text-sky-400 transition-all" style={{ fontSize: '12px' }}>
+              + Add Exercise
+            </button>
+            <button onClick={() => setShowPaste(true)}
+              className="py-3 px-4 border-2 border-dashed border-gray-700 text-gray-500 hover:border-gray-500 hover:text-gray-300 transition-all" style={{ fontSize: '11px' }}>
+              📋 Paste
+            </button>
+          </div>
         </>
       )}
 
@@ -496,6 +661,11 @@ export default function WorkoutLogger() {
       {/* Exercise picker modal */}
       {showPicker && (
         <ExercisePicker onSelect={addExercise} onClose={() => setShowPicker(false)} />
+      )}
+
+      {/* Paste import modal */}
+      {showPaste && (
+        <PasteImportModal onImport={importExercises} onClose={() => setShowPaste(false)} />
       )}
     </div>
   )
