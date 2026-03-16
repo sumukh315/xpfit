@@ -203,7 +203,7 @@ function PasteImportModal({ onImport, onClose }) {
       onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="pixel-card w-full max-w-lg" style={{ background: '#12121e', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
         <div className="p-4 border-b border-gray-800 flex justify-between items-center">
-          <span className="pixel-font text-sky-400" style={{ fontSize: '10px' }}>IMPORT FROM TEXT</span>
+          <span className="pixel-font text-sky-400" style={{ fontSize: '13px' }}>IMPORT FROM TEXT</span>
           <button onClick={onClose} className="text-gray-500 hover:text-white text-xl">✕</button>
         </div>
 
@@ -225,7 +225,7 @@ function PasteImportModal({ onImport, onClose }) {
               onClick={handleParse}
               disabled={!text.trim()}
               className="pixel-btn bg-sky-700 border-sky-500 text-white py-3 disabled:opacity-40"
-              style={{ fontSize: '10px' }}>
+              style={{ fontSize: '13px' }}>
               Parse Workout →
             </button>
           </div>
@@ -240,7 +240,7 @@ function PasteImportModal({ onImport, onClose }) {
                 <>
                   {/* Editable workout date */}
                   <div className="mb-4 bg-black/40 border border-gray-700 p-3">
-                    <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '7px' }}>WORKOUT DATE & TIME</div>
+                    <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '13px' }}>WORKOUT DATE & TIME</div>
                     <input
                       type="datetime-local"
                       value={workoutDate}
@@ -250,7 +250,7 @@ function PasteImportModal({ onImport, onClose }) {
                     />
                   </div>
 
-                  <p className="pixel-font text-green-400 mb-3" style={{ fontSize: '8px' }}>
+                  <p className="pixel-font text-green-400 mb-3" style={{ fontSize: '12px' }}>
                     FOUND {preview.length} EXERCISE{preview.length !== 1 ? 'S' : ''}
                   </p>
                   {preview.map((ex, i) => (
@@ -270,12 +270,12 @@ function PasteImportModal({ onImport, onClose }) {
             </div>
             <div className="p-4 border-t border-gray-800 flex gap-3">
               <button onClick={() => setPreview(null)}
-                className="flex-1 py-2 border border-gray-700 text-gray-400 hover:text-white transition-all" style={{ fontSize: '11px' }}>
+                className="flex-1 py-2 border border-gray-700 text-gray-400 hover:text-white transition-all" style={{ fontSize: '13px' }}>
                 ← Edit
               </button>
               <button onClick={() => { onImport(preview, workoutDate ? new Date(workoutDate) : null); onClose() }}
                 disabled={preview.length === 0}
-                className="flex-1 pixel-btn bg-green-700 border-green-500 text-white py-2 disabled:opacity-40" style={{ fontSize: '10px' }}>
+                className="flex-1 pixel-btn bg-green-700 border-green-500 text-white py-2 disabled:opacity-40" style={{ fontSize: '13px' }}>
                 Add to Workout
               </button>
             </div>
@@ -322,7 +322,7 @@ function ExercisePicker({ onSelect, onClose }) {
                   activeGroup === g.id
                     ? 'text-sky-300 border-b-2 border-sky-500 bg-sky-900/20'
                     : 'text-gray-500 hover:text-gray-300'
-                }`} style={{ fontSize: '8px' }}>
+                }`} style={{ fontSize: '12px' }}>
                 {g.label}
               </button>
             ))}
@@ -332,7 +332,7 @@ function ExercisePicker({ onSelect, onClose }) {
         {/* Exercise list */}
         <div className="overflow-y-auto flex-1 p-2">
           {search && (
-            <p className="pixel-font text-gray-600 px-2 py-1 mb-1" style={{ fontSize: '7px' }}>
+            <p className="pixel-font text-gray-600 px-2 py-1 mb-1" style={{ fontSize: '13px' }}>
               {filtered.length} results
             </p>
           )}
@@ -355,7 +355,7 @@ function ExercisePicker({ onSelect, onClose }) {
 function SetRow({ set, index, onChange, onRemove }) {
   return (
     <div className="flex gap-2 items-center">
-      <span className="pixel-font text-gray-600 w-6 text-center flex-shrink-0" style={{ fontSize: '8px' }}>{index + 1}</span>
+      <span className="pixel-font text-gray-600 w-6 text-center flex-shrink-0" style={{ fontSize: '12px' }}>{index + 1}</span>
       <input type="number" placeholder="lbs" value={set.weight || ''}
         onChange={e => onChange({ ...set, weight: e.target.value })}
         className="w-20 bg-black/40 border border-gray-700 text-white px-2 py-1.5 text-sm text-center focus:border-sky-500 outline-none" />
@@ -394,7 +394,7 @@ function ExerciseCard({ exercise, index, onChange, onRemove, recommendation }) {
         <div>
           <span className="text-white font-medium" style={{ fontSize: '15px' }}>{exercise.name}</span>
           {muscleGroup && (
-            <span className="ml-2 text-gray-600" style={{ fontSize: '11px' }}>{muscleGroup.label}</span>
+            <span className="ml-2 text-gray-600" style={{ fontSize: '13px' }}>{muscleGroup.label}</span>
           )}
         </div>
         <button onClick={onRemove} className="text-gray-700 hover:text-red-400 ml-2">✕</button>
@@ -402,7 +402,7 @@ function ExerciseCard({ exercise, index, onChange, onRemove, recommendation }) {
 
       {recommendation && (
         <div className="bg-sky-900/20 border border-sky-800 p-2 mb-3 text-xs text-sky-300">
-          💡 <span className="pixel-font" style={{ fontSize: '7px' }}>TIP:</span> {recommendation.reason}
+          💡 <span className="pixel-font" style={{ fontSize: '13px' }}>TIP:</span> {recommendation.reason}
           {recommendation.weight && ` Try ${recommendation.weight}lbs × ${recommendation.reps} reps.`}
         </div>
       )}
@@ -417,7 +417,7 @@ function ExerciseCard({ exercise, index, onChange, onRemove, recommendation }) {
           <SetRow key={i} set={set} index={i} onChange={s => updateSet(i, s)} onRemove={() => removeSet(i)} />
         ))}
       </div>
-      <button onClick={addSet} className="text-sky-400 hover:text-sky-300 text-xs border border-sky-900 hover:border-sky-600 px-3 py-1 transition-all" style={{ fontSize: '11px' }}>
+      <button onClick={addSet} className="text-sky-400 hover:text-sky-300 text-xs border border-sky-900 hover:border-sky-600 px-3 py-1 transition-all" style={{ fontSize: '13px' }}>
         + Add Set
       </button>
     </div>
@@ -600,6 +600,73 @@ export default function WorkoutLogger() {
     }
   }
 
+  async function handlePhotoShare() {
+    if (!photoFile) return
+    const img = new Image()
+    const objectUrl = URL.createObjectURL(photoFile)
+    img.src = objectUrl
+    await new Promise(resolve => { img.onload = resolve })
+
+    const MAX = 1080
+    const scale = Math.min(1, MAX / Math.max(img.width, img.height))
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.round(img.width * scale)
+    canvas.height = Math.round(img.height * scale)
+    const ctx = canvas.getContext('2d')
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+    URL.revokeObjectURL(objectUrl)
+
+    // Dark gradient strip at bottom
+    const stripH = Math.round(canvas.height * 0.2)
+    const grad = ctx.createLinearGradient(0, canvas.height - stripH, 0, canvas.height)
+    grad.addColorStop(0, 'rgba(0,0,0,0)')
+    grad.addColorStop(1, 'rgba(0,0,0,0.75)')
+    ctx.fillStyle = grad
+    ctx.fillRect(0, canvas.height - stripH, canvas.width, stripH)
+
+    const pad = Math.round(canvas.width * 0.04)
+    // Workout name
+    const nameSize = Math.round(stripH * 0.36)
+    ctx.font = `bold ${nameSize}px -apple-system, sans-serif`
+    ctx.fillStyle = '#ffffff'
+    ctx.textBaseline = 'bottom'
+    ctx.textAlign = 'left'
+    ctx.fillText(savedWorkout.name, pad, canvas.height - pad)
+
+    // Sub-line: duration + date
+    const sub = []
+    if (savedWorkout.duration) sub.push(`${savedWorkout.duration} min`)
+    if (savedWorkout.workoutDate) {
+      sub.push(savedWorkout.workoutDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }))
+    }
+    if (sub.length > 0) {
+      const subSize = Math.round(nameSize * 0.65)
+      ctx.font = `${subSize}px -apple-system, sans-serif`
+      ctx.fillStyle = 'rgba(255,255,255,0.75)'
+      ctx.fillText(sub.join(' · '), pad, canvas.height - pad - nameSize - 4)
+    }
+
+    // XPFIT branding — top right
+    const brandSize = Math.round(canvas.width * 0.038)
+    ctx.font = `bold ${brandSize}px -apple-system, sans-serif`
+    ctx.fillStyle = 'rgba(255,255,255,0.85)'
+    ctx.textBaseline = 'top'
+    ctx.textAlign = 'right'
+    ctx.fillText('XPFIT', canvas.width - pad, pad)
+
+    canvas.toBlob(async blob => {
+      const file = new File([blob], 'workout.jpg', { type: 'image/jpeg' })
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        try { await navigator.share({ files: [file], title: savedWorkout.name }) } catch (_) {}
+      } else {
+        const a = document.createElement('a')
+        a.href = URL.createObjectURL(blob)
+        a.download = 'workout.jpg'
+        a.click()
+      }
+    }, 'image/jpeg', 0.92)
+  }
+
   const startTimeStr = startTime.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) +
     ' ' + startTime.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toLowerCase()
 
@@ -623,14 +690,14 @@ export default function WorkoutLogger() {
       <div className="max-w-md mx-auto px-4 py-12 flex flex-col items-center text-center">
         <div className="pixel-card p-8 w-full" style={{ background: 'linear-gradient(135deg, #001d3d, #0a1628)', borderColor: '#38bdf8' }}>
 
-          <div className="pixel-font text-yellow-400 mb-2" style={{ fontSize: '11px', letterSpacing: '3px' }}>LEVEL UP!</div>
+          <div className="pixel-font text-yellow-400 mb-2" style={{ fontSize: '13px', letterSpacing: '3px' }}>LEVEL UP!</div>
           <div className="fantasy-font text-white mb-1" style={{ fontSize: '48px' }}>{levelUp.newLevel}</div>
           <div className="pixel-font text-sky-400 mb-6" style={{ fontSize: '14px' }}>{levelUp.title}</div>
 
           {canChoose && !unlockSaved ? (
             <div className="mb-6">
               <div className="bg-yellow-900/30 border border-yellow-600 px-4 py-3 mb-4">
-                <div className="pixel-font text-yellow-400 mb-1" style={{ fontSize: '8px' }}>UNLOCK A NEW CLASS!</div>
+                <div className="pixel-font text-yellow-400 mb-1" style={{ fontSize: '12px' }}>UNLOCK A NEW CLASS!</div>
                 <div className="text-gray-300" style={{ fontSize: '12px' }}>Every 5 levels, pick one class to unlock</div>
               </div>
               <div className="grid grid-cols-3 gap-2 mb-4">
@@ -641,19 +708,19 @@ export default function WorkoutLogger() {
                     <button key={cls} onClick={() => setPickedUnlockClass(cls)}
                       className={`py-3 px-2 flex flex-col items-center gap-2 ${selected ? 'glass-option-gold' : 'glass-option'}`}>
                       <PixelCharacter options={{ gender: profile?.character?.gender || 'male', charClass: cls }} scale={0.4} />
-                      <div className={`pixel-font ${selected ? 'text-yellow-300' : 'text-gray-400'}`} style={{ fontSize: '7px' }}>{info.label}</div>
+                      <div className={`pixel-font ${selected ? 'text-yellow-300' : 'text-gray-400'}`} style={{ fontSize: '13px' }}>{info.label}</div>
                     </button>
                   )
                 })}
               </div>
               <button onClick={handleUnlockClass} disabled={!pickedUnlockClass || unlockSaving}
-                className="pixel-btn bg-yellow-700 border-yellow-500 text-white px-10 py-3 w-full disabled:opacity-40" style={{ fontSize: '10px' }}>
+                className="pixel-btn bg-yellow-700 border-yellow-500 text-white px-10 py-3 w-full disabled:opacity-40" style={{ fontSize: '13px' }}>
                 {unlockSaving ? 'Unlocking...' : 'Unlock Class'}
               </button>
             </div>
           ) : canChoose && unlockSaved ? (
             <div className="bg-yellow-900/30 border border-yellow-600 px-4 py-3 mb-6">
-              <div className="pixel-font text-yellow-400 mb-1" style={{ fontSize: '8px' }}>CLASS UNLOCKED!</div>
+              <div className="pixel-font text-yellow-400 mb-1" style={{ fontSize: '12px' }}>CLASS UNLOCKED!</div>
               <div className="text-white" style={{ fontSize: '14px' }}>{CLASS_INFO[pickedUnlockClass]?.label}</div>
               <div className="text-gray-400 text-xs mt-1">Change your character in Profile</div>
             </div>
@@ -665,7 +732,7 @@ export default function WorkoutLogger() {
 
           {(!canChoose || unlockSaved) && (
             <button onClick={() => setLevelUp(null)}
-              className="pixel-btn bg-yellow-700 border-yellow-500 text-white px-10 py-4 w-full" style={{ fontSize: '11px' }}>
+              className="pixel-btn bg-yellow-700 border-yellow-500 text-white px-10 py-4 w-full" style={{ fontSize: '13px' }}>
               Continue →
             </button>
           )}
@@ -683,18 +750,24 @@ export default function WorkoutLogger() {
           <p className="text-gray-400 mb-2" style={{ fontSize: '13px' }}>{savedWorkout.name}</p>
           <p className="pixel-font text-sky-400 mb-6" style={{ fontSize: '12px' }}>+{savedWorkout.xp} XP earned</p>
 
-          <p className="pixel-font text-gray-500 mb-3" style={{ fontSize: '8px' }}>SHARE YOUR WORKOUT</p>
+          <p className="pixel-font text-gray-500 mb-3" style={{ fontSize: '12px' }}>SHARE YOUR WORKOUT</p>
           <div className="flex flex-col gap-3 mb-6">
+            {photoFile && (
+              <button onClick={handlePhotoShare}
+                className="pixel-btn bg-sky-700 border-sky-500 text-white py-3 w-full" style={{ fontSize: '13px' }}>
+                Share Photo to Messages
+              </button>
+            )}
             <button onClick={handleDiscordShare}
-              className="pixel-btn bg-indigo-800 border-indigo-600 text-white py-3 w-full" style={{ fontSize: '10px' }}>
+              className="pixel-btn bg-indigo-800 border-indigo-600 text-white py-3 w-full" style={{ fontSize: '13px' }}>
               Share to Discord
             </button>
             <button onClick={handleNativeShare}
-              className="pixel-btn bg-blue-800 border-blue-600 text-white py-3 w-full" style={{ fontSize: '10px' }}>
+              className="pixel-btn bg-blue-800 border-blue-600 text-white py-3 w-full" style={{ fontSize: '13px' }}>
               Share via Text / Messenger
             </button>
             <button onClick={handleCopy}
-              className="pixel-btn bg-gray-800 border-gray-600 text-white py-3 w-full" style={{ fontSize: '10px' }}>
+              className="pixel-btn bg-gray-800 border-gray-600 text-white py-3 w-full" style={{ fontSize: '13px' }}>
               {copied ? 'Copied!' : 'Copy to Clipboard'}
             </button>
           </div>
@@ -715,7 +788,7 @@ export default function WorkoutLogger() {
       <div className="flex justify-between items-center mb-4">
         <h1 className="pixel-font text-sky-400" style={{ fontSize: '14px' }}>Log Workout</h1>
         <div className="text-right">
-          <div className="pixel-font text-gray-500 mb-0.5" style={{ fontSize: '7px' }}>
+          <div className="pixel-font text-gray-500 mb-0.5" style={{ fontSize: '13px' }}>
             {importedDate ? 'WORKOUT DATE' : 'STARTED'}
           </div>
           <div className={importedDate ? 'text-yellow-400' : 'text-white'} style={{ fontSize: '12px' }}>
@@ -740,11 +813,11 @@ export default function WorkoutLogger() {
           <p className="text-gray-500 mb-4">No exercises yet</p>
           <div className="flex gap-3 justify-center flex-wrap">
             <button onClick={() => setShowPicker(true)}
-              className="pixel-btn bg-sky-700 border-sky-500 text-white px-8 py-3" style={{ fontSize: '10px' }}>
+              className="pixel-btn bg-sky-700 border-sky-500 text-white px-8 py-3" style={{ fontSize: '13px' }}>
               + Add Exercise
             </button>
             <button onClick={() => setShowPaste(true)}
-              className="pixel-btn bg-gray-800 border-gray-600 text-white px-8 py-3" style={{ fontSize: '10px' }}>
+              className="pixel-btn bg-gray-800 border-gray-600 text-white px-8 py-3" style={{ fontSize: '13px' }}>
               Paste from App
             </button>
           </div>
@@ -763,7 +836,7 @@ export default function WorkoutLogger() {
               + Add Exercise
             </button>
             <button onClick={() => setShowPaste(true)}
-              className="py-3 px-4 border-2 border-dashed border-gray-700 text-gray-500 hover:border-gray-500 hover:text-gray-300 transition-all" style={{ fontSize: '11px' }}>
+              className="py-3 px-4 border-2 border-dashed border-gray-700 text-gray-500 hover:border-gray-500 hover:text-gray-300 transition-all" style={{ fontSize: '13px' }}>
               📋 Paste
             </button>
           </div>
@@ -772,14 +845,14 @@ export default function WorkoutLogger() {
 
       {/* Notes */}
       <div className="pixel-card p-4 mb-3">
-        <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>NOTES</label>
+        <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '12px' }}>NOTES</label>
         <textarea placeholder="How did it go? Any PRs? How you felt..." value={notes} onChange={e => setNotes(e.target.value)}
           rows={3} className="w-full bg-black/40 border border-gray-700 text-white px-3 py-2 resize-none focus:border-sky-500 outline-none" />
       </div>
 
       {/* Photo */}
       <div className="pixel-card p-4 mb-5">
-        <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>ADD PHOTO</label>
+        <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '12px' }}>ADD PHOTO</label>
         <input type="file" accept="image/*" onChange={e => setPhotoFile(e.target.files[0])} className="text-gray-400 text-sm" />
         {photoFile && <p className="text-green-400 text-xs mt-1">Selected: {photoFile.name}</p>}
       </div>
@@ -789,11 +862,11 @@ export default function WorkoutLogger() {
         style={{ background: 'linear-gradient(to top, #0d0d1a, #12122288)' }}>
         <div className="max-w-2xl mx-auto flex items-center justify-between gap-4">
           <div>
-            <div className="pixel-font text-gray-500 mb-1" style={{ fontSize: '7px' }}>YOU WILL EARN</div>
+            <div className="pixel-font text-gray-500 mb-1" style={{ fontSize: '13px' }}>YOU WILL EARN</div>
             <div className="flex gap-3">
               <span className="pixel-font text-sky-400" style={{ fontSize: '13px' }}>+{xpPreview} XP</span>
               <span className="pixel-font text-yellow-400" style={{ fontSize: '13px' }}>+{pointsPreview} 🪙</span>
-              <span className="text-gray-600" style={{ fontSize: '11px' }}>{exercises.length} exercises · {totalSets} sets</span>
+              <span className="text-gray-600" style={{ fontSize: '13px' }}>{exercises.length} exercises · {totalSets} sets</span>
             </div>
           </div>
           <button onClick={() => {
@@ -804,7 +877,7 @@ export default function WorkoutLogger() {
             setEndTime(`${pad(now.getHours())}:${pad(now.getMinutes())}`)
             setShowFinish(true)
           }} disabled={saving || exercises.length === 0}
-            className="pixel-btn bg-green-700 border-green-500 text-white px-6 py-3 flex-shrink-0 disabled:opacity-40" style={{ fontSize: '10px' }}>
+            className="pixel-btn bg-green-700 border-green-500 text-white px-6 py-3 flex-shrink-0 disabled:opacity-40" style={{ fontSize: '13px' }}>
             {saving ? 'Saving...' : '✓ Finish'}
           </button>
         </div>
@@ -831,7 +904,7 @@ export default function WorkoutLogger() {
             {importedDate ? (
               <>
                 <div className="mb-3">
-                  <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '7px' }}>START</div>
+                  <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '13px' }}>START</div>
                   <input
                     type="datetime-local"
                     value={importedStartStr}
@@ -841,7 +914,7 @@ export default function WorkoutLogger() {
                   />
                 </div>
                 <div className="mb-5">
-                  <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '7px' }}>END</div>
+                  <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '13px' }}>END</div>
                   <input
                     type="datetime-local"
                     value={importedEndStr}
@@ -854,11 +927,11 @@ export default function WorkoutLogger() {
             ) : (
               <>
                 <div className="mb-2">
-                  <div className="pixel-font text-gray-500 mb-1" style={{ fontSize: '7px' }}>START</div>
+                  <div className="pixel-font text-gray-500 mb-1" style={{ fontSize: '13px' }}>START</div>
                   <div className="text-gray-300" style={{ fontSize: '13px' }}>{startTimeStr}</div>
                 </div>
                 <div className="mb-5">
-                  <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '7px' }}>END</div>
+                  <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '13px' }}>END</div>
                   <input
                     type="time"
                     value={endTime}
@@ -870,11 +943,11 @@ export default function WorkoutLogger() {
             )}
             <div className="flex gap-3">
               <button onClick={() => setShowFinish(false)}
-                className="flex-1 py-3 glass-option text-gray-400 hover:text-white transition-all" style={{ fontSize: '11px' }}>
+                className="flex-1 py-3 glass-option text-gray-400 hover:text-white transition-all" style={{ fontSize: '13px' }}>
                 Cancel
               </button>
               <button onClick={handleSave} disabled={saving}
-                className="flex-1 pixel-btn bg-green-700 border-green-500 text-white py-3 disabled:opacity-40" style={{ fontSize: '10px' }}>
+                className="flex-1 pixel-btn bg-green-700 border-green-500 text-white py-3 disabled:opacity-40" style={{ fontSize: '13px' }}>
                 {saving ? 'Saving...' : 'Save Workout'}
               </button>
             </div>

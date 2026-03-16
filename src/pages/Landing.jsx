@@ -26,8 +26,8 @@ export default function Landing() {
           { label: 'Social', desc: 'Challenge your friends' },
         ].map(f => (
           <div key={f.label} className="pixel-card p-4 text-center">
-            <div className="pixel-font text-sky-300 mb-1" style={{ fontSize: '8px' }}>{f.label}</div>
-            <div className="text-gray-400" style={{ fontSize: '11px' }}>{f.desc}</div>
+            <div className="pixel-font text-sky-300 mb-1" style={{ fontSize: '12px' }}>{f.label}</div>
+            <div className="text-gray-400" style={{ fontSize: '13px' }}>{f.desc}</div>
           </div>
         ))}
       </div>
@@ -37,20 +37,20 @@ export default function Landing() {
         <Link
           to="/signup"
           className="pixel-btn bg-sky-700 border-sky-500 text-white px-8 py-4 hover:bg-sky-600 no-underline"
-          style={{ fontSize: '11px' }}
+          style={{ fontSize: '13px' }}
         >
           Start Quest
         </Link>
         <Link
           to="/login"
           className="pixel-btn bg-transparent border-gray-600 text-gray-300 px-8 py-4 hover:border-sky-500 hover:text-white no-underline"
-          style={{ fontSize: '11px' }}
+          style={{ fontSize: '13px' }}
         >
           Login
         </Link>
       </div>
 
-      <p className="text-gray-600 mt-8" style={{ fontSize: '11px' }}>
+      <p className="text-gray-600 mt-8" style={{ fontSize: '13px' }}>
         Free to play. No pay-to-win. Just gains.
       </p>
     </div>

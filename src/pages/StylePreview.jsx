@@ -19,7 +19,7 @@ export default function StylePreview() {
       {/* ── Option 1: Glassy ── */}
       <div className="max-w-3xl mx-auto mb-16">
         <div className="mb-4 flex items-center gap-3">
-          <span className="pixel-font text-yellow-400" style={{ fontSize: '10px' }}>Option 1 — Glassy</span>
+          <span className="pixel-font text-yellow-400" style={{ fontSize: '13px' }}>Option 1 — Glassy</span>
           <span className="text-gray-600 text-xs">Semi-transparent with soft glow</span>
         </div>
         <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
@@ -47,7 +47,7 @@ export default function StylePreview() {
                   cursor: 'pointer',
                 }}>
                 <PixelCharacter options={{ gender, charClass: cls }} scale={0.4} />
-                <div className="pixel-font" style={{ fontSize: '7px', color: sel ? '#67e8f9' : '#6b7280' }}>
+                <div className="pixel-font" style={{ fontSize: '13px', color: sel ? '#67e8f9' : '#6b7280' }}>
                   {CLASS_INFO[cls].label}
                 </div>
               </button>
@@ -59,7 +59,7 @@ export default function StylePreview() {
       {/* ── Option 2: Pixel Frame ── */}
       <div className="max-w-3xl mx-auto mb-16">
         <div className="mb-4 flex items-center gap-3">
-          <span className="pixel-font text-yellow-400" style={{ fontSize: '10px' }}>Option 2 — Pixel Frame</span>
+          <span className="pixel-font text-yellow-400" style={{ fontSize: '13px' }}>Option 2 — Pixel Frame</span>
           <span className="text-gray-600 text-xs">Hard edges, inset shadow — classic RPG slot</span>
         </div>
         <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
@@ -86,7 +86,7 @@ export default function StylePreview() {
                   imageRendering: 'pixelated',
                 }}>
                 <PixelCharacter options={{ gender, charClass: cls }} scale={0.4} />
-                <div className="pixel-font" style={{ fontSize: '7px', color: sel ? '#38bdf8' : '#4b6680' }}>
+                <div className="pixel-font" style={{ fontSize: '13px', color: sel ? '#38bdf8' : '#4b6680' }}>
                   {CLASS_INFO[cls].label}
                 </div>
               </button>
@@ -98,7 +98,7 @@ export default function StylePreview() {
       {/* ── Option 3: Minimal ── */}
       <div className="max-w-3xl mx-auto mb-16">
         <div className="mb-4 flex items-center gap-3">
-          <span className="pixel-font text-yellow-400" style={{ fontSize: '10px' }}>Option 3 — Minimal</span>
+          <span className="pixel-font text-yellow-400" style={{ fontSize: '13px' }}>Option 3 — Minimal</span>
           <span className="text-gray-600 text-xs">Clean lines, bottom-only highlight on select</span>
         </div>
         <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
@@ -121,7 +121,7 @@ export default function StylePreview() {
                   cursor: 'pointer',
                 }}>
                 <PixelCharacter options={{ gender, charClass: cls }} scale={0.4} />
-                <div className="pixel-font" style={{ fontSize: '7px', color: sel ? '#38bdf8' : '#4b5563' }}>
+                <div className="pixel-font" style={{ fontSize: '13px', color: sel ? '#38bdf8' : '#4b5563' }}>
                   {CLASS_INFO[cls].label}
                 </div>
               </button>

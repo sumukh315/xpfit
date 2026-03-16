@@ -58,7 +58,7 @@ export default function Profile() {
         </div>
         <div className="flex-1 text-center md:text-left">
           <h2 className="pixel-font text-white mb-1" style={{ fontSize: '20px' }}>{profile?.username}</h2>
-          <p className="pixel-font text-sky-400 mb-1" style={{ fontSize: '11px' }}>Level {level} · {getLevelTitle(level)}</p>
+          <p className="pixel-font text-sky-400 mb-1" style={{ fontSize: '13px' }}>Level {level} · {getLevelTitle(level)}</p>
           <p className="text-gray-400 mb-4 capitalize" style={{ fontSize: '12px' }}>
             {charOptions.gender || 'Male'} · {CLASS_INFO[charOptions.charClass]?.label || 'Warrior'}
           </p>
@@ -78,16 +78,16 @@ export default function Profile() {
 
       <div className="pixel-card p-4">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="pixel-font text-sky-400" style={{ fontSize: '10px' }}>Change Character</h2>
+          <h2 className="pixel-font text-sky-400" style={{ fontSize: '13px' }}>Change Character</h2>
           {!editing ? (
             <button onClick={() => { setCharacter(profile?.character || {}); setEditing(true) }}
-              className="pixel-btn bg-sky-800 border-sky-600 text-white px-4 py-2" style={{ fontSize: '8px' }}>
+              className="pixel-btn bg-sky-800 border-sky-600 text-white px-4 py-2" style={{ fontSize: '12px' }}>
               Edit
             </button>
           ) : (
             <div className="flex gap-2">
-              <button onClick={() => setEditing(false)} className="pixel-btn bg-gray-800 border-gray-600 text-gray-300 px-3 py-1" style={{ fontSize: '8px' }}>Cancel</button>
-              <button onClick={saveCharacter} disabled={saving} className="pixel-btn bg-green-700 border-green-500 text-white px-4 py-1" style={{ fontSize: '8px' }}>
+              <button onClick={() => setEditing(false)} className="pixel-btn bg-gray-800 border-gray-600 text-gray-300 px-3 py-1" style={{ fontSize: '12px' }}>Cancel</button>
+              <button onClick={saveCharacter} disabled={saving} className="pixel-btn bg-green-700 border-green-500 text-white px-4 py-1" style={{ fontSize: '12px' }}>
                 {saving ? 'Saving...' : 'Save'}
               </button>
             </div>
@@ -98,7 +98,7 @@ export default function Profile() {
           <div className="mt-4">
 
             <div className="mb-4">
-              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '7px' }}>GENDER</label>
+              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '13px' }}>GENDER</label>
               <div className="flex gap-2">
                 {['male', 'female'].map(g => (
                   <button key={g} onClick={() => updateChar('gender', g)}
@@ -109,7 +109,7 @@ export default function Profile() {
               </div>
             </div>
             <div>
-              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '7px' }}>CLASS</label>
+              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '13px' }}>CLASS</label>
               <div className="grid grid-cols-3 gap-2">
                 {CLASSES.map(cls => {
                   const info = CLASS_INFO[cls]
@@ -125,10 +125,10 @@ export default function Profile() {
                         selected ? 'glass-option-active' : 'glass-option'
                       }`}>
                       {!unlocked && (
-                        <div className="absolute top-1 right-1 text-gray-600" style={{ fontSize: '9px' }}>🔒</div>
+                        <div className="absolute top-1 right-1 text-gray-600" style={{ fontSize: '12px' }}>🔒</div>
                       )}
-                      <div className={`pixel-font ${selected ? 'text-sky-300' : unlocked ? 'text-gray-300' : 'text-gray-600'}`} style={{ fontSize: '8px' }}>{info.label}</div>
-                      <div className={`${unlocked ? 'text-gray-500' : 'text-gray-700'}`} style={{ fontSize: '10px' }}>
+                      <div className={`pixel-font ${selected ? 'text-sky-300' : unlocked ? 'text-gray-300' : 'text-gray-600'}`} style={{ fontSize: '12px' }}>{info.label}</div>
+                      <div className={`${unlocked ? 'text-gray-500' : 'text-gray-700'}`} style={{ fontSize: '13px' }}>
                         {unlocked ? info.desc : 'Not yet unlocked'}
                       </div>
                     </button>
@@ -155,19 +155,19 @@ export default function Profile() {
       {/* Discord Integration */}
       <div className="pixel-card p-4 mt-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="pixel-font text-sky-400" style={{ fontSize: '10px' }}>Discord Integration</h2>
-          <span className={`pixel-font text-xs px-2 py-1 rounded-lg ${profile?.discord_webhook ? 'glass-option-active text-green-400' : 'glass-option text-gray-500'}`} style={{ fontSize: '8px' }}>
+          <h2 className="pixel-font text-sky-400" style={{ fontSize: '13px' }}>Discord Integration</h2>
+          <span className={`pixel-font text-xs px-2 py-1 rounded-lg ${profile?.discord_webhook ? 'glass-option-active text-green-400' : 'glass-option text-gray-500'}`} style={{ fontSize: '12px' }}>
             {profile?.discord_webhook ? 'Connected' : 'Disconnected'}
           </span>
         </div>
 
-        <p className="text-gray-500 mb-4" style={{ fontSize: '11px' }}>
+        <p className="text-gray-500 mb-4" style={{ fontSize: '13px' }}>
           Get notified in Discord every time you complete a workout. Paste your webhook URL below to connect.
         </p>
 
         <div className="glass-row p-3 mb-4 rounded">
-          <p className="pixel-font text-gray-400 mb-1" style={{ fontSize: '7px' }}>HOW TO GET YOUR WEBHOOK URL</p>
-          <p className="text-gray-500" style={{ fontSize: '11px' }}>
+          <p className="pixel-font text-gray-400 mb-1" style={{ fontSize: '13px' }}>HOW TO GET YOUR WEBHOOK URL</p>
+          <p className="text-gray-500" style={{ fontSize: '13px' }}>
             Discord server → Channel Settings → Integrations → Webhooks → New Webhook → Copy URL
           </p>
         </div>
@@ -185,7 +185,7 @@ export default function Profile() {
             onClick={saveDiscordWebhook}
             disabled={savingDiscord}
             className="pixel-btn bg-sky-800 border-sky-600 text-white px-4 py-2 disabled:opacity-50"
-            style={{ fontSize: '8px' }}>
+            style={{ fontSize: '12px' }}>
             {savingDiscord ? 'Saving...' : discordSaved ? 'Saved!' : 'Save'}
           </button>
         </div>
@@ -201,7 +201,7 @@ export default function Profile() {
               finally { setSavingDiscord(false) }
             }}
             className="text-gray-600 hover:text-red-400 text-xs mt-2 transition-colors"
-            style={{ fontSize: '11px' }}>
+            style={{ fontSize: '13px' }}>
             Remove webhook
           </button>
         )}

@@ -33,7 +33,7 @@ export default function Login() {
 
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
           <div>
-            <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>USERNAME OR EMAIL</label>
+            <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '12px' }}>USERNAME OR EMAIL</label>
             <input
               type="text"
               value={email}
@@ -43,7 +43,7 @@ export default function Login() {
             />
           </div>
           <div>
-            <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>PASSWORD</label>
+            <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '12px' }}>PASSWORD</label>
             <input
               type="password"
               value={password}
@@ -56,7 +56,7 @@ export default function Login() {
           {error && <p className="text-red-400" style={{ fontSize: '12px' }}>{error}</p>}
 
           <div className="text-right">
-            <Link to="/forgot-password" className="text-gray-500 hover:text-sky-400" style={{ fontSize: '11px' }}>
+            <Link to="/forgot-password" className="text-gray-500 hover:text-sky-400" style={{ fontSize: '13px' }}>
               Forgot password?
             </Link>
           </div>

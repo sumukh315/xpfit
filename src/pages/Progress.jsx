@@ -140,7 +140,7 @@ export default function Progress() {
         <>
           {/* ── Exercise Progress ───────────────────────────────────── */}
           <div className="pixel-card p-4 mb-6">
-            <h2 className="pixel-font text-sky-400 mb-4" style={{ fontSize: '10px' }}>Exercise Progress</h2>
+            <h2 className="pixel-font text-sky-400 mb-4" style={{ fontSize: '13px' }}>Exercise Progress</h2>
 
             {/* Muscle group tabs */}
             <div className="flex flex-wrap gap-1 mb-4">
@@ -150,7 +150,7 @@ export default function Progress() {
                     selectedGroup === g.id
                       ? 'border-sky-500 bg-sky-900/40 text-sky-300'
                       : 'border-gray-700 text-gray-500 hover:border-gray-500'
-                  }`} style={{ fontSize: '7px' }}>
+                  }`} style={{ fontSize: '13px' }}>
                   {g.label}
                 </button>
               ))}
@@ -166,7 +166,7 @@ export default function Progress() {
                     <button key={name} onClick={() => setSelectedExercise(name)}
                       className={`px-3 py-1.5 border-2 transition-all`}
                       style={{
-                        fontSize: '11px',
+                        fontSize: '13px',
                         borderColor: selectedExercise === name ? groupColor : '#374151',
                         background: selectedExercise === name ? `${groupColor}22` : 'transparent',
                         color: selectedExercise === name ? groupColor : '#9ca3af',
@@ -200,7 +200,7 @@ export default function Progress() {
 
           {/* ── Sets Per Week ───────────────────────────────────────── */}
           <div className="pixel-card p-4 mb-6">
-            <h2 className="pixel-font text-sky-400 mb-4" style={{ fontSize: '10px' }}>Sets Per Week by Muscle Group</h2>
+            <h2 className="pixel-font text-sky-400 mb-4" style={{ fontSize: '13px' }}>Sets Per Week by Muscle Group</h2>
             {weeklyData.length === 0 ? (
               <p className="text-gray-500 text-center py-6" style={{ fontSize: '12px' }}>Not enough data yet.</p>
             ) : (
@@ -210,7 +210,7 @@ export default function Progress() {
                   <XAxis dataKey="week" tick={{ fill: '#6b7280', fontSize: 9 }} />
                   <YAxis tick={{ fill: '#6b7280', fontSize: 10 }} />
                   <Tooltip content={<CustomTooltip />} />
-                  <Legend wrapperStyle={{ fontSize: '10px', color: '#9ca3af' }} />
+                  <Legend wrapperStyle={{ fontSize: '13px', color: '#9ca3af' }} />
                   {MUSCLE_GROUPS.map(g => (
                     <Bar key={g.id} dataKey={g.id} name={g.label} fill={g.color} stackId="a" />
                   ))}
@@ -221,7 +221,7 @@ export default function Progress() {
 
           {/* ── Personal Records ────────────────────────────────────── */}
           <div className="pixel-card p-4">
-            <h2 className="pixel-font text-sky-400 mb-4" style={{ fontSize: '10px' }}>Personal Records</h2>
+            <h2 className="pixel-font text-sky-400 mb-4" style={{ fontSize: '13px' }}>Personal Records</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {Object.entries(prs).slice(0, 9).map(([name, weight]) => (
                 <div key={name} className="glass-row p-3">

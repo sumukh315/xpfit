@@ -50,12 +50,12 @@ export default function ResetPassword() {
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-6">
             <div>
-              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>NEW PASSWORD</label>
+              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '12px' }}>NEW PASSWORD</label>
               <input type="password" value={password} onChange={e => setPassword(e.target.value)} required
                 className="glass-input w-full" />
             </div>
             <div>
-              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>CONFIRM PASSWORD</label>
+              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '12px' }}>CONFIRM PASSWORD</label>
               <input type="password" value={confirm} onChange={e => setConfirm(e.target.value)} required
                 className="glass-input w-full" />
             </div>

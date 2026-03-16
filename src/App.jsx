@@ -13,6 +13,7 @@ import Social from './pages/Social'
 import Profile from './pages/Profile'
 import StylePreview from './pages/StylePreview'
 import ColorPreview from './pages/ColorPreview'
+import FontPreview from './pages/FontPreview'
 import WorkoutLogs from './pages/WorkoutLogs'
 
 function ProtectedRoute({ children }) {
@@ -30,7 +31,7 @@ function AuthLayout({ children }) {
   return (
     <>
       <Navbar />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 main-content">{children}</main>
     </>
   )
 }
@@ -61,6 +62,7 @@ function AppRoutes() {
         <ProtectedRoute><AuthLayout><Social /></AuthLayout></ProtectedRoute>
       } />
       <Route path="/style-preview" element={<StylePreview />} />
+      <Route path="/font-preview" element={<FontPreview />} />
       <Route path="/color-preview" element={<ColorPreview />} />
       <Route path="/profile" element={
         <ProtectedRoute><AuthLayout><Profile /></AuthLayout></ProtectedRoute>
@@ -84,7 +86,12 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <div className="flex flex-col min-h-screen">
+        <div className="flex flex-col min-h-screen" style={{ position: 'relative', zIndex: 1 }}>
+          <div className="bg-decor" aria-hidden="true">
+            <div className="bg-orb bg-orb-1" />
+            <div className="bg-orb bg-orb-2" />
+            <div className="bg-orb bg-orb-3" />
+          </div>
           <div className="flex-1">
             <AppRoutes />
           </div>

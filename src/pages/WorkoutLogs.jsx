@@ -74,15 +74,15 @@ function PhotoLightbox({ url, workoutName, discordWebhook, onClose }) {
         <img src={url} alt="Workout" className="w-full max-h-[65vh] object-contain rounded" />
         <div className="flex gap-3 justify-center mt-4 flex-wrap">
           <button onClick={handleNativeShare}
-            className="pixel-btn bg-blue-800 border-blue-600 text-white px-5 py-2" style={{ fontSize: '10px' }}>
+            className="pixel-btn bg-blue-800 border-blue-600 text-white px-5 py-2" style={{ fontSize: '13px' }}>
             Share via Messages
           </button>
           <button onClick={handleDiscord}
-            className="pixel-btn bg-indigo-800 border-indigo-600 text-white px-5 py-2" style={{ fontSize: '10px' }}>
+            className="pixel-btn bg-indigo-800 border-indigo-600 text-white px-5 py-2" style={{ fontSize: '13px' }}>
             {discordSent ? 'Sent!' : 'Send to Discord'}
           </button>
           <button onClick={handleCopy}
-            className="pixel-btn bg-gray-800 border-gray-600 text-white px-5 py-2" style={{ fontSize: '10px' }}>
+            className="pixel-btn bg-gray-800 border-gray-600 text-white px-5 py-2" style={{ fontSize: '13px' }}>
             {copied ? 'Copied!' : 'Copy Photo Link'}
           </button>
         </div>
@@ -187,7 +187,7 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete }) {
 
             {/* Exercises */}
             <div>
-              <div className="pixel-font text-gray-500 mb-3" style={{ fontSize: '8px' }}>EXERCISES</div>
+              <div className="pixel-font text-gray-500 mb-3" style={{ fontSize: '12px' }}>EXERCISES</div>
               <div className="flex flex-col gap-3">
                 {(workout.exercises || []).map((ex, i) => (
                   <div key={i} className="bg-black/40 border border-gray-800 p-3">
@@ -211,7 +211,7 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete }) {
             {/* Notes */}
             {workout.notes && (
               <div>
-                <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '8px' }}>NOTES</div>
+                <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '12px' }}>NOTES</div>
                 <div className="bg-black/40 border border-gray-800 p-3 text-gray-300" style={{ fontSize: '13px', lineHeight: '1.6' }}>
                   {workout.notes}
                 </div>
@@ -221,7 +221,7 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete }) {
             {/* Photo */}
             {workout.photo_url && (
               <div>
-                <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '8px' }}>WORKOUT PHOTO</div>
+                <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '12px' }}>WORKOUT PHOTO</div>
                 <div className="relative">
                   <img
                     src={workout.photo_url}
@@ -233,7 +233,7 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete }) {
                   <button
                     onClick={() => setLightboxUrl(workout.photo_url)}
                     className="absolute bottom-2 right-2 bg-black/70 text-white px-3 py-1 border border-gray-600 hover:border-sky-500 transition-all"
-                    style={{ fontSize: '11px' }}>
+                    style={{ fontSize: '13px' }}>
                     View & Share Photo
                   </button>
                 </div>
@@ -242,18 +242,18 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete }) {
 
             {/* Share workout text */}
             <div>
-              <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '8px' }}>SHARE WORKOUT</div>
+              <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '12px' }}>SHARE WORKOUT</div>
               <div className="flex gap-2 flex-wrap">
                 <button onClick={handleDiscordShare}
-                  className="flex-1 pixel-btn bg-indigo-800 border-indigo-600 text-white py-2" style={{ fontSize: '9px' }}>
+                  className="flex-1 pixel-btn bg-indigo-800 border-indigo-600 text-white py-2" style={{ fontSize: '12px' }}>
                   {discordSent ? 'Sent!' : 'Discord'}
                 </button>
                 <button onClick={handleNativeShare}
-                  className="flex-1 pixel-btn bg-blue-800 border-blue-600 text-white py-2" style={{ fontSize: '9px' }}>
+                  className="flex-1 pixel-btn bg-blue-800 border-blue-600 text-white py-2" style={{ fontSize: '12px' }}>
                   Messages
                 </button>
                 <button onClick={handleCopyText}
-                  className="flex-1 pixel-btn bg-gray-800 border-gray-600 text-white py-2" style={{ fontSize: '9px' }}>
+                  className="flex-1 pixel-btn bg-gray-800 border-gray-600 text-white py-2" style={{ fontSize: '12px' }}>
                   {copied ? 'Copied!' : 'Copy'}
                 </button>
               </div>
@@ -267,7 +267,7 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete }) {
               {deleting ? 'Deleting...' : 'Delete Workout'}
             </button>
             <button onClick={onClose}
-              className="pixel-btn bg-sky-800 border-sky-600 text-white px-5 py-2" style={{ fontSize: '9px' }}>
+              className="pixel-btn bg-sky-800 border-sky-600 text-white px-5 py-2" style={{ fontSize: '12px' }}>
               Close
             </button>
           </div>
@@ -339,7 +339,7 @@ export default function WorkoutLogs() {
         <div className="flex flex-col gap-6">
           {Object.entries(grouped).map(([month, monthWorkouts]) => (
             <div key={month}>
-              <div className="pixel-font text-gray-600 mb-3 pb-1 border-b border-gray-800" style={{ fontSize: '8px' }}>
+              <div className="pixel-font text-gray-600 mb-3 pb-1 border-b border-gray-800" style={{ fontSize: '12px' }}>
                 {month.toUpperCase()} · {monthWorkouts.length} WORKOUT{monthWorkouts.length !== 1 ? 'S' : ''}
               </div>
               <div className="flex flex-col gap-2">
@@ -365,7 +365,7 @@ export default function WorkoutLogs() {
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-1 flex-shrink-0 ml-4">
-                          <span className="pixel-font text-sky-400" style={{ fontSize: '11px' }}>+{w.xp_earned || 0} XP</span>
+                          <span className="pixel-font text-sky-400" style={{ fontSize: '13px' }}>+{w.xp_earned || 0} XP</span>
                           {w.photo_url && (
                             <span className="text-gray-600 text-xs">📷 photo</span>
                           )}
@@ -375,12 +375,12 @@ export default function WorkoutLogs() {
                       {w.exercises?.length > 0 && (
                         <div className="mt-2 flex flex-wrap gap-1">
                           {w.exercises.slice(0, 4).map((ex, i) => (
-                            <span key={i} className="text-gray-600 glass-row px-2 py-0.5" style={{ fontSize: '10px' }}>
+                            <span key={i} className="text-gray-600 glass-row px-2 py-0.5" style={{ fontSize: '13px' }}>
                               {ex.name}
                             </span>
                           ))}
                           {w.exercises.length > 4 && (
-                            <span className="text-gray-700" style={{ fontSize: '10px' }}>+{w.exercises.length - 4} more</span>
+                            <span className="text-gray-700" style={{ fontSize: '13px' }}>+{w.exercises.length - 4} more</span>
                           )}
                         </div>
                       )}

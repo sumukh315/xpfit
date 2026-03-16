@@ -103,10 +103,10 @@ export default function Signup() {
             <div key={s} className="flex items-center gap-2">
               <div className={`w-8 h-8 flex items-center justify-center border-2 pixel-font ${
                 i <= step ? 'border-sky-400 bg-sky-900/40 text-sky-300' : 'border-gray-600 text-gray-600'
-              }`} style={{ fontSize: '10px' }}>
+              }`} style={{ fontSize: '13px' }}>
                 {i + 1}
               </div>
-              <span className={`pixel-font hidden sm:block ${i <= step ? 'text-sky-300' : 'text-gray-600'}`} style={{ fontSize: '8px' }}>
+              <span className={`pixel-font hidden sm:block ${i <= step ? 'text-sky-300' : 'text-gray-600'}`} style={{ fontSize: '12px' }}>
                 {s}
               </span>
               {i < STEPS.length - 1 && <div className={`w-6 h-0.5 ${i < step ? 'bg-purple-500' : 'bg-gray-700'}`} />}
@@ -122,18 +122,18 @@ export default function Signup() {
             </h2>
             <div className="flex flex-col gap-4">
               <div>
-                <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>USERNAME</label>
+                <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '12px' }}>USERNAME</label>
                 <input type="text" value={username} onChange={e => setUsername(e.target.value)}
                   className="glass-input w-full"
                   placeholder="YourHeroName" />
               </div>
               <div>
-                <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>EMAIL</label>
+                <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '12px' }}>EMAIL</label>
                 <input type="email" value={email} onChange={e => setEmail(e.target.value)}
                   className="glass-input w-full" />
               </div>
               <div>
-                <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>PASSWORD</label>
+                <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '12px' }}>PASSWORD</label>
                 <input type="password" value={password} onChange={e => setPassword(e.target.value)}
                   className="glass-input w-full" />
               </div>
@@ -152,18 +152,18 @@ export default function Signup() {
             <h2 className="fantasy-font text-sky-400 mb-2 text-center" style={{ fontSize: '20px' }}>
               Fitness Goals
             </h2>
-            <p className="text-gray-500 text-center mb-6" style={{ fontSize: '11px' }}>
+            <p className="text-gray-500 text-center mb-6" style={{ fontSize: '13px' }}>
               Help us personalize your XPFit experience
             </p>
 
             {/* Fitness Goals */}
             <div className="mb-5">
-              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>PRIMARY GOALS (select all that apply)</label>
+              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '12px' }}>PRIMARY GOALS (select all that apply)</label>
               <div className="grid grid-cols-2 gap-2">
                 {FITNESS_GOALS.map(g => (
                   <button key={g.value} onClick={() => toggleFitnessGoal(g.value)}
                     className={`py-2 px-3 text-left ${fitnessProfile.fitnessGoals.includes(g.value) ? 'glass-option-active text-sky-300' : 'glass-option text-gray-400'}`}
-                    style={{ fontSize: '11px' }}>
+                    style={{ fontSize: '13px' }}>
                     {g.label}
                   </button>
                 ))}
@@ -172,13 +172,13 @@ export default function Signup() {
 
             {/* Experience Level */}
             <div className="mb-5">
-              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>EXPERIENCE LEVEL</label>
+              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '12px' }}>EXPERIENCE LEVEL</label>
               <div className="flex gap-2">
                 {EXPERIENCE_LEVELS.map(lvl => (
                   <button key={lvl.value} onClick={() => updateFitness('experienceLevel', lvl.value)}
                     className={`flex-1 py-2 px-2 text-center ${fitnessProfile.experienceLevel === lvl.value ? 'glass-option-active' : 'glass-option'}`}>
-                    <div className={`pixel-font ${fitnessProfile.experienceLevel === lvl.value ? 'text-sky-300' : 'text-gray-400'}`} style={{ fontSize: '8px' }}>{lvl.label}</div>
-                    <div className="text-gray-500" style={{ fontSize: '9px' }}>{lvl.desc}</div>
+                    <div className={`pixel-font ${fitnessProfile.experienceLevel === lvl.value ? 'text-sky-300' : 'text-gray-400'}`} style={{ fontSize: '12px' }}>{lvl.label}</div>
+                    <div className="text-gray-500" style={{ fontSize: '12px' }}>{lvl.desc}</div>
                   </button>
                 ))}
               </div>
@@ -186,12 +186,12 @@ export default function Signup() {
 
             {/* Workout Types */}
             <div className="mb-5">
-              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>WORKOUT TYPES (select all that apply)</label>
+              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '12px' }}>WORKOUT TYPES (select all that apply)</label>
               <div className="flex flex-wrap gap-2">
                 {WORKOUT_TYPES.map(type => (
                   <button key={type.value} onClick={() => toggleWorkoutType(type.value)}
                     className={`py-1.5 px-3 ${fitnessProfile.workoutTypes.includes(type.value) ? 'glass-option-active text-sky-300' : 'glass-option text-gray-400'}`}
-                    style={{ fontSize: '11px' }}>
+                    style={{ fontSize: '13px' }}>
                     {type.label}
                   </button>
                 ))}
@@ -200,14 +200,14 @@ export default function Signup() {
 
             {/* Days Per Week */}
             <div className="mb-6">
-              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>
+              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '12px' }}>
                 DAYS PER WEEK: <span className="text-sky-400">{fitnessProfile.daysPerWeek}</span>
               </label>
               <div className="flex gap-1">
                 {[1,2,3,4,5,6,7].map(d => (
                   <button key={d} onClick={() => updateFitness('daysPerWeek', d)}
                     className={`flex-1 py-2 pixel-font ${fitnessProfile.daysPerWeek === d ? 'glass-option-active text-sky-300' : 'glass-option text-gray-500'}`}
-                    style={{ fontSize: '10px' }}>
+                    style={{ fontSize: '13px' }}>
                     {d}
                   </button>
                 ))}
@@ -215,9 +215,9 @@ export default function Signup() {
             </div>
 
             <div className="flex gap-3">
-              <button onClick={() => setStep(0)} className="pixel-btn bg-gray-800 border-gray-600 text-gray-300 py-2 px-4" style={{ fontSize: '9px' }}>← Back</button>
+              <button onClick={() => setStep(0)} className="pixel-btn bg-gray-800 border-gray-600 text-gray-300 py-2 px-4" style={{ fontSize: '12px' }}>← Back</button>
               <button onClick={() => setStep(2)}
-                className="flex-1 pixel-btn bg-sky-700 border-sky-500 text-white py-2" style={{ fontSize: '9px' }}>
+                className="flex-1 pixel-btn bg-sky-700 border-sky-500 text-white py-2" style={{ fontSize: '12px' }}>
                 Next →
               </button>
             </div>
@@ -230,7 +230,7 @@ export default function Signup() {
             <h2 className="fantasy-font text-sky-400 mb-2 text-center" style={{ fontSize: '20px' }}>
               Choose Your Hero
             </h2>
-            <p className="text-gray-500 text-center mb-6" style={{ fontSize: '11px' }}>
+            <p className="text-gray-500 text-center mb-6" style={{ fontSize: '13px' }}>
               Pick your class and a bonus unlock. Every 5 levels you'll earn a new class choice — the more you work out, the more you unlock.
             </p>
 
@@ -238,7 +238,7 @@ export default function Signup() {
             <div className="flex justify-center mb-6">
               <div className="pixel-card p-4 glow-purple flex flex-col items-center gap-2">
                 <PixelCharacter options={character} scale={1} />
-                <span className="pixel-font text-sky-300" style={{ fontSize: '9px' }}>
+                <span className="pixel-font text-sky-300" style={{ fontSize: '12px' }}>
                   {CLASS_INFO[character.charClass]?.label} · {character.gender === 'male' ? 'Male' : 'Female'}
                 </span>
               </div>
@@ -246,12 +246,12 @@ export default function Signup() {
 
             {/* Gender */}
             <div className="mb-5">
-              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>GENDER</label>
+              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '12px' }}>GENDER</label>
               <div className="flex gap-3">
                 {['male', 'female'].map(g => (
                   <button key={g} onClick={() => updateChar('gender', g)}
                     className={`flex-1 py-2 capitalize pixel-font ${character.gender === g ? 'glass-option-active text-sky-300' : 'glass-option text-gray-400'}`}
-                    style={{ fontSize: '9px' }}>
+                    style={{ fontSize: '12px' }}>
                     {g === 'male' ? 'Male' : 'Female'}
                   </button>
                 ))}
@@ -260,7 +260,7 @@ export default function Signup() {
 
             {/* Starting class */}
             <div className="mb-4">
-              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>YOUR CLASS (you'll play as this)</label>
+              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '12px' }}>YOUR CLASS (you'll play as this)</label>
               <div className="grid grid-cols-3 gap-2">
                 {CLASSES.map(cls => {
                   const info = CLASS_INFO[cls]
@@ -272,7 +272,7 @@ export default function Signup() {
                     }}
                       className={`py-3 px-2 flex flex-col items-center gap-2 ${selected ? 'glass-option-active' : 'glass-option'}`}>
                       <PixelCharacter options={{ gender: character.gender, charClass: cls }} scale={0.4} />
-                      <div className={`pixel-font ${selected ? 'text-sky-300' : 'text-gray-300'}`} style={{ fontSize: '7px' }}>{info.label}</div>
+                      <div className={`pixel-font ${selected ? 'text-sky-300' : 'text-gray-300'}`} style={{ fontSize: '13px' }}>{info.label}</div>
                     </button>
                   )
                 })}
@@ -281,7 +281,7 @@ export default function Signup() {
 
             {/* Second unlock */}
             <div className="mb-6">
-              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>BONUS STARTER CLASS (unlock 1 more now, earn the rest every 5 levels)</label>
+              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '12px' }}>BONUS STARTER CLASS (unlock 1 more now, earn the rest every 5 levels)</label>
               <div className="grid grid-cols-5 gap-2">
                 {CLASSES.filter(cls => cls !== character.charClass).map(cls => {
                   const info = CLASS_INFO[cls]
@@ -290,7 +290,7 @@ export default function Signup() {
                     <button key={cls} onClick={() => setSecondClass(cls)}
                       className={`py-2 px-1 flex flex-col items-center gap-1 ${selected ? 'glass-option-gold' : 'glass-option'}`}>
                       <PixelCharacter options={{ gender: character.gender, charClass: cls }} scale={0.3} />
-                      <div className={`pixel-font ${selected ? 'text-yellow-300' : 'text-gray-400'}`} style={{ fontSize: '6px' }}>{info.label}</div>
+                      <div className={`pixel-font ${selected ? 'text-yellow-300' : 'text-gray-400'}`} style={{ fontSize: '13px' }}>{info.label}</div>
                     </button>
                   )
                 })}

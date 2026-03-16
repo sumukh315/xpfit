@@ -70,7 +70,7 @@ export default function Dashboard() {
           <h1 className="fantasy-font text-white mb-1" style={{ fontSize: '24px' }}>
             {profile?.username || 'Hero'}
           </h1>
-          <p className="pixel-font text-sky-400 mb-4" style={{ fontSize: '10px' }}>
+          <p className="pixel-font text-sky-400 mb-4" style={{ fontSize: '13px' }}>
             Level {level} {getLevelTitle(level)}
           </p>
           <XPBar totalXP={profile?.total_xp || 0} />
@@ -91,7 +91,7 @@ export default function Dashboard() {
         </div>
         <Link to="/workout/new"
           className="pixel-btn bg-green-700 border-green-500 text-white px-6 py-4 no-underline glow-green"
-          style={{ fontSize: '10px', whiteSpace: 'nowrap' }}>
+          style={{ fontSize: '13px', whiteSpace: 'nowrap' }}>
           + New Workout
         </Link>
       </div>
@@ -112,7 +112,7 @@ export default function Dashboard() {
 
       {recommendations.length > 0 && (
         <div className="pixel-card p-4 mb-6" style={{ borderColor: '#0369a1' }}>
-          <h2 className="pixel-font text-sky-400 mb-4" style={{ fontSize: '11px' }}>
+          <h2 className="pixel-font text-sky-400 mb-4" style={{ fontSize: '13px' }}>
             Personalized Tips
           </h2>
           <div className="flex flex-col gap-3">
@@ -120,7 +120,7 @@ export default function Dashboard() {
               <div key={i} className="flex gap-3 glass-row p-3">
                 <div className="text-sky-400 pixel-font mt-0.5" style={{ fontSize: '12px', minWidth: '16px' }}>{i + 1}</div>
                 <div>
-                  <div className="pixel-font text-white mb-1" style={{ fontSize: '9px' }}>{rec.title}</div>
+                  <div className="pixel-font text-white mb-1" style={{ fontSize: '12px' }}>{rec.title}</div>
                   <div className="text-gray-400" style={{ fontSize: '12px' }}>{rec.tip}</div>
                 </div>
               </div>
@@ -131,13 +131,13 @@ export default function Dashboard() {
 
       <div className="pixel-card p-4">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="pixel-font text-sky-400" style={{ fontSize: '11px' }}>Recent Workouts</h2>
+          <h2 className="pixel-font text-sky-400" style={{ fontSize: '13px' }}>Recent Workouts</h2>
           <Link to="/progress" className="text-sky-400 hover:text-sky-300 text-sm">View All →</Link>
         </div>
         {recentWorkouts.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-gray-500 mb-4">No workouts yet. Start your quest!</p>
-            <Link to="/workout/new" className="pixel-btn bg-sky-700 border-sky-500 text-white px-6 py-3 no-underline" style={{ fontSize: '10px' }}>
+            <Link to="/workout/new" className="pixel-btn bg-sky-700 border-sky-500 text-white px-6 py-3 no-underline" style={{ fontSize: '13px' }}>
               Log First Workout
             </Link>
           </div>
@@ -152,7 +152,7 @@ export default function Dashboard() {
                   </div>
                 </Link>
                 <div className="flex items-center gap-3 flex-shrink-0 ml-3">
-                  <div className="pixel-font text-sky-400" style={{ fontSize: '9px' }}>
+                  <div className="pixel-font text-sky-400" style={{ fontSize: '12px' }}>
                     +{w.xp_earned || 0} XP
                   </div>
                   <button onClick={async () => {

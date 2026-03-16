@@ -13,10 +13,10 @@ function daysSince(dateStr) {
 
 function ActivityBadge({ days }) {
   if (days === null) return <span className="text-gray-600 text-xs">No workouts</span>
-  if (days === 0) return <span className="text-green-400 pixel-font" style={{ fontSize: '8px' }}>Active today</span>
-  if (days === 1) return <span className="text-green-400 pixel-font" style={{ fontSize: '8px' }}>Active yesterday</span>
-  if (days <= 3) return <span className="text-yellow-400 pixel-font" style={{ fontSize: '8px' }}>{days} days ago</span>
-  return <span className="text-red-400 pixel-font" style={{ fontSize: '8px' }}>{days} days ago</span>
+  if (days === 0) return <span className="text-green-400 pixel-font" style={{ fontSize: '12px' }}>Active today</span>
+  if (days === 1) return <span className="text-green-400 pixel-font" style={{ fontSize: '12px' }}>Active yesterday</span>
+  if (days <= 3) return <span className="text-yellow-400 pixel-font" style={{ fontSize: '12px' }}>{days} days ago</span>
+  return <span className="text-red-400 pixel-font" style={{ fontSize: '12px' }}>{days} days ago</span>
 }
 
 export default function Social() {
@@ -30,6 +30,8 @@ export default function Social() {
   const [selectedFriend, setSelectedFriend] = useState(null)
   const [friendWorkouts, setFriendWorkouts] = useState([])
   const [friendLastWorkout, setFriendLastWorkout] = useState({})
+  const [expandedWorkout, setExpandedWorkout] = useState(null)
+  const [lightboxPhoto, setLightboxPhoto] = useState(null)
 
   // Discord
   const [discordWebhook, setDiscordWebhook] = useState(profile?.discord_webhook || '')
@@ -132,42 +134,85 @@ export default function Social() {
     const charOptions = selectedFriend.character || { gender: 'male', charClass: 'warrior' }
     return (
       <div className="max-w-2xl mx-auto px-4 py-6">
-        <button onClick={() => setSelectedFriend(null)} className="text-sky-400 hover:text-sky-300 mb-6 flex items-center gap-2">
-          Back to Friends
+        <button onClick={() => { setSelectedFriend(null); setExpandedWorkout(null) }}
+          className="text-sky-400 hover:text-sky-300 mb-6 flex items-center gap-2 font-medium">
+          ← Back to Friends
         </button>
         <div className="pixel-card p-4 sm:p-6 mb-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
           <div className="pixel-card p-4 glow-purple flex-shrink-0">
             <PixelCharacter options={charOptions} scale={0.9} />
           </div>
           <div className="text-center sm:text-left">
-            <h2 className="pixel-font text-white mb-1" style={{ fontSize: '16px' }}>{selectedFriend.username}</h2>
-            <p className="pixel-font text-sky-400 mb-3" style={{ fontSize: '10px' }}>Level {level} {getLevelTitle(level)}</p>
+            <h2 className="pixel-font text-white mb-1" style={{ fontSize: '18px' }}>{selectedFriend.username}</h2>
+            <p className="pixel-font text-sky-400 mb-3" style={{ fontSize: '13px' }}>Level {level} {getLevelTitle(level)}</p>
             <XPBar totalXP={selectedFriend.total_xp || 0} />
-            <p className="text-yellow-400 pixel-font mt-2" style={{ fontSize: '9px' }}>{selectedFriend.points || 0} Points</p>
+            <p className="text-yellow-400 font-semibold mt-2">{selectedFriend.points || 0} Points</p>
           </div>
         </div>
         <div className="pixel-card p-4">
-          <h3 className="pixel-font text-sky-400 mb-4" style={{ fontSize: '10px' }}>Recent Workouts</h3>
+          <h3 className="pixel-font text-sky-400 mb-4" style={{ fontSize: '13px' }}>Recent Workouts</h3>
           {friendWorkouts.length === 0 ? (
             <p className="text-gray-500 text-center py-4">No workouts yet.</p>
           ) : (
             <div className="flex flex-col gap-3">
-              {friendWorkouts.map(w => (
-                <div key={w.id} className="glass-row p-3">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <div className="text-white font-medium">{w.name}</div>
-                      <div className="text-gray-500 text-xs">{new Date(w.created_at).toLocaleDateString()} · {w.exercises?.length || 0} exercises</div>
-                      {w.notes && <div className="text-gray-400 text-xs mt-1 italic">{w.notes}</div>}
-                    </div>
-                    <span className="pixel-font text-sky-400 flex-shrink-0 ml-2" style={{ fontSize: '9px' }}>+{w.xp_earned} XP</span>
+              {friendWorkouts.map(w => {
+                const isExpanded = expandedWorkout === w.id
+                const totalSets = (w.exercises || []).reduce((a, e) => a + (e.sets?.length || 0), 0)
+                return (
+                  <div key={w.id} className="glass-row overflow-hidden">
+                    <button className="w-full text-left p-3 flex justify-between items-start"
+                      onClick={() => setExpandedWorkout(isExpanded ? null : w.id)}>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-white font-semibold">{w.name}</div>
+                        <div className="text-gray-500 text-sm mt-0.5">
+                          {new Date(w.created_at).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                          {w.duration_minutes ? ` · ${w.duration_minutes} min` : ''}
+                          {' · '}{w.exercises?.length || 0} exercises · {totalSets} sets
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 ml-3 flex-shrink-0">
+                        <span className="pixel-font text-sky-400 text-sm">+{w.xp_earned} XP</span>
+                        <span className="text-gray-500 text-sm">{isExpanded ? '▲' : '▼'}</span>
+                      </div>
+                    </button>
+                    {isExpanded && (
+                      <div className="px-3 pb-3 border-t border-white/5 pt-3 flex flex-col gap-2">
+                        {w.photo_url && (
+                          <img src={w.photo_url} alt="Workout"
+                            className="w-full rounded-lg object-cover cursor-pointer mb-1"
+                            style={{ maxHeight: '220px' }}
+                            onClick={() => setLightboxPhoto(w.photo_url)} />
+                        )}
+                        {(w.exercises || []).map((ex, ei) => (
+                          <div key={ei} className="glass-row p-2">
+                            <div className="text-white font-medium text-sm mb-1">{ex.name}</div>
+                            {(ex.sets || []).map((s, si) => (
+                              <div key={si} className="flex gap-3 text-sm text-gray-400">
+                                <span className="text-gray-600 w-4">{si + 1}</span>
+                                <span className="text-gray-300">{s.weight} lbs</span>
+                                <span className="text-gray-600">×</span>
+                                <span className="text-gray-300">{s.reps} reps</span>
+                                {s.note && <span className="text-gray-500 italic text-xs">— {s.note}</span>}
+                              </div>
+                            ))}
+                          </div>
+                        ))}
+                        {w.notes && <div className="text-gray-400 text-sm italic pt-1">{w.notes}</div>}
+                      </div>
+                    )}
                   </div>
-                  {w.photo_url && <img src={w.photo_url} alt="Workout" className="mt-3 w-full max-h-48 object-cover border border-gray-700" />}
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>
+        {lightboxPhoto && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ background: 'rgba(0,0,0,0.95)' }}
+            onClick={() => setLightboxPhoto(null)}>
+            <img src={lightboxPhoto} alt="Workout" className="max-w-full rounded-lg" style={{ maxHeight: '85vh' }} />
+          </div>
+        )}
       </div>
     )
   }
@@ -179,12 +224,12 @@ export default function Social() {
       {/* Discord Connection */}
       <div className="pixel-card p-4 mb-6">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="pixel-font text-sky-400" style={{ fontSize: '10px' }}>Discord</h2>
-          <span className={`pixel-font px-2 py-1 border ${profile?.discord_webhook ? 'border-green-500 text-green-400 bg-green-900/20' : 'border-gray-700 text-gray-500'}`} style={{ fontSize: '8px' }}>
+          <h2 className="pixel-font text-sky-400" style={{ fontSize: '13px' }}>Discord</h2>
+          <span className={`pixel-font px-2 py-1 border ${profile?.discord_webhook ? 'border-green-500 text-green-400 bg-green-900/20' : 'border-gray-700 text-gray-500'}`} style={{ fontSize: '12px' }}>
             {profile?.discord_webhook ? 'Connected' : 'Not connected'}
           </span>
         </div>
-        <p className="text-gray-500 mb-3" style={{ fontSize: '11px' }}>
+        <p className="text-gray-500 mb-3" style={{ fontSize: '13px' }}>
           Connect a Discord channel to share workouts manually with the Share button.
           <br />
           To get a webhook: Discord server → Channel Settings → Integrations → Webhooks → New Webhook → Copy URL
@@ -196,7 +241,7 @@ export default function Social() {
             style={{ fontSize: '12px' }} />
           <button onClick={saveDiscordWebhook} disabled={savingDiscord}
             className="pixel-btn bg-sky-800 border-sky-600 text-white px-4 py-2 disabled:opacity-50"
-            style={{ fontSize: '8px' }}>
+            style={{ fontSize: '12px' }}>
             {savingDiscord ? 'Saving...' : discordSaved ? 'Saved!' : 'Save'}
           </button>
         </div>
@@ -205,12 +250,12 @@ export default function Social() {
       <div className="grid md:grid-cols-2 gap-6 mb-6">
         {/* Find Players */}
         <div className="pixel-card p-4">
-          <h2 className="pixel-font text-sky-400 mb-4" style={{ fontSize: '10px' }}>Find Players</h2>
+          <h2 className="pixel-font text-sky-400 mb-4" style={{ fontSize: '13px' }}>Find Players</h2>
           <div className="flex gap-2 mb-4">
             <input type="text" placeholder="Search username..." value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && searchUsers()}
               className="flex-1 bg-black/40 border border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none text-sm" />
-            <button onClick={searchUsers} className="pixel-btn bg-sky-700 border-sky-500 text-white px-4 py-2" style={{ fontSize: '9px' }}>Search</button>
+            <button onClick={searchUsers} className="pixel-btn bg-sky-700 border-sky-500 text-white px-4 py-2" style={{ fontSize: '12px' }}>Search</button>
           </div>
           <div className="flex flex-col gap-2">
             {searchResults.map(u => {
@@ -224,7 +269,7 @@ export default function Social() {
                       <div className="text-gray-500 text-xs">Level {getLevelFromXP(u.total_xp || 0).level}</div>
                     </div>
                   </div>
-                  <button onClick={() => sendRequest(u.id, u.username)} className="pixel-btn bg-green-800 border-green-600 text-white px-3 py-1" style={{ fontSize: '8px' }}>+ Add</button>
+                  <button onClick={() => sendRequest(u.id, u.username)} className="pixel-btn bg-green-800 border-green-600 text-white px-3 py-1" style={{ fontSize: '12px' }}>+ Add</button>
                 </div>
               )
             })}
@@ -234,12 +279,12 @@ export default function Social() {
         {/* Friend Requests */}
         {requests.length > 0 && (
           <div className="pixel-card p-4">
-            <h2 className="pixel-font text-yellow-400 mb-4" style={{ fontSize: '10px' }}>Requests ({requests.length})</h2>
+            <h2 className="pixel-font text-yellow-400 mb-4" style={{ fontSize: '13px' }}>Requests ({requests.length})</h2>
             <div className="flex flex-col gap-2">
               {requests.map(u => (
                 <div key={u.id} className="flex items-center justify-between p-2 glass-row">
                   <span className="text-white text-sm">{u.username}</span>
-                  <button onClick={() => acceptRequest(u.id)} className="pixel-btn bg-green-800 border-green-600 text-white px-3 py-1" style={{ fontSize: '8px' }}>Accept</button>
+                  <button onClick={() => acceptRequest(u.id)} className="pixel-btn bg-green-800 border-green-600 text-white px-3 py-1" style={{ fontSize: '12px' }}>Accept</button>
                 </div>
               ))}
             </div>
@@ -250,12 +295,12 @@ export default function Social() {
       {/* Pending sent requests */}
       {pending.length > 0 && (
         <div className="pixel-card p-4 mb-6">
-          <h2 className="pixel-font text-gray-500 mb-3" style={{ fontSize: '10px' }}>WAITING FOR RESPONSE ({pending.length})</h2>
+          <h2 className="pixel-font text-gray-500 mb-3" style={{ fontSize: '13px' }}>WAITING FOR RESPONSE ({pending.length})</h2>
           <div className="flex flex-wrap gap-2">
             {pending.map(u => (
               <div key={u.id} className="flex items-center gap-2 bg-black/40 border border-gray-800 px-3 py-2">
                 <span className="text-gray-400 text-sm">{u.username}</span>
-                <span className="pixel-font text-gray-600" style={{ fontSize: '7px' }}>Request sent</span>
+                <span className="pixel-font text-gray-600" style={{ fontSize: '13px' }}>Request sent</span>
               </div>
             ))}
           </div>
@@ -265,7 +310,7 @@ export default function Social() {
       {/* People You May Know */}
       {suggested.length > 0 && (
         <div className="pixel-card p-4 mb-6">
-          <h2 className="pixel-font text-yellow-400 mb-4" style={{ fontSize: '10px' }}>People You May Know</h2>
+          <h2 className="pixel-font text-yellow-400 mb-4" style={{ fontSize: '13px' }}>People You May Know</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {suggested.map(u => {
               const { level } = getLevelFromXP(u.total_xp || 0)
@@ -276,12 +321,12 @@ export default function Social() {
                     <PixelCharacter options={charOpts} scale={0.35} />
                     <div>
                       <div className="text-white text-sm">{u.username}</div>
-                      <div className="pixel-font text-sky-400" style={{ fontSize: '8px' }}>Level {level}</div>
-                      <div className="text-gray-600" style={{ fontSize: '10px' }}>Friend of a friend</div>
+                      <div className="pixel-font text-sky-400" style={{ fontSize: '12px' }}>Level {level}</div>
+                      <div className="text-gray-600" style={{ fontSize: '13px' }}>Friend of a friend</div>
                     </div>
                   </div>
                   <button onClick={() => sendRequest(u.id, u.username)}
-                    className="pixel-btn bg-green-800 border-green-600 text-white px-3 py-1 flex-shrink-0" style={{ fontSize: '8px' }}>
+                    className="pixel-btn bg-green-800 border-green-600 text-white px-3 py-1 flex-shrink-0" style={{ fontSize: '12px' }}>
                     + Add
                   </button>
                 </div>
@@ -293,7 +338,7 @@ export default function Social() {
 
       {/* Party / Friends */}
       <div className="pixel-card p-4">
-        <h2 className="pixel-font text-sky-400 mb-4" style={{ fontSize: '10px' }}>Your Party ({friends.length})</h2>
+        <h2 className="pixel-font text-sky-400 mb-4" style={{ fontSize: '13px' }}>Your Party ({friends.length})</h2>
         {friends.length === 0 ? (
           <p className="text-gray-500 text-center py-6">No friends yet. Search for players above!</p>
         ) : (
@@ -309,7 +354,7 @@ export default function Social() {
                       <PixelCharacter options={charOpts} scale={0.45} />
                       <div>
                         <div className="text-white text-sm font-medium">{f.username}</div>
-                        <div className="pixel-font text-sky-400" style={{ fontSize: '8px' }}>LVL {level}</div>
+                        <div className="pixel-font text-sky-400" style={{ fontSize: '12px' }}>LVL {level}</div>
                       </div>
                     </div>
                     <XPBar totalXP={f.total_xp || 0} />
@@ -319,7 +364,7 @@ export default function Social() {
                   </button>
                   <button onClick={() => nudgeFriend(f)}
                     className="mt-3 w-full pixel-font text-gray-500 hover:text-yellow-400 border border-gray-800 hover:border-yellow-600 py-1 transition-all"
-                    style={{ fontSize: '7px' }}>
+                    style={{ fontSize: '13px' }}>
                     Nudge on Discord
                   </button>
                 </div>

@@ -62,7 +62,7 @@ export default function Shop() {
       </div>
 
       {message && (
-        <div className="pixel-card p-3 mb-4 text-center text-green-400 pixel-font" style={{ fontSize: '9px' }}>{message}</div>
+        <div className="pixel-card p-3 mb-4 text-center text-green-400 pixel-font" style={{ fontSize: '12px' }}>{message}</div>
       )}
 
       <div className="flex flex-col md:flex-row gap-6">
@@ -70,7 +70,7 @@ export default function Shop() {
           <div className="pixel-card p-6 glow-purple">
             <PixelCharacter options={previewOptions} scale={1} />
           </div>
-          <span className="pixel-font text-gray-500" style={{ fontSize: '8px' }}>Your Character</span>
+          <span className="pixel-font text-gray-500" style={{ fontSize: '12px' }}>Your Character</span>
           <div className="text-xs text-gray-600 text-center">Hover items to preview</div>
         </div>
 
@@ -94,17 +94,17 @@ export default function Shop() {
                   <div className="text-white font-medium text-sm mb-1">{item.name}</div>
                   <div className="text-gray-500 text-xs mb-3">{item.description}</div>
                   {isEquipped ? (
-                    <span className="pixel-font text-sky-400" style={{ fontSize: '7px' }}>✓ EQUIPPED</span>
+                    <span className="pixel-font text-sky-400" style={{ fontSize: '13px' }}>✓ EQUIPPED</span>
                   ) : owned ? (
                     <button onClick={() => handleEquip(item)}
-                      className="pixel-btn bg-sky-800 border-sky-600 text-white px-3 py-1 w-full" style={{ fontSize: '8px' }}>
+                      className="pixel-btn bg-sky-800 border-sky-600 text-white px-3 py-1 w-full" style={{ fontSize: '12px' }}>
                       Equip
                     </button>
                   ) : (
                     <button onClick={() => handleBuy(item)}
                       disabled={buying === item.id || (profile?.points || 0) < item.price}
                       className={`pixel-btn px-3 py-1 w-full ${(profile?.points || 0) < item.price ? 'bg-gray-800 border-gray-700 text-gray-600' : 'bg-yellow-700 border-yellow-600 text-white'}`}
-                      style={{ fontSize: '8px' }}>
+                      style={{ fontSize: '12px' }}>
                       {item.price} pts
                     </button>
                   )}

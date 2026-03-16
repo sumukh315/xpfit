@@ -40,7 +40,7 @@ export default function ForgotPassword() {
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-6">
             <div>
-              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '8px' }}>EMAIL</label>
+              <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '12px' }}>EMAIL</label>
               <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
                 className="glass-input w-full" />
             </div>

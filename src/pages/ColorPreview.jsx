@@ -104,33 +104,33 @@ export default function ColorPreview() {
               <span style={{ color: s.accent, fontFamily: 'monospace', fontSize: '13px', fontWeight: 'bold' }}>XP<span style={{ color: s.accent2 }}>FIT</span></span>
               <div style={{ display: 'flex', gap: '8px' }}>
                 {['Home','Workout','Progress'].map(l => (
-                  <span key={l} style={{ color: s.sub, fontFamily: 'monospace', fontSize: '9px' }}>{l}</span>
+                  <span key={l} style={{ color: s.sub, fontFamily: 'monospace', fontSize: '12px' }}>{l}</span>
                 ))}
               </div>
             </div>
 
             {/* Mini card */}
             <div style={{ background: s.card, border: `1px solid ${s.border}`, padding: '12px', marginBottom: '10px' }}>
-              <div style={{ color: s.text, fontFamily: 'monospace', fontSize: '11px', marginBottom: '4px' }}>Level 12 — Warrior</div>
+              <div style={{ color: s.text, fontFamily: 'monospace', fontSize: '13px', marginBottom: '4px' }}>Level 12 — Warrior</div>
               <div style={{ background: s.border, height: '6px', borderRadius: '1px', marginBottom: '8px' }}>
                 <div style={{ background: s.accent, height: '100%', width: '65%' }} />
               </div>
               <div style={{ display: 'flex', gap: '8px' }}>
-                <span style={{ color: s.accent2, fontFamily: 'monospace', fontSize: '9px' }}>+50 XP</span>
-                <span style={{ color: s.sub, fontFamily: 'monospace', fontSize: '9px' }}>3 exercises</span>
+                <span style={{ color: s.accent2, fontFamily: 'monospace', fontSize: '12px' }}>+50 XP</span>
+                <span style={{ color: s.sub, fontFamily: 'monospace', fontSize: '12px' }}>3 exercises</span>
               </div>
             </div>
 
             {/* Mini button */}
             <div style={{ background: s.accent, border: `2px solid ${s.accent2}`, padding: '8px', textAlign: 'center' }}>
-              <span style={{ color: '#000', fontFamily: 'monospace', fontSize: '10px', fontWeight: 'bold' }}>+ New Workout</span>
+              <span style={{ color: '#000', fontFamily: 'monospace', fontSize: '13px', fontWeight: 'bold' }}>+ New Workout</span>
             </div>
 
-            <p style={{ color: s.text, fontFamily: 'monospace', fontSize: '11px', marginTop: '10px', textAlign: 'center' }}>{s.name}</p>
+            <p style={{ color: s.text, fontFamily: 'monospace', fontSize: '13px', marginTop: '10px', textAlign: 'center' }}>{s.name}</p>
           </div>
         ))}
       </div>
-      <p className="text-center text-gray-600 mt-8" style={{ fontSize: '11px' }}>
+      <p className="text-center text-gray-600 mt-8" style={{ fontSize: '13px' }}>
         <Link to="/" className="text-gray-500 hover:text-white">← Back</Link>
       </p>
     </div>

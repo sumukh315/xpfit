@@ -198,7 +198,7 @@ export default function WorkoutImport() {
       {/* Success banner */}
       {importResult !== null && (
         <div className="pixel-card p-4 mb-6 border-green-500 bg-green-900/20">
-          <p className="pixel-font text-green-400" style={{ fontSize: '10px' }}>
+          <p className="pixel-font text-green-400" style={{ fontSize: '13px' }}>
             Imported {importResult} workout{importResult !== 1 ? 's' : ''} successfully!
           </p>
         </div>
@@ -209,7 +209,7 @@ export default function WorkoutImport() {
         {[{ key: 'csv', label: '📄 CSV Upload' }, { key: 'text', label: '📋 Paste / Text' }].map(t => (
           <button key={t.key} onClick={() => { setTab(t.key); setImportResult(null); setImportError('') }}
             className={`pixel-btn py-2 px-5 ${tab === t.key ? 'bg-sky-800 border-sky-500 text-white' : 'bg-gray-900 border-gray-700 text-gray-400'}`}
-            style={{ fontSize: '9px' }}>
+            style={{ fontSize: '12px' }}>
             {t.label}
           </button>
         ))}
@@ -221,14 +221,14 @@ export default function WorkoutImport() {
           <div className="pixel-card p-5 mb-4">
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-4">
               <div>
-                <h2 className="pixel-font text-white mb-1" style={{ fontSize: '11px' }}>Upload CSV File</h2>
-                <p className="text-gray-500" style={{ fontSize: '11px' }}>
+                <h2 className="pixel-font text-white mb-1" style={{ fontSize: '13px' }}>Upload CSV File</h2>
+                <p className="text-gray-500" style={{ fontSize: '13px' }}>
                   Format: Date, Workout Name, Exercise, Sets, Reps, Weight (lbs), Notes
                 </p>
               </div>
               <button onClick={downloadTemplate}
                 className="pixel-btn bg-gray-800 border-gray-600 text-gray-300 px-4 py-2 whitespace-nowrap"
-                style={{ fontSize: '8px' }}>
+                style={{ fontSize: '12px' }}>
                 Download Template
               </button>
             </div>
@@ -238,7 +238,7 @@ export default function WorkoutImport() {
               onClick={() => fileInputRef.current?.click()}>
               <div className="text-3xl mb-2">📂</div>
               <p className="text-gray-400" style={{ fontSize: '12px' }}>Click to select a CSV file</p>
-              <p className="text-gray-600" style={{ fontSize: '11px' }}>or drag and drop</p>
+              <p className="text-gray-600" style={{ fontSize: '13px' }}>or drag and drop</p>
               <input ref={fileInputRef} type="file" accept=".csv,text/csv" className="hidden" onChange={handleCSVFile} />
             </div>
 
@@ -253,11 +253,11 @@ export default function WorkoutImport() {
       {tab === 'text' && (
         <div>
           <div className="pixel-card p-5 mb-4">
-            <h2 className="pixel-font text-white mb-2" style={{ fontSize: '11px' }}>Paste Workout Text</h2>
-            <p className="text-gray-500 mb-4" style={{ fontSize: '11px' }}>
+            <h2 className="pixel-font text-white mb-2" style={{ fontSize: '13px' }}>Paste Workout Text</h2>
+            <p className="text-gray-500 mb-4" style={{ fontSize: '13px' }}>
               Paste anything — notes app entries, messenger logs, spreadsheet copy-paste. The parser detects dates and exercise patterns automatically.
             </p>
-            <p className="text-gray-600 mb-3" style={{ fontSize: '10px' }}>
+            <p className="text-gray-600 mb-3" style={{ fontSize: '13px' }}>
               Examples it understands: "Bench Press 3x10 135lbs" · "Squats: 3 sets of 8 at 185" · "deadlift 225 5x5" · "bench 3x10@135"
             </p>
             <textarea
@@ -270,7 +270,7 @@ export default function WorkoutImport() {
             />
             <button onClick={handleParseText} disabled={!pasteText.trim()}
               className="pixel-btn bg-sky-800 border-sky-600 text-white px-6 py-2 mt-3 disabled:opacity-40"
-              style={{ fontSize: '9px' }}>
+              style={{ fontSize: '12px' }}>
               Parse Text
             </button>
           </div>
@@ -281,7 +281,7 @@ export default function WorkoutImport() {
       {parsedWorkouts && parsedWorkouts.length > 0 && (
         <div className="pixel-card p-5">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="pixel-font text-sky-400" style={{ fontSize: '11px' }}>
+            <h2 className="pixel-font text-sky-400" style={{ fontSize: '13px' }}>
               Preview — {parsedWorkouts.length} workout{parsedWorkouts.length !== 1 ? 's' : ''} detected
             </h2>
           </div>
@@ -296,13 +296,13 @@ export default function WorkoutImport() {
                 {w.exercises.length > 0 ? (
                   <div className="flex flex-col gap-0.5 mt-1">
                     {w.exercises.map((ex, j) => (
-                      <div key={j} className="text-gray-400" style={{ fontSize: '11px' }}>
+                      <div key={j} className="text-gray-400" style={{ fontSize: '13px' }}>
                         · {ex.name} — {(ex.sets || []).map(s => `${s.weight}×${s.reps}`).join(', ')}
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="text-gray-600" style={{ fontSize: '11px' }}>No exercises parsed</div>
+                  <div className="text-gray-600" style={{ fontSize: '13px' }}>No exercises parsed</div>
                 )}
               </div>
             ))}
@@ -316,7 +316,7 @@ export default function WorkoutImport() {
             onClick={() => handleImport(parsedWorkouts)}
             disabled={importing}
             className="pixel-btn bg-green-700 border-green-500 text-white px-8 py-3 disabled:opacity-50"
-            style={{ fontSize: '10px' }}>
+            style={{ fontSize: '13px' }}>
             {importing ? 'Importing...' : `Import ${parsedWorkouts.length} Workout${parsedWorkouts.length !== 1 ? 's' : ''}`}
           </button>
         </div>

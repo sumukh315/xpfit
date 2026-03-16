@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&family=Rajdhani:wght@400;500;600;700&family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
 
 * { box-sizing: border-box; }
 
@@ -8,29 +8,79 @@ body {
   margin: 0;
   background-color: #000814;
   background-image:
-    radial-gradient(ellipse at 20% 20%, rgba(14, 116, 144, 0.15) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 80%, rgba(2, 62, 138, 0.2) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 0%, rgba(56, 189, 248, 0.08) 0%, transparent 40%);
+    radial-gradient(ellipse at 20% 15%, rgba(14, 116, 144, 0.18) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 85%, rgba(2, 62, 138, 0.22) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 50%, rgba(56, 189, 248, 0.06) 0%, transparent 45%);
   background-attachment: fixed;
   color: #e2e8f0;
-  font-family: 'Rajdhani', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 15px;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
+}
+
+/* ── Background Decoration ── */
+.bg-decor {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.bg-decor::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(56, 189, 248, 0.18) 1px, transparent 1px);
+  background-size: 44px 44px;
+  opacity: 0.18;
+}
+
+.bg-orb {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.bg-orb-1 {
+  width: 800px; height: 800px;
+  top: -320px; left: -200px;
+  background: radial-gradient(circle at center, rgba(14,116,144,0.32) 0%, rgba(2,62,138,0.14) 45%, transparent 70%);
+  filter: blur(70px);
+}
+
+.bg-orb-2 {
+  width: 650px; height: 650px;
+  bottom: -180px; right: -120px;
+  background: radial-gradient(circle at center, rgba(56,189,248,0.22) 0%, rgba(14,116,144,0.08) 50%, transparent 70%);
+  filter: blur(80px);
+}
+
+.bg-orb-3 {
+  width: 400px; height: 400px;
+  top: 45%; left: 55%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle at center, rgba(2,62,138,0.18) 0%, transparent 70%);
+  filter: blur(60px);
 }
 
 /* ── Fonts ── */
 .pixel-font {
-  font-family: 'Press Start 2P', monospace;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
 .fantasy-font {
-  font-family: 'Cinzel', serif;
-  letter-spacing: 0.08em;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
 .fantasy-title {
-  font-family: 'Cinzel Decorative', serif;
-  letter-spacing: 0.1em;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.01em;
 }
 
 /* ── Cards ── */
@@ -64,16 +114,16 @@ body {
   border: 1px solid;
   border-radius: 10px;
   cursor: pointer;
-  font-family: 'Cinzel', serif;
-  font-size: 11px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+  min-height: 40px;
 }
 
 .pixel-btn::before {
@@ -101,6 +151,7 @@ body {
   -webkit-backdrop-filter: blur(8px);
   transition: all 0.15s ease;
   cursor: pointer;
+  min-height: 40px;
 }
 .glass-option:hover:not(:disabled) {
   border-color: rgba(56, 189, 248, 0.3);
@@ -120,6 +171,7 @@ body {
   box-shadow: 0 0 16px rgba(56, 189, 248, 0.2), inset 0 1px 0 rgba(103, 232, 249, 0.15);
   transition: all 0.15s ease;
   cursor: pointer;
+  min-height: 40px;
 }
 .glass-option-gold {
   background: linear-gradient(135deg, rgba(120, 80, 0, 0.35), rgba(80, 50, 0, 0.4));
@@ -192,7 +244,7 @@ body {
   gap: 12px;
   margin: 16px 0;
   color: rgba(56, 189, 248, 0.4);
-  font-size: 11px;
+  font-size: 12px;
 }
 .rune-divider::before,
 .rune-divider::after {
@@ -228,8 +280,8 @@ canvas {
 
 /* ── Input fields ── */
 input, textarea, select {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 14px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 15px;
   border-radius: 10px;
 }
 
@@ -241,7 +293,8 @@ input, textarea, select {
   -webkit-backdrop-filter: blur(8px);
   color: white;
   transition: border-color 0.2s, background 0.2s;
-  padding: 8px 12px;
+  padding: 10px 14px;
+  font-size: 15px;
 }
 .glass-input:focus {
   border-color: rgba(56, 189, 248, 0.55);
@@ -250,4 +303,11 @@ input, textarea, select {
 }
 .glass-input::placeholder {
   color: rgba(156, 163, 175, 0.55);
+}
+
+/* ── Mobile bottom nav spacer ── */
+@media (max-width: 767px) {
+  .main-content {
+    padding-bottom: 72px;
+  }
 }
