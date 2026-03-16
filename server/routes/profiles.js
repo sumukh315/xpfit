@@ -1,11 +1,11 @@
 import { Router } from 'express'
-import db from '../db.js'
+import pool from '../db.js'
 import { requireAuth } from '../middleware/auth.js'
 
 const router = Router()
 router.use(requireAuth)
 
-router.patch('/me', (req, res) => {
+router.patch('/me', async (req, res) => {
   const allowed = ['character', 'equipped', 'inventory', 'points', 'discord_webhook', 'fitness_profile', 'unlocked_classes']
   const updates = {}
   for (const key of allowed) {
@@ -15,11 +15,16 @@ router.patch('/me', (req, res) => {
   }
   if (!Object.keys(updates).length) return res.status(400).json({ error: 'Nothing to update' })
 
-  const setClause = Object.keys(updates).map(k => `${k} = ?`).join(', ')
-  db.prepare(`UPDATE users SET ${setClause} WHERE id = ?`).run(...Object.values(updates), req.user.id)
+  const keys = Object.keys(updates)
+  const values = Object.values(updates)
+  const setClause = keys.map((k, i) => `${k} = $${i + 1}`).join(', ')
+  await pool.query(
+    `UPDATE users SET ${setClause} WHERE id = $${keys.length + 1}`,
+    [...values, req.user.id]
+  )
 
-  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)
-  const { password_hash, ...safe } = user
+  const { rows } = await pool.query('SELECT * FROM users WHERE id = $1', [req.user.id])
+  const { password_hash, ...safe } = rows[0]
   res.json({
     ...safe,
     character: JSON.parse(safe.character || '{}'),
@@ -30,30 +35,31 @@ router.patch('/me', (req, res) => {
   })
 })
 
-router.get('/search', (req, res) => {
+router.get('/search', async (req, res) => {
   const { q } = req.query
   if (!q) return res.json([])
-  const users = db.prepare(`
-    SELECT id, username, total_xp, points, character, equipped FROM users
-    WHERE username LIKE ? AND id != ?
-    LIMIT 10
-  `).all(`%${q}%`, req.user.id)
-  res.json(users.map(u => ({
+  const { rows } = await pool.query(
+    `SELECT id, username, total_xp, points, character, equipped FROM users
+     WHERE username ILIKE $1 AND id != $2 LIMIT 10`,
+    [`%${q}%`, req.user.id]
+  )
+  res.json(rows.map(u => ({
     ...u,
     character: JSON.parse(u.character || '{}'),
     equipped: JSON.parse(u.equipped || '{}'),
   })))
 })
 
-router.get('/:id', (req, res) => {
-  const user = db.prepare(`
-    SELECT id, username, total_xp, points, character, equipped FROM users WHERE id = ?
-  `).get(req.params.id)
-  if (!user) return res.status(404).json({ error: 'Not found' })
+router.get('/:id', async (req, res) => {
+  const { rows } = await pool.query(
+    'SELECT id, username, total_xp, points, character, equipped FROM users WHERE id = $1',
+    [req.params.id]
+  )
+  if (!rows[0]) return res.status(404).json({ error: 'Not found' })
   res.json({
-    ...user,
-    character: JSON.parse(user.character || '{}'),
-    equipped: JSON.parse(user.equipped || '{}'),
+    ...rows[0],
+    character: JSON.parse(rows[0].character || '{}'),
+    equipped: JSON.parse(rows[0].equipped || '{}'),
   })
 })
 

@@ -2,7 +2,7 @@ import { Router } from 'express'
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
 import nodemailer from 'nodemailer'
-import db from '../db.js'
+import pool from '../db.js'
 import { signToken, requireAuth } from '../middleware/auth.js'
 
 const router = Router()
@@ -16,23 +16,28 @@ router.post('/signup', async (req, res) => {
     const initialUnlocked = Array.isArray(unlockedClasses) && unlockedClasses.length === 2
       ? unlockedClasses
       : ['warrior', 'mage']
-    const stmt = db.prepare(`
-      INSERT INTO users (username, email, password_hash, character, equipped, inventory, total_xp, points, fitness_profile, unlocked_classes)
-      VALUES (?, ?, ?, ?, '{}', '[]', 0, 100, ?, ?)
-    `)
-    const result = stmt.run(username, email, hash, JSON.stringify(character || {}), JSON.stringify(fitnessProfile || {}), JSON.stringify(initialUnlocked))
-    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(result.lastInsertRowid)
+
+    const { rows: [{ id }] } = await pool.query(
+      `INSERT INTO users (username, email, password_hash, character, equipped, inventory, total_xp, points, fitness_profile, unlocked_classes)
+       VALUES ($1, $2, $3, $4, '{}', '[]', 0, 100, $5, $6) RETURNING id`,
+      [username, email, hash, JSON.stringify(character || {}), JSON.stringify(fitnessProfile || {}), JSON.stringify(initialUnlocked)]
+    )
+    const user = (await pool.query('SELECT * FROM users WHERE id = $1', [id])).rows[0]
     const token = signToken({ id: user.id, username: user.username })
     res.json({ token, user: sanitizeUser(user) })
   } catch (e) {
-    if (e.message.includes('UNIQUE')) return res.status(400).json({ error: 'Username or email already taken' })
+    if (e.message.includes('unique') || e.code === '23505') return res.status(400).json({ error: 'Username or email already taken' })
     res.status(500).json({ error: e.message })
   }
 })
 
 router.post('/login', async (req, res) => {
   const { email, password } = req.body
-  const user = db.prepare('SELECT * FROM users WHERE email = ? OR LOWER(username) = LOWER(?)').get(email, email)
+  const { rows } = await pool.query(
+    'SELECT * FROM users WHERE email = $1 OR LOWER(username) = LOWER($2)',
+    [email, email]
+  )
+  const user = rows[0]
   if (!user) return res.status(401).json({ error: 'Invalid username/email or password' })
 
   const valid = await bcrypt.compare(password, user.password_hash)
@@ -42,20 +47,24 @@ router.post('/login', async (req, res) => {
   res.json({ token, user: sanitizeUser(user) })
 })
 
-router.get('/me', requireAuth, (req, res) => {
-  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)
-  if (!user) return res.status(404).json({ error: 'User not found' })
-  res.json(sanitizeUser(user))
+router.get('/me', requireAuth, async (req, res) => {
+  const { rows } = await pool.query('SELECT * FROM users WHERE id = $1', [req.user.id])
+  if (!rows[0]) return res.status(404).json({ error: 'User not found' })
+  res.json(sanitizeUser(rows[0]))
 })
 
 router.post('/forgot-password', async (req, res) => {
   const { email } = req.body
-  const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email)
-  if (!user) return res.json({ message: 'If that email exists, a reset link was sent.' })
+  const { rows } = await pool.query('SELECT * FROM users WHERE email = $1', [email])
+  if (!rows[0]) return res.json({ message: 'If that email exists, a reset link was sent.' })
+  const user = rows[0]
 
   const token = crypto.randomBytes(32).toString('hex')
-  const expires = new Date(Date.now() + 1000 * 60 * 60).toISOString() // 1 hour
-  db.prepare('INSERT OR REPLACE INTO password_reset_tokens (user_id, token, expires_at) VALUES (?, ?, ?)').run(user.id, token, expires)
+  const expires = new Date(Date.now() + 1000 * 60 * 60).toISOString()
+  await pool.query(
+    'INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)',
+    [user.id, token, expires]
+  )
 
   const siteUrl = process.env.SITE_URL || 'http://localhost:5173'
   const resetLink = `${siteUrl}/reset-password?token=${token}`
@@ -82,13 +91,17 @@ router.post('/reset-password', async (req, res) => {
   const { token, password } = req.body
   if (!token || !password) return res.status(400).json({ error: 'Missing fields' })
 
-  const record = db.prepare('SELECT * FROM password_reset_tokens WHERE token = ? AND used = 0').get(token)
+  const { rows } = await pool.query(
+    'SELECT * FROM password_reset_tokens WHERE token = $1 AND used = 0',
+    [token]
+  )
+  const record = rows[0]
   if (!record) return res.status(400).json({ error: 'Invalid or expired reset link.' })
   if (new Date(record.expires_at) < new Date()) return res.status(400).json({ error: 'Reset link has expired.' })
 
   const hash = await bcrypt.hash(password, 10)
-  db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(hash, record.user_id)
-  db.prepare('UPDATE password_reset_tokens SET used = 1 WHERE id = ?').run(record.id)
+  await pool.query('UPDATE users SET password_hash = $1 WHERE id = $2', [hash, record.user_id])
+  await pool.query('UPDATE password_reset_tokens SET used = 1 WHERE id = $1', [record.id])
 
   res.json({ message: 'Password updated successfully.' })
 })
