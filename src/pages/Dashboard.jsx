@@ -146,13 +146,13 @@ export default function Dashboard() {
           <div className="flex flex-col gap-3">
             {recentWorkouts.map(w => (
               <div key={w.id} className="flex items-center justify-between p-3 bg-black/30 border border-gray-800">
-                <div>
+                <Link to="/logs" className="flex-1 min-w-0 no-underline hover:opacity-80 transition-opacity">
                   <div className="text-white font-medium">{w.name}</div>
                   <div className="text-gray-500 text-xs">
                     {new Date(w.created_at).toLocaleDateString()} · {w.exercises?.length || 0} exercises
                   </div>
-                </div>
-                <div className="flex items-center gap-3">
+                </Link>
+                <div className="flex items-center gap-3 flex-shrink-0 ml-3">
                   <div className="pixel-font text-sky-400" style={{ fontSize: '9px' }}>
                     +{w.xp_earned || 0} XP
                   </div>
