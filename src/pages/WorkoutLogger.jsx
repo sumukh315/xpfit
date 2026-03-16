@@ -91,8 +91,21 @@ function parseWorkoutText(text) {
   let detectedDate = null
 
   const setOnlyRe = /^[•\-\*]?\s*(\d+(?:\.\d+)?)\s*(?:lbs?|kg)?\s*[x×]\s*(\d+)(.*)$/i
+  const weightOnlyRe = /^[•\-\*]?\s*(\d+(?:\.\d+)?)\s*(?:lbs?|kg)?\s*$/i
+  // "Name - val/val/val" or "Name - val" where val can be "135", "135x8", "20 min", "35*"
+  const dashFormatRe = /^(.+?)\s*[-–]\s*(.+)$/
   const inlineRe = /^(.+?)\s{1,}(\d+(?:\.\d+)?)\s*(?:lbs?|kg)?\s*[x×]\s*(\d+)(.*)?$/i
   const skipRe = /^(workout\s*#?\d*|date:|notes?:|day\s*\d|logged\s+using|logged\s+with)/i
+
+  function parseDashChunk(chunk) {
+    chunk = chunk.trim().replace(/\*+$/, m => { return '' }) // strip trailing *
+    const raw = chunk.trim()
+    const xm = raw.match(/^(\d+(?:\.\d+)?)\s*(?:lbs?|kg)?\s*[x×]\s*(\d+)\s*(.*)$/i)
+    if (xm) return { weight: xm[1], reps: xm[2], note: xm[3]?.trim() || undefined }
+    const wm = raw.match(/^(\d+(?:\.\d+)?)\s*(min|km|cal|sec|s)?\s*$/i)
+    if (wm) return { weight: wm[1], reps: '1', note: wm[2] || undefined }
+    return null
+  }
 
   for (const line of lines) {
     // Try to detect a date line first
@@ -104,6 +117,21 @@ function parseWorkoutText(text) {
     }
 
     if (skipRe.test(line)) continue
+
+    // "Exercise - 85/85/100" or "Exercise - 85 x 8 / 95 x 6"
+    const dashMatch = line.match(dashFormatRe)
+    if (dashMatch) {
+      const name = dashMatch[1].replace(/^[•\-\*]\s*/, '').trim()
+      if (name && !/^\d+$/.test(name)) {
+        const chunks = dashMatch[2].split('/')
+        const sets = chunks.map(parseDashChunk).filter(Boolean)
+        if (sets.length > 0) {
+          current = { name: titleCase(name), sets }
+          exercises.push(current)
+          continue
+        }
+      }
+    }
 
     const setMatch = line.match(setOnlyRe)
     if (setMatch) {
@@ -126,6 +154,16 @@ function parseWorkoutText(text) {
         exercises.push(current)
       }
       continue
+    }
+
+    // Weight-only line (e.g. "135" or "225lbs") under a current exercise
+    const weightMatch = line.match(weightOnlyRe)
+    if (weightMatch && current) {
+      const w = parseFloat(weightMatch[1])
+      if (w > 5) {
+        current.sets.push({ weight: weightMatch[1], reps: '1' })
+        continue
+      }
     }
 
     const cleanName = line.replace(/^[•\-\*]\s*/, '').trim()
