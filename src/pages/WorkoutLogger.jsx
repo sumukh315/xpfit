@@ -451,15 +451,17 @@ export default function WorkoutLogger() {
   const pointsPreview = calcWorkoutPoints(totalSets)
 
   function buildShareText(name, exList, xp, duration) {
-    const lines = [`Workout: ${name}`]
-    if (duration) lines.push(`Duration: ${duration} min`)
+    const date = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    const lines = [date, '']
     exList.forEach(ex => {
-      const sets = (ex.sets || []).map(s => `${s.weight}lbs x${s.reps}`).join(', ')
-      lines.push(`  ${ex.name}: ${sets}`)
+      lines.push(ex.name)
+      ;(ex.sets || []).forEach(s => {
+        const note = s.note ? ` ${s.note}` : ''
+        lines.push(`${s.weight}lb x ${s.reps}${note}`)
+      })
+      lines.push('')
     })
-    lines.push(`XP earned: +${xp}`)
-    lines.push('— XPFit')
-    return lines.join('\n')
+    return lines.join('\n').trimEnd()
   }
 
   async function handleSave() {

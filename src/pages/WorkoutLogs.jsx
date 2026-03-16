@@ -12,16 +12,17 @@ function formatTime(str) {
 }
 
 function buildShareText(workout) {
-  const lines = [`Workout: ${workout.name}`]
-  if (workout.duration_minutes) lines.push(`Duration: ${workout.duration_minutes} min`)
+  const date = new Date(workout.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  const lines = [date, '']
   ;(workout.exercises || []).forEach(ex => {
-    const sets = (ex.sets || []).map(s => `${s.weight}lbs×${s.reps}`).join(', ')
-    lines.push(`  ${ex.name}: ${sets}`)
+    lines.push(ex.name)
+    ;(ex.sets || []).forEach(s => {
+      const note = s.note ? ` ${s.note}` : ''
+      lines.push(`${s.weight}lb x ${s.reps}${note}`)
+    })
+    lines.push('')
   })
-  if (workout.notes) lines.push(`Notes: ${workout.notes}`)
-  lines.push(`XP earned: +${workout.xp_earned || 0}`)
-  lines.push('— XPFit')
-  return lines.join('\n')
+  return lines.join('\n').trimEnd()
 }
 
 // ─── Photo Lightbox ───────────────────────────────────────────────────────────
