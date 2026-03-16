@@ -185,7 +185,7 @@ export default function Social() {
           </span>
         </div>
         <p className="text-gray-500 mb-3" style={{ fontSize: '11px' }}>
-          Connect a Discord channel to auto-share your workouts and send accountability nudges to friends.
+          Connect a Discord channel to share workouts manually with the Share button.
           <br />
           To get a webhook: Discord server → Channel Settings → Integrations → Webhooks → New Webhook → Copy URL
         </p>
