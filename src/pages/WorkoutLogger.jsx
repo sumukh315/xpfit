@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { api } from '../lib/api'
-import { calcWorkoutXP, calcWorkoutPoints, getRecommendation } from '../lib/xpSystem'
+import { calcWorkoutXP, calcWorkoutPoints, getRecommendation, getLevelFromXP, getLevelTitle } from '../lib/xpSystem'
 
 // ─── Exercise Library ─────────────────────────────────────────────────────────
 const MUSCLE_GROUPS = [
@@ -391,6 +391,7 @@ export default function WorkoutLogger() {
   const [recommendations, setRecommendations] = useState({})
   const [previousWorkouts, setPreviousWorkouts] = useState({})
   const [savedWorkout, setSavedWorkout] = useState(null)
+  const [levelUp, setLevelUp] = useState(null) // { oldLevel, newLevel, title }
   const [copied, setCopied] = useState(false)
 
   const [startTime] = useState(() => new Date())
@@ -466,6 +467,7 @@ export default function WorkoutLogger() {
 
     setSaving(true)
     setShowFinish(false)
+    const oldLevel = getLevelFromXP(profile?.total_xp || 0).level
     try {
       await api.createWorkout({
         name: workoutName, exercises, notes,
@@ -476,6 +478,10 @@ export default function WorkoutLogger() {
         duration_minutes: Math.round((end - startTime) / 60000),
       })
       await refreshProfile()
+      const newLevel = getLevelFromXP((profile?.total_xp || 0) + xpPreview).level
+      if (newLevel > oldLevel) {
+        setLevelUp({ oldLevel, newLevel, title: getLevelTitle(newLevel) })
+      }
       setSavedWorkout({
         name: workoutName,
         exercises,
@@ -523,6 +529,26 @@ export default function WorkoutLogger() {
 
   const startTimeStr = startTime.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) +
     ' ' + startTime.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toLowerCase()
+
+  if (levelUp) {
+    return (
+      <div className="max-w-md mx-auto px-4 py-12 flex flex-col items-center text-center">
+        <div className="pixel-card p-10 w-full" style={{ background: 'linear-gradient(135deg, #001d3d, #0a1628)', borderColor: '#38bdf8' }}>
+          <div className="text-6xl mb-4">⭐</div>
+          <div className="pixel-font text-yellow-400 mb-2" style={{ fontSize: '11px', letterSpacing: '3px' }}>LEVEL UP!</div>
+          <div className="fantasy-font text-white mb-1" style={{ fontSize: '48px' }}>{levelUp.newLevel}</div>
+          <div className="pixel-font text-sky-400 mb-6" style={{ fontSize: '14px' }}>{levelUp.title}</div>
+          <div className="text-gray-400 mb-8" style={{ fontSize: '13px' }}>
+            You reached Level {levelUp.newLevel}.<br />Keep pushing!
+          </div>
+          <button onClick={() => setLevelUp(null)}
+            className="pixel-btn bg-yellow-700 border-yellow-500 text-white px-10 py-4 w-full" style={{ fontSize: '11px' }}>
+            Continue →
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   if (savedWorkout) {
     return (

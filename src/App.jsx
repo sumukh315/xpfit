@@ -13,7 +13,6 @@ import Social from './pages/Social'
 import Profile from './pages/Profile'
 import StylePreview from './pages/StylePreview'
 import ColorPreview from './pages/ColorPreview'
-import WorkoutImport from './pages/WorkoutImport'
 import WorkoutLogs from './pages/WorkoutLogs'
 
 function ProtectedRoute({ children }) {
@@ -65,9 +64,6 @@ function AppRoutes() {
       <Route path="/color-preview" element={<ColorPreview />} />
       <Route path="/profile" element={
         <ProtectedRoute><AuthLayout><Profile /></AuthLayout></ProtectedRoute>
-      } />
-      <Route path="/import" element={
-        <ProtectedRoute><AuthLayout><WorkoutImport /></AuthLayout></ProtectedRoute>
       } />
       <Route path="/logs" element={
         <ProtectedRoute><AuthLayout><WorkoutLogs /></AuthLayout></ProtectedRoute>
