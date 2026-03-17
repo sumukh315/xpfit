@@ -14,6 +14,8 @@ const navItems = [
   { path: '/profile',     label: 'Profile', icon: '◉' },
 ]
 
+const mobileNavItems = navItems.filter(i => i.path !== '/profile')
+
 export default function Navbar() {
   const { profile } = useAuth()
   const location = useLocation()
@@ -30,6 +32,18 @@ export default function Navbar() {
           {/* Logo */}
           <Link to="/dashboard" className="fantasy-title no-underline" style={{ fontSize: '20px' }}>
             <span style={{ color: '#6ab04c' }}>XP</span><span style={{ color: '#e63946' }}>FIT</span>
+          </Link>
+
+          {/* Mobile avatar → Profile */}
+          <Link to="/profile" className="md:hidden no-underline ml-auto" style={{ display: 'flex' }}>
+            <div style={{
+              width: 32, height: 32, borderRadius: '50%',
+              overflow: 'hidden', border: '2px solid rgba(103,232,249,0.3)',
+              background: 'rgba(5,10,30,0.8)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <PixelCharacter options={charOptions} scale={0.20} />
+            </div>
           </Link>
 
           {/* Desktop nav links */}
@@ -72,7 +86,7 @@ export default function Navbar() {
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50"
         style={{ background: 'rgba(3,8,18,0.9)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(103,232,249,0.12)' }}>
         <div className="flex">
-          {navItems.map(item => {
+          {mobileNavItems.map(item => {
             const active = location.pathname === item.path
             return (
               <Link key={item.path} to={item.path}

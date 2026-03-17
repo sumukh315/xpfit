@@ -3,7 +3,7 @@ import { api } from '../lib/api'
 
 export default function CoachModal({ onClose }) {
   const [messages, setMessages] = useState([
-    { role: 'coach', text: "Hello young trainer! I have been training heroes like you for centuries, and I applaud your journey. Ask me anything." }
+    { role: 'coach', text: "Welcome, trainee. I've guided countless individuals on their path to strength and discipline. Your journey is underway—ask, and I'll help you progress." }
   ])
   const [input, setInput] = useState('')
   const [image, setImage] = useState(null) // { base64, mimeType, preview }
