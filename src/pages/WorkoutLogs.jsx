@@ -169,8 +169,8 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete, onPhotoAdde
         start_time: editData.start_time ? new Date(editData.start_time).toISOString() : undefined,
         end_time: editData.end_time ? new Date(editData.end_time).toISOString() : undefined,
       }
-      await api.updateWorkout(workout.id, payload)
-      onUpdate(workout.id, payload)
+      const result = await api.updateWorkout(workout.id, payload)
+      onUpdate(workout.id, { ...payload, duration_minutes: result.duration_minutes ?? workout.duration_minutes })
       setEditing(false)
     } catch (e) { alert('Save failed: ' + e.message) }
     finally { setSaving(false) }

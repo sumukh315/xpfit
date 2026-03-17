@@ -87,28 +87,37 @@ router.post('/', upload.single('photo'), async (req, res) => {
 router.patch('/:id', async (req, res) => {
   const { name, exercises, notes, start_time, end_time } = req.body
   const { rows } = await pool.query(
-    'SELECT id FROM workouts WHERE id = $1 AND user_id = $2',
+    'SELECT id, start_time, end_time FROM workouts WHERE id = $1 AND user_id = $2',
     [req.params.id, req.user.id]
   )
   if (!rows[0]) return res.status(404).json({ error: 'Not found' })
+
+  const resolvedStart = start_time ?? rows[0].start_time
+  const resolvedEnd = end_time ?? rows[0].end_time
+  const duration_minutes = (resolvedStart && resolvedEnd)
+    ? Math.round((new Date(resolvedEnd) - new Date(resolvedStart)) / 60000)
+    : null
+
   await pool.query(
     `UPDATE workouts SET
       name = COALESCE($1, name),
       exercises = COALESCE($2, exercises),
       notes = COALESCE($3, notes),
       start_time = COALESCE($4, start_time),
-      end_time = COALESCE($5, end_time)
-    WHERE id = $6`,
+      end_time = COALESCE($5, end_time),
+      duration_minutes = COALESCE($6, duration_minutes)
+    WHERE id = $7`,
     [
       name ?? null,
       exercises !== undefined ? JSON.stringify(exercises) : null,
       notes ?? null,
       start_time ?? null,
       end_time ?? null,
+      duration_minutes,
       req.params.id,
     ]
   )
-  res.json({ ok: true })
+  res.json({ ok: true, duration_minutes })
 })
 
 router.patch('/:id/photo', upload.single('photo'), async (req, res) => {
