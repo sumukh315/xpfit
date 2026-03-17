@@ -7,10 +7,10 @@ import PixelCharacter from './PixelCharacter'
 const navItems = [
   { path: '/dashboard',   label: 'Home',    icon: '⌂' },
   { path: '/workout/new', label: 'Workout', icon: '+' },
+  { path: '/progress',    label: 'Stats',   icon: '▲' },
   { path: '/logs',        label: 'Logs',    icon: '≡' },
   { path: '/shop',        label: 'Shop',    icon: '✦' },
   { path: '/social',      label: 'Friends', icon: '⊙' },
-  { path: '/progress',    label: 'Stats',   icon: '▲' },
   { path: '/profile',     label: 'Profile', icon: '◉' },
 ]
 
