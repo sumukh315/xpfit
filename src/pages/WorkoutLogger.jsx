@@ -356,10 +356,12 @@ function ExercisePicker({ onSelect, onClose, customExercises = {}, usageCounts =
   const showingGroup = !showingSearch && activeGroup !== null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4"
       style={{ background: 'rgba(0,0,0,0.8)' }}
       onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="pixel-card w-full max-w-lg" style={{ background: '#12121e', maxHeight: '82vh', display: 'flex', flexDirection: 'column' }}>
+      <div className="pixel-card w-full max-w-lg sm:rounded-xl" style={{ background: '#12121e', height: '100dvh', maxHeight: '100dvh', display: 'flex', flexDirection: 'column', borderRadius: 0 }}
+        onClick={e => e.stopPropagation()}>
+        <div style={{ height: 'env(safe-area-inset-top, 0px)' }} />
 
         {/* Header */}
         <div className="p-4 border-b border-gray-800 flex items-center gap-3">
@@ -482,6 +484,7 @@ function ExercisePicker({ onSelect, onClose, customExercises = {}, usageCounts =
             </div>
           )}
         </div>
+        <div style={{ height: 'env(safe-area-inset-bottom, 0px)' }} />
       </div>
     </div>
   )
