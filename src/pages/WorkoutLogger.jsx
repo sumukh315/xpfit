@@ -420,7 +420,7 @@ function ExercisePicker({ onSelect, onClose, customExercises = {}, usageCounts =
 }
 
 // ─── Set Row ──────────────────────────────────────────────────────────────────
-function SetRow({ set, index, onChange, onRemove, isIsolated }) {
+function SetRow({ set, index, onChange, onRemove, isIsolated, isCardio }) {
   const [showMenu, setShowMenu] = useState(false)
   const menuRef = useRef(null)
 
@@ -442,7 +442,24 @@ function SetRow({ set, index, onChange, onRemove, isIsolated }) {
         <span className="text-gray-400 font-semibold" style={{ fontSize: '12px' }}>{index + 1}</span>
       </div>
 
-      {isIsolated ? (
+      {isCardio ? (
+        <>
+          {/* Duration */}
+          <div className="flex-1 min-w-0">
+            <div className="text-sky-400 font-semibold" style={{ fontSize: '10px' }}>MIN</div>
+            <input type="number" value={set.duration || ''} placeholder="—"
+              onChange={e => onChange({ ...set, duration: e.target.value })}
+              className={inputCls} style={{ fontSize: '15px' }} />
+          </div>
+          {/* Pace */}
+          <div className="flex-[2] min-w-0">
+            <div className="text-green-400 font-semibold" style={{ fontSize: '10px' }}>PACE (min/mi)</div>
+            <input type="text" value={set.pace || ''} placeholder="e.g. 8:30"
+              onChange={e => onChange({ ...set, pace: e.target.value })}
+              className={inputCls} style={{ fontSize: '15px' }} />
+          </div>
+        </>
+      ) : isIsolated ? (
         <>
           {/* Left */}
           <div className="flex-1 min-w-0">
@@ -468,13 +485,15 @@ function SetRow({ set, index, onChange, onRemove, isIsolated }) {
         </div>
       )}
 
-      {/* Reps */}
-      <div className="flex-1 min-w-0">
-        <div className="text-gray-500" style={{ fontSize: '11px' }}>Reps</div>
-        <input type="number" value={set.reps || ''} placeholder="—"
-          onChange={e => onChange({ ...set, reps: e.target.value })}
-          className={inputCls} style={{ fontSize: '15px' }} />
-      </div>
+      {/* Reps — hidden for cardio */}
+      {!isCardio && (
+        <div className="flex-1 min-w-0">
+          <div className="text-gray-500" style={{ fontSize: '11px' }}>Reps</div>
+          <input type="number" value={set.reps || ''} placeholder="—"
+            onChange={e => onChange({ ...set, reps: e.target.value })}
+            className={inputCls} style={{ fontSize: '15px' }} />
+        </div>
+      )}
 
       {/* Notes */}
       <div className="flex-[2] min-w-0">
@@ -574,11 +593,19 @@ function isIsolatedExercise(name) {
   return name.toLowerCase().includes('isolated')
 }
 
+const CARDIO_EXERCISES = new Set([
+  'Running','Treadmill','Cycling','Rowing Machine','Elliptical','Stair Climber','HIIT Sprint',
+])
+function isCardioExercise(name) {
+  return CARDIO_EXERCISES.has(name)
+}
+
 // ─── Exercise Card ────────────────────────────────────────────────────────────
 function ExerciseCard({ exercise, onChange, onRemove, onMoveUp, onMoveDown, onReplace, onShowHistory, recommendation, isFirst, isLast }) {
   const [showMenu, setShowMenu] = useState(false)
   const menuRef = useRef(null)
   const isolated = isIsolatedExercise(exercise.name)
+  const cardio = isCardioExercise(exercise.name)
 
   useEffect(() => {
     if (!showMenu) return
@@ -671,7 +698,7 @@ function ExerciseCard({ exercise, onChange, onRemove, onMoveUp, onMoveDown, onRe
       {/* Sets */}
       <div className="border-t border-gray-800/60">
         {(exercise.sets || []).map((set, i) => (
-          <SetRow key={i} set={set} index={i} onChange={s => updateSet(i, s)} onRemove={() => removeSet(i)} isIsolated={isolated} />
+          <SetRow key={i} set={set} index={i} onChange={s => updateSet(i, s)} onRemove={() => removeSet(i)} isIsolated={isolated} isCardio={cardio} />
         ))}
       </div>
 
