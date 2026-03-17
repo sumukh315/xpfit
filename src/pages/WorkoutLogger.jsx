@@ -9,23 +9,14 @@ import PixelCharacter from '../components/PixelCharacter'
 // ─── Exercise Library ─────────────────────────────────────────────────────────
 const MUSCLE_GROUPS = [
   {
-    id: 'chest',
-    label: 'Chest',
+    id: 'legs',
+    label: 'Legs',
     exercises: [
-      'Bench Press', 'Incline Bench Press', 'Decline Bench Press',
-      'Dumbbell Fly', 'Incline Dumbbell Fly', 'Cable Fly',
-      'Push-Up', 'Chest Dip', 'Pec Deck', 'Cable Crossover',
-      'Landmine Press', 'Machine Chest Press',
-    ],
-  },
-  {
-    id: 'back',
-    label: 'Back',
-    exercises: [
-      'Deadlift', 'Barbell Row', 'Dumbbell Row', 'Pull-Up', 'Chin-Up',
-      'Lat Pulldown', 'Seated Cable Row', 'T-Bar Row', 'Face Pull',
-      'Straight-Arm Pulldown', 'Rack Pull', 'Good Morning',
-      'Hyperextension', 'Shrug',
+      'Squat', 'Front Squat', 'Goblet Squat', 'Bulgarian Split Squat',
+      'Leg Press', 'Hack Squat', 'Romanian Deadlift', 'Leg Curl',
+      'Leg Extension', 'Hip Thrust', 'Glute Bridge', 'Lunge',
+      'Walking Lunge', 'Step-Up', 'Calf Raise', 'Seated Calf Raise',
+      'Sumo Deadlift', 'Box Jump',
     ],
   },
   {
@@ -40,6 +31,16 @@ const MUSCLE_GROUPS = [
     ],
   },
   {
+    id: 'back',
+    label: 'Back',
+    exercises: [
+      'Deadlift', 'Barbell Row', 'Dumbbell Row', 'Pull-Up', 'Chin-Up',
+      'Lat Pulldown', 'Seated Cable Row', 'T-Bar Row', 'Face Pull',
+      'Straight-Arm Pulldown', 'Rack Pull', 'Good Morning',
+      'Hyperextension', 'Shrug',
+    ],
+  },
+  {
     id: 'shoulders',
     label: 'Shoulders',
     exercises: [
@@ -50,14 +51,13 @@ const MUSCLE_GROUPS = [
     ],
   },
   {
-    id: 'legs',
-    label: 'Legs',
+    id: 'chest',
+    label: 'Chest',
     exercises: [
-      'Squat', 'Front Squat', 'Goblet Squat', 'Bulgarian Split Squat',
-      'Leg Press', 'Hack Squat', 'Romanian Deadlift', 'Leg Curl',
-      'Leg Extension', 'Hip Thrust', 'Glute Bridge', 'Lunge',
-      'Walking Lunge', 'Step-Up', 'Calf Raise', 'Seated Calf Raise',
-      'Sumo Deadlift', 'Box Jump',
+      'Bench Press', 'Incline Bench Press', 'Decline Bench Press',
+      'Dumbbell Fly', 'Incline Dumbbell Fly', 'Cable Fly',
+      'Push-Up', 'Chest Dip', 'Pec Deck', 'Cable Crossover',
+      'Landmine Press', 'Machine Chest Press',
     ],
   },
   {
@@ -289,17 +289,48 @@ function PasteImportModal({ onImport, onClose }) {
 }
 
 // ─── Exercise Picker Modal ────────────────────────────────────────────────────
-function ExercisePicker({ onSelect, onClose }) {
-  const [activeGroup, setActiveGroup] = useState('chest')
+function ExercisePicker({ onSelect, onClose, customExercises = {}, usageCounts = {}, onAddCustomExercise }) {
+  const [activeGroup, setActiveGroup] = useState('legs')
   const [search, setSearch] = useState('')
+  const [addingCustom, setAddingCustom] = useState(false)
+  const [customName, setCustomName] = useState('')
   const inputRef = useRef(null)
+  const customInputRef = useRef(null)
 
   useEffect(() => { inputRef.current?.focus() }, [])
+  useEffect(() => { if (addingCustom) customInputRef.current?.focus() }, [addingCustom])
 
   const group = MUSCLE_GROUPS.find(g => g.id === activeGroup)
-  const filtered = search
-    ? MUSCLE_GROUPS.flatMap(g => g.exercises).filter(e => e.toLowerCase().includes(search.toLowerCase()))
-    : group.exercises
+
+  function sortByUsage(names) {
+    return [...names].sort((a, b) => (usageCounts[b] || 0) - (usageCounts[a] || 0))
+  }
+
+  const groupCustom = customExercises[activeGroup] || []
+  const groupDefault = sortByUsage(group?.exercises || [])
+  const allForGroup = [...groupCustom, ...groupDefault.filter(e => !groupCustom.includes(e))]
+
+  const allExercises = search
+    ? (() => {
+        const all = MUSCLE_GROUPS.flatMap(g => [
+          ...(customExercises[g.id] || []),
+          ...g.exercises.filter(e => !(customExercises[g.id] || []).includes(e)),
+        ])
+        const unique = [...new Set(all)]
+        const matched = unique.filter(e => e.toLowerCase().includes(search.toLowerCase()))
+        return sortByUsage(matched)
+      })()
+    : allForGroup
+
+  function handleAddCustom() {
+    const name = customName.trim()
+    if (!name) return
+    onAddCustomExercise(activeGroup, name)
+    setCustomName('')
+    setAddingCustom(false)
+    onSelect(name)
+    onClose()
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
@@ -316,7 +347,7 @@ function ExercisePicker({ onSelect, onClose }) {
         {!search && (
           <div className="flex overflow-x-auto border-b border-gray-800" style={{ scrollbarWidth: 'none' }}>
             {MUSCLE_GROUPS.map(g => (
-              <button key={g.id} onClick={() => setActiveGroup(g.id)}
+              <button key={g.id} onClick={() => { setActiveGroup(g.id); setAddingCustom(false) }}
                 className={`flex-shrink-0 px-4 py-3 pixel-font transition-all ${
                   activeGroup === g.id
                     ? 'text-sky-300 border-b-2 border-sky-500 bg-sky-900/20'
@@ -330,18 +361,53 @@ function ExercisePicker({ onSelect, onClose }) {
         <div className="overflow-y-auto flex-1 p-2">
           {search && (
             <p className="pixel-font text-gray-600 px-2 py-1 mb-1" style={{ fontSize: '13px' }}>
-              {filtered.length} results
+              {allExercises.length} results
             </p>
           )}
           <div className="grid grid-cols-2 gap-1">
-            {filtered.map(name => (
-              <button key={name} onClick={() => { onSelect(name); onClose() }}
-                className="text-left px-3 py-2.5 border border-gray-800 hover:border-sky-600 hover:bg-sky-900/20 transition-all text-gray-300 hover:text-white"
-                style={{ fontSize: '12px' }}>
-                {name}
-              </button>
-            ))}
+            {allExercises.map(name => {
+              const isCustom = (customExercises[activeGroup] || []).includes(name) ||
+                Object.values(customExercises).some(arr => arr.includes(name))
+              return (
+                <button key={name} onClick={() => { onSelect(name); onClose() }}
+                  className="text-left px-3 py-2.5 border border-gray-800 hover:border-sky-600 hover:bg-sky-900/20 transition-all text-gray-300 hover:text-white flex items-center gap-1.5"
+                  style={{ fontSize: '12px' }}>
+                  {isCustom && <span className="text-sky-500 flex-shrink-0" style={{ fontSize: '10px' }}>★</span>}
+                  <span>{name}</span>
+                  {usageCounts[name] > 0 && (
+                    <span className="ml-auto text-gray-600 flex-shrink-0" style={{ fontSize: '10px' }}>{usageCounts[name]}×</span>
+                  )}
+                </button>
+              )
+            })}
           </div>
+
+          {/* Add custom exercise */}
+          {!search && (
+            <div className="mt-3 px-1">
+              {addingCustom ? (
+                <div className="flex gap-2">
+                  <input ref={customInputRef} type="text" placeholder="Exercise name..."
+                    value={customName} onChange={e => setCustomName(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && handleAddCustom()}
+                    className="flex-1 bg-black/40 border border-sky-700 text-white px-3 py-2 focus:outline-none"
+                    style={{ fontSize: '13px' }} />
+                  <button onClick={handleAddCustom}
+                    className="pixel-btn bg-sky-700 border-sky-500 text-white px-4" style={{ fontSize: '12px' }}>
+                    Add
+                  </button>
+                  <button onClick={() => { setAddingCustom(false); setCustomName('') }}
+                    className="text-gray-500 hover:text-white px-2" style={{ fontSize: '18px' }}>✕</button>
+                </div>
+              ) : (
+                <button onClick={() => setAddingCustom(true)}
+                  className="w-full py-2.5 border border-dashed border-gray-700 text-sky-400 hover:border-sky-600 hover:bg-sky-900/10 transition-all text-center"
+                  style={{ fontSize: '12px' }}>
+                  + Add Custom Exercise to {group?.label}
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -631,6 +697,24 @@ export default function WorkoutLogger() {
         })
       })
       setPreviousWorkouts(prevMap)
+    } catch (e) { console.error(e) }
+  }
+
+  // Build usage count map from workout history
+  const usageCounts = {}
+  allWorkouts.forEach(w => {
+    w.exercises?.forEach(ex => {
+      if (ex.name) usageCounts[ex.name] = (usageCounts[ex.name] || 0) + 1
+    })
+  })
+
+  const customExercises = profile?.custom_exercises || {}
+
+  async function handleAddCustomExercise(groupId, name) {
+    const updated = { ...customExercises, [groupId]: [...(customExercises[groupId] || []), name] }
+    try {
+      await api.updateProfile({ custom_exercises: updated })
+      await refreshProfile()
     } catch (e) { console.error(e) }
   }
 
@@ -1103,12 +1187,21 @@ export default function WorkoutLogger() {
 
       {/* ── Modals ── */}
       {showPicker && replaceIdx === null && (
-        <ExercisePicker onSelect={addExercise} onClose={() => setShowPicker(false)} />
+        <ExercisePicker
+          onSelect={addExercise}
+          onClose={() => setShowPicker(false)}
+          customExercises={customExercises}
+          usageCounts={usageCounts}
+          onAddCustomExercise={handleAddCustomExercise}
+        />
       )}
       {replaceIdx !== null && (
         <ExercisePicker
           onSelect={name => replaceExercise(replaceIdx, name)}
           onClose={() => setReplaceIdx(null)}
+          customExercises={customExercises}
+          usageCounts={usageCounts}
+          onAddCustomExercise={handleAddCustomExercise}
         />
       )}
       {showPaste && (

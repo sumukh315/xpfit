@@ -55,8 +55,22 @@ export default function Profile() {
       <h1 className="pixel-font text-sky-400 mb-6" style={{ fontSize: '14px' }}>Profile</h1>
 
       <div className="pixel-card p-6 mb-6 flex flex-col md:flex-row gap-6 items-center">
-        <div className="pixel-card p-5 glow-purple">
-          <PixelCharacter options={displayChar} scale={1} />
+        <div className="flex flex-col items-center gap-3">
+          <div className="pixel-card p-5 glow-purple">
+            <PixelCharacter options={displayChar} scale={1} />
+          </div>
+          {/* Pet square */}
+          {profile?.active_pet ? (
+            <div className="pixel-card p-2 flex flex-col items-center justify-center" style={{ width: 80, height: 80 }}>
+              <PetSprite petId={profile.active_pet} size={60} />
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center border border-dashed border-gray-700 rounded-xl text-center"
+              style={{ width: 80, height: 80, padding: 6 }}>
+              <div className="text-gray-600" style={{ fontSize: '18px' }}>🐾</div>
+              <div className="text-gray-600 leading-tight mt-1" style={{ fontSize: '9px' }}>Visit Shop</div>
+            </div>
+          )}
         </div>
         <div className="flex-1 text-center md:text-left">
           <h2 className="pixel-font text-white mb-1" style={{ fontSize: '20px' }}>{profile?.username}</h2>
@@ -150,42 +164,6 @@ export default function Profile() {
                 <span className="text-white capitalize">{value || '—'}</span>
               </div>
             ))}
-          </div>
-        )}
-      </div>
-
-      {/* Pet */}
-      <div className="pixel-card p-4 mt-6">
-        <h2 className="pixel-font text-sky-400 mb-4" style={{ fontSize: '13px' }}>Your Pet</h2>
-        {profile?.active_pet ? (
-          <div className="flex items-center gap-4">
-            <PetSprite petId={profile.active_pet} size={90} />
-            <div>
-              <div className="text-white font-semibold" style={{ fontSize: '15px' }}>
-                {PETS.find(p => p.id === profile.active_pet)?.name}
-              </div>
-              <div className="text-gray-500 mt-1" style={{ fontSize: '12px' }}>
-                {PETS.find(p => p.id === profile.active_pet)?.desc}
-              </div>
-              <div className="text-gray-600 mt-2" style={{ fontSize: '12px' }}>
-                Swap pets in the <span className="text-sky-400">Shop → Pets</span> tab
-              </div>
-            </div>
-          </div>
-        ) : (profile?.owned_pets || []).length > 0 ? (
-          <div>
-            <p className="text-gray-500 mb-3" style={{ fontSize: '13px' }}>You have pets but none equipped. Go to Shop → Pets to equip one.</p>
-            <div className="flex gap-3 flex-wrap">
-              {(profile.owned_pets).map(id => <PetSprite key={id} petId={id} size={60} />)}
-            </div>
-          </div>
-        ) : (
-          <div className="glass-row p-4 text-center">
-            <p className="text-gray-500 mb-1" style={{ fontSize: '13px' }}>No pet yet.</p>
-            <p className="text-gray-600" style={{ fontSize: '12px' }}>
-              Visit the <span className="text-yellow-400">Shop</span> to adopt one.
-              Earn <span className="text-purple-400">PR Points</span> by beating your records to unlock special pets.
-            </p>
           </div>
         )}
       </div>

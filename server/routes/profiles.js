@@ -14,13 +14,14 @@ function parseProfile(u) {
     fitness_profile: JSON.parse(u.fitness_profile || '{}'),
     unlocked_classes: JSON.parse(u.unlocked_classes || '["warrior","mage"]'),
     owned_pets: JSON.parse(u.owned_pets || '[]'),
+    custom_exercises: JSON.parse(u.custom_exercises || '{}'),
   }
 }
 
 router.patch('/me', async (req, res) => {
   const allowed = [
     'character', 'equipped', 'inventory', 'points', 'discord_webhook',
-    'fitness_profile', 'unlocked_classes', 'owned_pets', 'active_pet', 'pr_points',
+    'fitness_profile', 'unlocked_classes', 'owned_pets', 'active_pet', 'pr_points', 'custom_exercises',
   ]
   const updates = {}
   for (const key of allowed) {

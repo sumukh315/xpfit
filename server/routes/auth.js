@@ -116,6 +116,7 @@ function sanitizeUser(user) {
     fitness_profile: JSON.parse(safe.fitness_profile || '{}'),
     unlocked_classes: JSON.parse(safe.unlocked_classes || '["warrior","mage"]'),
     owned_pets: JSON.parse(safe.owned_pets || '[]'),
+    custom_exercises: JSON.parse(safe.custom_exercises || '{}'),
   }
 }
 
