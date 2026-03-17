@@ -10,7 +10,7 @@ const navItems = [
   { path: '/workout/new', label: 'Workout', icon: '+' },
   { path: '/logs',        label: 'Logs',    icon: '≡' },
   { path: '/shop',        label: 'Shop',    icon: '✦' },
-  { path: '/social',      label: 'Friends', icon: '♦' },
+  { path: '/social',      label: 'Friends', icon: '☺' },
   { path: '/profile',     label: 'Profile', icon: '◉' },
 ]
 
