@@ -219,42 +219,42 @@ export default function Social() {
           )}
         </div>
         {/* Friends of this friend */}
-        {(() => {
-          const myFriendIds = new Set(friends.map(f => f.id))
-          const pendingIds = new Set(pending.map(p => p.id))
-          const strangers = friendFriends.filter(u =>
-            u.id !== profile?.id && !myFriendIds.has(u.id) && !pendingIds.has(u.id)
-          )
-          if (strangers.length === 0) return null
-          return (
-            <div className="pixel-card p-4 mt-4">
-              <h3 className="pixel-font text-sky-400 mb-4" style={{ fontSize: '13px' }}>
-                {selectedFriend.username}'s Friends
-              </h3>
-              <div className="flex flex-col gap-2">
-                {strangers.map(u => {
-                  const { level } = getLevelFromXP(u.total_xp || 0)
-                  const charOpts = u.character || { gender: 'male', charClass: 'warrior' }
-                  return (
-                    <div key={u.id} className="flex items-center justify-between p-2 glass-row">
-                      <div className="flex items-center gap-3">
-                        <PixelCharacter options={charOpts} scale={0.35} />
-                        <div>
-                          <div className="text-white text-sm">{u.username}</div>
-                          <div className="pixel-font text-sky-400" style={{ fontSize: '12px' }}>Level {level}</div>
-                        </div>
+        {friendFriends.filter(u => u.id !== profile?.id).length > 0 && (
+          <div className="pixel-card p-4 mt-4">
+            <h3 className="pixel-font text-sky-400 mb-4" style={{ fontSize: '13px' }}>
+              {selectedFriend.username}'s Friends ({friendFriends.filter(u => u.id !== profile?.id).length})
+            </h3>
+            <div className="flex flex-col gap-2">
+              {friendFriends.filter(u => u.id !== profile?.id).map(u => {
+                const { level } = getLevelFromXP(u.total_xp || 0)
+                const charOpts = u.character || { gender: 'male', charClass: 'warrior' }
+                const isMyFriend = friends.some(f => f.id === u.id)
+                const isPending = pending.some(p => p.id === u.id)
+                return (
+                  <div key={u.id} className="flex items-center justify-between p-2 glass-row">
+                    <div className="flex items-center gap-3">
+                      <PixelCharacter options={charOpts} scale={0.35} />
+                      <div>
+                        <div className="text-white text-sm">{u.username}</div>
+                        <div className="pixel-font text-sky-400" style={{ fontSize: '12px' }}>Level {level}</div>
                       </div>
+                    </div>
+                    {isMyFriend ? (
+                      <span className="text-green-400 pixel-font" style={{ fontSize: '11px' }}>Friends</span>
+                    ) : isPending ? (
+                      <span className="text-gray-500 pixel-font" style={{ fontSize: '11px' }}>Pending</span>
+                    ) : (
                       <button onClick={() => sendRequest(u.id, u.username)}
                         className="pixel-btn bg-green-800 border-green-600 text-white px-3 py-1" style={{ fontSize: '12px' }}>
                         + Add
                       </button>
-                    </div>
-                  )
-                })}
-              </div>
+                    )}
+                  </div>
+                )
+              })}
             </div>
-          )
-        })()}
+          </div>
+        )}
 
         {lightboxPhoto && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
