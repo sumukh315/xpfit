@@ -80,10 +80,7 @@ export default function Profile() {
     <div className="max-w-3xl mx-auto px-4 py-6">
       <h1 className="pixel-font text-sky-400 mb-6" style={{ fontSize: '14px' }}>Profile</h1>
 
-      <div className="pixel-card p-6 mb-6 flex flex-col md:flex-row gap-6 items-center relative">
-        <Link to="/progress" className="absolute top-4 right-4 text-sky-400 hover:text-sky-300 no-underline pixel-font" style={{ fontSize: '12px' }}>
-          View Stats →
-        </Link>
+      <div className="pixel-card p-6 mb-6 flex flex-col md:flex-row gap-6 items-center">
         <div className="flex flex-col items-center gap-3">
           <div className="pixel-card p-5 glow-purple">
             <PixelCharacter options={displayChar} scale={1} />
@@ -102,7 +99,10 @@ export default function Profile() {
           )}
         </div>
         <div className="flex-1 text-center md:text-left">
-          <h2 className="pixel-font text-white mb-1" style={{ fontSize: '20px' }}>{profile?.username}</h2>
+          <div className="flex items-start justify-between gap-2 mb-1">
+            <h2 className="pixel-font text-white" style={{ fontSize: '20px' }}>{profile?.username}</h2>
+            <Link to="/progress" className="text-sky-400 hover:text-sky-300 no-underline pixel-font flex-shrink-0 mt-1" style={{ fontSize: '12px' }}>View Stats →</Link>
+          </div>
           <p className="pixel-font text-sky-400 mb-1" style={{ fontSize: '13px' }}>Level {level} · {getLevelTitle(level)}</p>
           <p className="text-gray-400 mb-4 capitalize" style={{ fontSize: '12px' }}>
             {charOptions.gender || 'Male'} · {CLASS_INFO[charOptions.charClass]?.label || 'Warrior'}

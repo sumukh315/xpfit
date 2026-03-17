@@ -10,6 +10,7 @@ const navItems = [
   { path: '/logs',        label: 'Logs',    icon: '≡' },
   { path: '/shop',        label: 'Shop',    icon: '✦' },
   { path: '/social',      label: 'Friends', icon: '⊙' },
+  { path: '/progress',    label: 'Stats',   icon: '▲' },
   { path: '/profile',     label: 'Profile', icon: '◉' },
 ]
 
