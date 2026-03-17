@@ -26,8 +26,21 @@ const EXERCISES_BY_GROUP = {
   cardio:    ['Running','Treadmill','Cycling','Rowing Machine','Elliptical','Jump Rope','Stair Climber','HIIT Sprint','Battle Ropes','Burpee','Box Jump','Sled Push'],
 }
 
+function normalizeEx(name) {
+  return name.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim()
+}
+
 function getGroupForExercise(name) {
-  return Object.entries(EXERCISES_BY_GROUP).find(([, list]) => list.includes(name))?.[0] || null
+  const norm = normalizeEx(name)
+  for (const [group, list] of Object.entries(EXERCISES_BY_GROUP)) {
+    for (const canonical of list) {
+      const cn = normalizeEx(canonical)
+      if (norm === cn) return group                              // exact
+      if (norm.includes(cn)) return group                       // "leg press machine" ⊇ "leg press"
+      if (cn.includes(norm) && norm.length >= 5) return group   // "barbell squat" ⊇ "squat"
+    }
+  }
+  return null
 }
 
 function getWeekStart(offset = 0) {

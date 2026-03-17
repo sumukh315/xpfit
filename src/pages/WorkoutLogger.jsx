@@ -299,6 +299,9 @@ function ExercisePicker({ onSelect, onClose, customExercises = {}, usageCounts =
   const [search, setSearch] = useState('')
   const [addingCustom, setAddingCustom] = useState(false)
   const [customName, setCustomName] = useState('')
+  const [hiddenExercises, setHiddenExercises] = useState(
+    () => JSON.parse(localStorage.getItem('xpfit_hidden_exercises') || '{}')
+  )
   const inputRef = useRef(null)
   const customInputRef = useRef(null)
 
@@ -311,15 +314,24 @@ function ExercisePicker({ onSelect, onClose, customExercises = {}, usageCounts =
     return [...names].sort((a, b) => (usageCounts[b] || 0) - (usageCounts[a] || 0))
   }
 
+  function hideExercise(groupId, name) {
+    setHiddenExercises(prev => {
+      const updated = { ...prev, [groupId]: [...(prev[groupId] || []), name] }
+      localStorage.setItem('xpfit_hidden_exercises', JSON.stringify(updated))
+      return updated
+    })
+  }
+
+  const groupHidden = hiddenExercises[activeGroup] || []
   const groupCustom = customExercises[activeGroup] || []
-  const groupDefault = sortByUsage(group?.exercises || [])
+  const groupDefault = sortByUsage(group?.exercises || []).filter(e => !groupHidden.includes(e))
   const allForGroup = [...groupCustom, ...groupDefault.filter(e => !groupCustom.includes(e))]
 
   const allExercises = search
     ? (() => {
         const all = MUSCLE_GROUPS.flatMap(g => [
           ...(customExercises[g.id] || []),
-          ...g.exercises.filter(e => !(customExercises[g.id] || []).includes(e)),
+          ...g.exercises.filter(e => !(customExercises[g.id] || []).includes(e) && !(hiddenExercises[g.id] || []).includes(e)),
         ])
         const unique = [...new Set(all)]
         const matched = unique.filter(e => e.toLowerCase().includes(search.toLowerCase()))
@@ -374,15 +386,26 @@ function ExercisePicker({ onSelect, onClose, customExercises = {}, usageCounts =
               const isCustom = (customExercises[activeGroup] || []).includes(name) ||
                 Object.values(customExercises).some(arr => arr.includes(name))
               return (
-                <button key={name} onClick={() => { onSelect(name); onClose() }}
-                  className="text-left px-3 py-2.5 border border-gray-800 hover:border-sky-600 hover:bg-sky-900/20 transition-all text-gray-300 hover:text-white flex items-center gap-1.5"
-                  style={{ fontSize: '12px' }}>
-                  {isCustom && <span className="text-sky-500 flex-shrink-0" style={{ fontSize: '10px' }}>★</span>}
-                  <span>{name}</span>
-                  {usageCounts[name] > 0 && (
-                    <span className="ml-auto text-gray-600 flex-shrink-0" style={{ fontSize: '10px' }}>{usageCounts[name]}×</span>
+                <div key={name} className="flex border border-gray-800 hover:border-sky-600 transition-all group/ex">
+                  <button onClick={() => { onSelect(name); onClose() }}
+                    className="flex-1 text-left px-3 py-2.5 text-gray-300 hover:text-white flex items-center gap-1.5 min-w-0"
+                    style={{ fontSize: '12px' }}>
+                    {isCustom && <span className="text-sky-500 flex-shrink-0" style={{ fontSize: '10px' }}>★</span>}
+                    <span className="truncate">{name}</span>
+                    {usageCounts[name] > 0 && (
+                      <span className="ml-auto text-gray-600 flex-shrink-0 pl-1" style={{ fontSize: '10px' }}>{usageCounts[name]}×</span>
+                    )}
+                  </button>
+                  {!search && (
+                    <button
+                      onClick={e => { e.stopPropagation(); hideExercise(activeGroup, name) }}
+                      className="px-2 text-gray-700 hover:text-red-400 transition-colors flex-shrink-0"
+                      style={{ fontSize: '11px' }}
+                      title="Hide this exercise">
+                      ✕
+                    </button>
                   )}
-                </button>
+                </div>
               )
             })}
           </div>
@@ -593,11 +616,18 @@ function isIsolatedExercise(name) {
   return name.toLowerCase().includes('isolated')
 }
 
-const CARDIO_EXERCISES = new Set([
-  'Running','Treadmill','Cycling','Rowing Machine','Elliptical','Stair Climber','HIIT Sprint',
-])
+const CARDIO_EXERCISES = ['Running','Treadmill','Cycling','Rowing Machine','Elliptical','Stair Climber','HIIT Sprint']
+
+function normalizeEx(name) {
+  return name.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim()
+}
+
 function isCardioExercise(name) {
-  return CARDIO_EXERCISES.has(name)
+  const norm = normalizeEx(name)
+  return CARDIO_EXERCISES.some(c => {
+    const cn = normalizeEx(c)
+    return norm === cn || norm.includes(cn) || (cn.includes(norm) && norm.length >= 5)
+  })
 }
 
 // ─── Exercise Card ────────────────────────────────────────────────────────────
