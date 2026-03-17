@@ -4,6 +4,20 @@ export default function PetSprite({ petId, size = 80 }) {
   const pet = getPet(petId)
   if (!pet) return null
 
+  if (pet.image) {
+    return (
+      <div style={{
+        width: size,
+        height: size,
+        backgroundImage: `url(${pet.image})`,
+        backgroundSize: 'contain',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        flexShrink: 0,
+      }} />
+    )
+  }
+
   const cols = pet.cols || 2
   const rows = pet.rows || 3
   const bgW = cols * size
