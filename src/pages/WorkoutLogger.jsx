@@ -624,7 +624,14 @@ function ExerciseCard({ exercise, onChange, onRemove, onMoveUp, onMoveDown, onRe
                   className="flex-1 py-3 flex flex-col items-center gap-1 text-white hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed border-r border-gray-800"
                   style={{ fontSize: '13px' }}>
                   <span style={{ fontSize: '16px' }}>↑</span>
-                  <span>Move</span>
+                  <span>Up</span>
+                </button>
+                <button onClick={() => { onMoveDown?.(); setShowMenu(false) }}
+                  disabled={isLast}
+                  className="flex-1 py-3 flex flex-col items-center gap-1 text-white hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed border-r border-gray-800"
+                  style={{ fontSize: '13px' }}>
+                  <span style={{ fontSize: '16px' }}>↓</span>
+                  <span>Down</span>
                 </button>
                 <button onClick={() => { onReplace(); setShowMenu(false) }}
                   className="flex-1 py-3 flex flex-col items-center gap-1 text-white hover:bg-gray-800 border-r border-gray-800"
@@ -669,10 +676,11 @@ function ExerciseCard({ exercise, onChange, onRemove, onMoveUp, onMoveDown, onRe
         <button onClick={addSet}
           className="flex items-center gap-2.5 text-sky-400 hover:text-sky-300 transition-colors font-semibold"
           style={{ fontSize: '14px' }}>
-          <div className="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center flex-shrink-0"
-            style={{ fontSize: '16px', lineHeight: 1 }}>
-            +
-          </div>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" flexShrink="0">
+            <circle cx="12" cy="12" r="10.5" stroke="currentColor" strokeWidth="2"/>
+            <line x1="12" y1="7" x2="12" y2="17" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            <line x1="7" y1="12" x2="17" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
           Add Set
         </button>
       </div>
