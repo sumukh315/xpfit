@@ -40,6 +40,56 @@ export const PETS = [
     costType: 'points',
     col: 0.5, row: 2, yAdjust: 50,
   },
+
+  // ── pets2.png — 4 cols × 2 rows ──────────────────────────────────────────
+  {
+    id: 'steel_wolf',
+    name: 'Steel Wolf',
+    desc: 'Forged in battle, fueled by blue flame. Only the relentless earn this beast.',
+    cost: 900,
+    costType: 'points',
+    col: 0, row: 0, cols: 4, rows: 2, sheet: '/pets2.png',
+  },
+  {
+    id: 'mini_golem',
+    name: 'Mini Golem',
+    desc: 'Born from lava and stone. Grows stronger every time you break a record.',
+    cost: 200,
+    costType: 'pr_points',
+    col: 1, row: 0, cols: 4, rows: 2, sheet: '/pets2.png',
+  },
+  {
+    id: 'owl_scout',
+    name: 'Owl Scout',
+    desc: 'A tactical companion who tracks every rep. Wisdom wins the long game.',
+    cost: 700,
+    costType: 'points',
+    col: 0, row: 1, cols: 4, rows: 2, sheet: '/pets2.png',
+  },
+  {
+    id: 'shadow_cat',
+    name: 'Shadow Cat',
+    desc: 'Haunts the gym at midnight. Earned by those who shatter their own limits.',
+    cost: 175,
+    costType: 'pr_points',
+    col: 1, row: 1, cols: 4, rows: 2, sheet: '/pets2.png',
+  },
+  {
+    id: 'mini_griffin',
+    name: 'Mini Griffin',
+    desc: 'Half eagle, half lion — all elite. The rarest points companion in the shop.',
+    cost: 1500,
+    costType: 'points',
+    col: 2, row: 1, cols: 4, rows: 2, sheet: '/pets2.png',
+  },
+  {
+    id: 'skeleton_dog',
+    name: 'Skeleton Dog',
+    desc: 'Risen from the graveyard of missed PRs. A reminder to never give up.',
+    cost: 300,
+    costType: 'pr_points',
+    col: 3, row: 1, cols: 4, rows: 2, sheet: '/pets2.png',
+  },
 ]
 
 export function getPet(id) {
