@@ -3,6 +3,11 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { api } from '../lib/api'
 
+function parseExName(name = '') {
+  const match = name.match(/^(.+?)\s*\(([^)]+)\)\s*$/)
+  return match ? { base: match[1].trim(), note: match[2].trim() } : { base: name, note: null }
+}
+
 function formatDate(str) {
   return new Date(str).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
 }
@@ -352,7 +357,12 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete, onPhotoAdde
                 ) : (
                   (workout.exercises || []).map((ex, i) => (
                     <div key={i} className="bg-black/40 border border-gray-800 p-3">
-                      <div className="text-white font-medium mb-2" style={{ fontSize: '13px' }}>{ex.name}</div>
+                      <div className="text-white font-medium mb-2" style={{ fontSize: '13px' }}>
+                        {parseExName(ex.name).base}
+                        {parseExName(ex.name).note && (
+                          <span className="text-gray-500 font-normal ml-1" style={{ fontSize: '11px' }}>({parseExName(ex.name).note})</span>
+                        )}
+                      </div>
                       <div className="flex flex-col gap-1">
                         {(ex.sets || []).map((set, j) => (
                           <div key={j} className="flex items-center gap-3 text-xs">
@@ -579,11 +589,14 @@ export default function WorkoutLogs() {
                       {/* Exercise preview */}
                       {w.exercises?.length > 0 && (
                         <div className="mt-2 flex flex-wrap gap-1">
-                          {w.exercises.slice(0, 4).map((ex, i) => (
-                            <span key={i} className="text-gray-400 glass-row px-2 py-0.5" style={{ fontSize: '13px' }}>
-                              {ex.name}
-                            </span>
-                          ))}
+                          {w.exercises.slice(0, 4).map((ex, i) => {
+                            const { base, note } = parseExName(ex.name)
+                            return (
+                              <span key={i} className="text-gray-400 glass-row px-2 py-0.5" style={{ fontSize: '13px' }}>
+                                {base}{note && <span className="text-gray-600 ml-1" style={{ fontSize: '11px' }}>({note})</span>}
+                              </span>
+                            )
+                          })}
                           {w.exercises.length > 4 && (
                             <span className="text-gray-500" style={{ fontSize: '13px' }}>+{w.exercises.length - 4} more</span>
                           )}

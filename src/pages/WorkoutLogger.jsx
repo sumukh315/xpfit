@@ -6,6 +6,12 @@ import { calcWorkoutXP, calcWorkoutPoints, getRecommendation, getLevelFromXP, ge
 import { CLASS_INFO, CLASSES } from '../lib/pixelCharacter'
 import PixelCharacter from '../components/PixelCharacter'
 
+// Parse "Hip Adductor (Inside)" → { base: "Hip Adductor", note: "Inside" }
+function parseExName(name = '') {
+  const match = name.match(/^(.+?)\s*\(([^)]+)\)\s*$/)
+  return match ? { base: match[1].trim(), note: match[2].trim() } : { base: name, note: null }
+}
+
 // ─── Exercise Library ─────────────────────────────────────────────────────────
 const MUSCLE_GROUPS = [
   {
@@ -705,7 +711,12 @@ function ExerciseCard({ exercise, onChange, onRemove, onMoveUp, onMoveDown, onRe
     <div className="pixel-card mb-3" style={{ padding: 0, overflow: 'hidden' }}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-4 pb-3">
-        <span className="text-white font-bold" style={{ fontSize: '16px' }}>{exercise.name}</span>
+        <span className="text-white font-bold" style={{ fontSize: '16px' }}>
+          {parseExName(exercise.name).base}
+          {parseExName(exercise.name).note && (
+            <span className="text-gray-500 font-normal ml-1" style={{ fontSize: '12px' }}>({parseExName(exercise.name).note})</span>
+          )}
+        </span>
         <div className="relative" ref={menuRef}>
           <button onClick={() => setShowMenu(v => !v)}
             className="text-sky-400 hover:text-sky-300 w-8 h-8 flex items-center justify-center rounded-full hover:bg-sky-900/20 transition-all"
