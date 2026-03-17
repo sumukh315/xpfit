@@ -94,13 +94,12 @@ function parseWorkoutText(text) {
 
   const setOnlyRe = /^[•\-\*]?\s*(\d+(?:\.\d+)?)\s*(?:lbs?|kg)?\s*[x×]\s*(\d+)(.*)$/i
   const weightOnlyRe = /^[•\-\*]?\s*(\d+(?:\.\d+)?)\s*(?:lbs?|kg)?\s*$/i
-  // "Name - val/val/val" or "Name - val" where val can be "135", "135x8", "20 min", "35*"
   const dashFormatRe = /^(.+?)\s*[-–]\s*(.+)$/
   const inlineRe = /^(.+?)\s{1,}(\d+(?:\.\d+)?)\s*(?:lbs?|kg)?\s*[x×]\s*(\d+)(.*)?$/i
   const skipRe = /^(workout\s*#?\d*|date:|notes?:|day\s*\d|logged\s+using|logged\s+with)/i
 
   function parseDashChunk(chunk) {
-    chunk = chunk.trim().replace(/\*+$/, m => { return '' }) // strip trailing *
+    chunk = chunk.trim().replace(/\*+$/, () => '')
     const raw = chunk.trim()
     const xm = raw.match(/^(\d+(?:\.\d+)?)\s*(?:lbs?|kg)?\s*[x×]\s*(\d+)\s*(.*)$/i)
     if (xm) return { weight: xm[1], reps: xm[2], note: xm[3]?.trim() || undefined }
@@ -110,17 +109,14 @@ function parseWorkoutText(text) {
   }
 
   for (const line of lines) {
-    // Try to detect a date line first
     const dateMatch = line.match(DATE_LINE_RE)
     if (dateMatch) {
       const d = new Date(dateMatch[0])
       if (!isNaN(d.getTime())) detectedDate = d
       continue
     }
-
     if (skipRe.test(line)) continue
 
-    // "Exercise - 85/85/100" or "Exercise - 85 x 8 / 95 x 6"
     const dashMatch = line.match(dashFormatRe)
     if (dashMatch) {
       const name = dashMatch[1].replace(/^[•\-\*]\s*/, '').trim()
@@ -158,7 +154,6 @@ function parseWorkoutText(text) {
       continue
     }
 
-    // Weight-only line (e.g. "135" or "225lbs") under a current exercise
     const weightMatch = line.match(weightOnlyRe)
     if (weightMatch && current) {
       const w = parseFloat(weightMatch[1])
@@ -185,6 +180,13 @@ function titleCase(str) {
 function toDatetimeLocal(date) {
   const pad = n => String(n).padStart(2, '0')
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
+}
+
+function formatDatetimeDisplay(str) {
+  if (!str) return '—'
+  const d = new Date(str)
+  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) +
+    ' at ' + d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
 }
 
 // ─── Paste Import Modal ───────────────────────────────────────────────────────
@@ -240,7 +242,6 @@ function PasteImportModal({ onImport, onClose }) {
                 </p>
               ) : (
                 <>
-                  {/* Editable workout date */}
                   <div className="mb-4 bg-black/40 border border-gray-700 p-3">
                     <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '13px' }}>WORKOUT DATE & TIME</div>
                     <input
@@ -251,7 +252,6 @@ function PasteImportModal({ onImport, onClose }) {
                       style={{ fontSize: '13px' }}
                     />
                   </div>
-
                   <p className="pixel-font text-green-400 mb-3" style={{ fontSize: '12px' }}>
                     FOUND {preview.length} EXERCISE{preview.length !== 1 ? 'S' : ''}
                   </p>
@@ -306,7 +306,6 @@ function ExercisePicker({ onSelect, onClose }) {
       style={{ background: 'rgba(0,0,0,0.8)' }}
       onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="pixel-card w-full max-w-lg" style={{ background: '#12121e', maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
-        {/* Header */}
         <div className="p-4 border-b border-gray-800 flex items-center gap-3">
           <input ref={inputRef} type="text" placeholder="Search exercises..."
             value={search} onChange={e => setSearch(e.target.value)}
@@ -314,8 +313,6 @@ function ExercisePicker({ onSelect, onClose }) {
             style={{ fontSize: '13px' }} />
           <button onClick={onClose} className="text-gray-500 hover:text-white text-xl px-2">✕</button>
         </div>
-
-        {/* Muscle group tabs */}
         {!search && (
           <div className="flex overflow-x-auto border-b border-gray-800" style={{ scrollbarWidth: 'none' }}>
             {MUSCLE_GROUPS.map(g => (
@@ -330,8 +327,6 @@ function ExercisePicker({ onSelect, onClose }) {
             ))}
           </div>
         )}
-
-        {/* Exercise list */}
         <div className="overflow-y-auto flex-1 p-2">
           {search && (
             <p className="pixel-font text-gray-600 px-2 py-1 mb-1" style={{ fontSize: '13px' }}>
@@ -355,27 +350,148 @@ function ExercisePicker({ onSelect, onClose }) {
 
 // ─── Set Row ──────────────────────────────────────────────────────────────────
 function SetRow({ set, index, onChange, onRemove }) {
+  const [showMenu, setShowMenu] = useState(false)
+  const menuRef = useRef(null)
+
+  useEffect(() => {
+    if (!showMenu) return
+    function handleClick(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setShowMenu(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [showMenu])
+
   return (
-    <div className="flex gap-2 items-center">
-      <span className="pixel-font text-gray-600 w-6 text-center flex-shrink-0" style={{ fontSize: '12px' }}>{index + 1}</span>
-      <input type="number" placeholder="lbs" value={set.weight || ''}
-        onChange={e => onChange({ ...set, weight: e.target.value })}
-        className="w-20 bg-black/40 border border-gray-700 text-white px-2 py-1.5 text-sm text-center focus:border-sky-500 outline-none" />
-      <span className="text-gray-600 flex-shrink-0">×</span>
-      <input type="number" placeholder="reps" value={set.reps || ''}
-        onChange={e => onChange({ ...set, reps: e.target.value })}
-        className="w-16 bg-black/40 border border-gray-700 text-white px-2 py-1.5 text-sm text-center focus:border-sky-500 outline-none" />
-      <input type="text" placeholder="note..." value={set.note || ''}
-        onChange={e => onChange({ ...set, note: e.target.value })}
-        className="flex-1 bg-black/40 border border-gray-700 text-white px-2 py-1.5 text-sm focus:border-sky-500 outline-none" />
-      <button onClick={onRemove} className="text-gray-700 hover:text-red-400 text-sm px-1 flex-shrink-0">✕</button>
+    <div className="flex items-center gap-3 px-4 py-2.5 border-b border-gray-800/40 last:border-b-0">
+      {/* Circled number */}
+      <div className="w-7 h-7 rounded-full border border-gray-600 flex items-center justify-center flex-shrink-0">
+        <span className="text-gray-400 font-semibold" style={{ fontSize: '12px' }}>{index + 1}</span>
+      </div>
+
+      {/* Lb */}
+      <div className="flex-1 min-w-0">
+        <div className="text-gray-500" style={{ fontSize: '11px' }}>Lb</div>
+        <input type="number" value={set.weight || ''} placeholder="—"
+          onChange={e => onChange({ ...set, weight: e.target.value })}
+          className="bg-transparent text-white w-full focus:outline-none font-semibold"
+          style={{ fontSize: '15px' }} />
+      </div>
+
+      {/* Reps */}
+      <div className="flex-1 min-w-0">
+        <div className="text-gray-500" style={{ fontSize: '11px' }}>Reps</div>
+        <input type="number" value={set.reps || ''} placeholder="—"
+          onChange={e => onChange({ ...set, reps: e.target.value })}
+          className="bg-transparent text-white w-full focus:outline-none font-semibold"
+          style={{ fontSize: '15px' }} />
+      </div>
+
+      {/* Notes */}
+      <div className="flex-[2] min-w-0">
+        <div className="text-gray-500" style={{ fontSize: '11px' }}>Notes</div>
+        <input type="text" value={set.note || ''} placeholder="—"
+          onChange={e => onChange({ ...set, note: e.target.value })}
+          className="bg-transparent text-white w-full focus:outline-none"
+          style={{ fontSize: '14px' }} />
+      </div>
+
+      {/* Set menu */}
+      <div className="relative flex-shrink-0" ref={menuRef}>
+        <button onClick={() => setShowMenu(v => !v)}
+          className="text-sky-400 hover:text-sky-300 w-8 h-8 flex items-center justify-center"
+          style={{ fontSize: '20px', letterSpacing: '1px', lineHeight: 1 }}>
+          ···
+        </button>
+        {showMenu && (
+          <div className="absolute right-0 top-9 z-50 bg-gray-900 border border-gray-700 rounded-xl shadow-xl overflow-hidden w-36"
+            style={{ backdropFilter: 'blur(12px)' }}>
+            <button onClick={() => { onRemove(); setShowMenu(false) }}
+              className="w-full text-left px-4 py-3 text-red-400 hover:bg-red-900/20"
+              style={{ fontSize: '13px' }}>
+              Delete Set
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ─── History Modal ─────────────────────────────────────────────────────────────
+function HistoryModal({ exerciseName, allWorkouts, onClose }) {
+  const history = []
+  for (const w of (allWorkouts || [])) {
+    for (const ex of (w.exercises || [])) {
+      if (ex.name === exerciseName && ex.sets?.length > 0) {
+        history.push({ date: w.start_time || w.created_at, sets: ex.sets })
+        break
+      }
+    }
+    if (history.length >= 6) break
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center"
+      style={{ background: 'rgba(0,0,0,0.8)' }}
+      onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="w-full max-w-lg" style={{
+        background: '#0d0d1f',
+        borderRadius: '20px 20px 0 0',
+        border: '1px solid rgba(103,232,249,0.14)',
+        borderBottom: 'none',
+        maxHeight: '72vh',
+        display: 'flex', flexDirection: 'column',
+      }}>
+        <div className="p-4 border-b border-gray-800 flex justify-between items-center">
+          <div>
+            <div className="font-bold text-white" style={{ fontSize: '16px' }}>{exerciseName}</div>
+            <div className="pixel-font text-gray-500 mt-0.5" style={{ fontSize: '11px' }}>HISTORY</div>
+          </div>
+          <button onClick={onClose} className="text-gray-500 hover:text-white text-xl w-8 h-8 flex items-center justify-center">✕</button>
+        </div>
+        <div className="overflow-y-auto flex-1 px-4 py-4 flex flex-col gap-5">
+          {history.length === 0 ? (
+            <p className="text-gray-500 text-center py-8" style={{ fontSize: '13px' }}>No history yet</p>
+          ) : history.map((entry, i) => (
+            <div key={i}>
+              <div className="text-gray-400 font-semibold mb-2" style={{ fontSize: '13px' }}>
+                {new Date(entry.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+              </div>
+              <div className="flex flex-col gap-1.5">
+                {entry.sets.map((s, j) => (
+                  <div key={j} className="flex items-center gap-3 glass-row px-3 py-2">
+                    <div className="w-6 h-6 rounded-full border border-gray-600 flex items-center justify-center flex-shrink-0">
+                      <span className="text-gray-400 font-semibold" style={{ fontSize: '11px' }}>{j + 1}</span>
+                    </div>
+                    <span className="text-white font-semibold" style={{ fontSize: '14px' }}>
+                      {s.weight || '—'} lbs × {s.reps || '—'}
+                    </span>
+                    {s.note && <span className="text-gray-500" style={{ fontSize: '12px' }}>— {s.note}</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }
 
 // ─── Exercise Card ────────────────────────────────────────────────────────────
-function ExerciseCard({ exercise, index, onChange, onRemove, recommendation }) {
-  const muscleGroup = MUSCLE_GROUPS.find(g => g.exercises.includes(exercise.name))
+function ExerciseCard({ exercise, onChange, onRemove, onMoveUp, onMoveDown, onReplace, onShowHistory, recommendation, isFirst, isLast }) {
+  const [showMenu, setShowMenu] = useState(false)
+  const menuRef = useRef(null)
+
+  useEffect(() => {
+    if (!showMenu) return
+    function handleClick(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setShowMenu(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [showMenu])
 
   function addSet() {
     const lastSet = exercise.sets?.[exercise.sets.length - 1]
@@ -391,37 +507,80 @@ function ExerciseCard({ exercise, index, onChange, onRemove, recommendation }) {
   }
 
   return (
-    <div className="pixel-card p-4 mb-3">
-      <div className="flex justify-between items-center mb-3">
-        <div>
-          <span className="text-white font-medium" style={{ fontSize: '15px' }}>{exercise.name}</span>
-          {muscleGroup && (
-            <span className="ml-2 text-gray-600" style={{ fontSize: '13px' }}>{muscleGroup.label}</span>
+    <div className="pixel-card mb-3" style={{ padding: 0, overflow: 'hidden' }}>
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 pt-4 pb-3">
+        <span className="text-white font-bold" style={{ fontSize: '16px' }}>{exercise.name}</span>
+        <div className="relative" ref={menuRef}>
+          <button onClick={() => setShowMenu(v => !v)}
+            className="text-sky-400 hover:text-sky-300 w-8 h-8 flex items-center justify-center rounded-full hover:bg-sky-900/20 transition-all"
+            style={{ fontSize: '20px', letterSpacing: '1px', lineHeight: 1 }}>
+            ···
+          </button>
+          {showMenu && (
+            <div className="absolute right-0 top-10 z-50 rounded-2xl shadow-2xl overflow-hidden w-48"
+              style={{ background: 'rgba(15,15,30,0.97)', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(16px)' }}>
+              <div className="px-4 py-2.5 border-b border-gray-800">
+                <span className="text-gray-400 font-semibold" style={{ fontSize: '12px' }}>{exercise.name}</span>
+              </div>
+              <div className="flex border-b border-gray-800">
+                <button onClick={() => { onMoveUp?.(); setShowMenu(false) }}
+                  disabled={isFirst}
+                  className="flex-1 py-3 flex flex-col items-center gap-1 text-white hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed border-r border-gray-800"
+                  style={{ fontSize: '13px' }}>
+                  <span style={{ fontSize: '16px' }}>↑</span>
+                  <span>Move</span>
+                </button>
+                <button onClick={() => { onReplace(); setShowMenu(false) }}
+                  className="flex-1 py-3 flex flex-col items-center gap-1 text-white hover:bg-gray-800 border-r border-gray-800"
+                  style={{ fontSize: '13px' }}>
+                  <span style={{ fontSize: '16px' }}>↺</span>
+                  <span>Replace</span>
+                </button>
+                <button onClick={() => { onRemove(); setShowMenu(false) }}
+                  className="flex-1 py-3 flex flex-col items-center gap-1 text-red-400 hover:bg-red-900/20"
+                  style={{ fontSize: '13px' }}>
+                  <span style={{ fontSize: '16px' }}>✕</span>
+                  <span>Delete</span>
+                </button>
+              </div>
+              <button onClick={() => { onShowHistory(); setShowMenu(false) }}
+                className="w-full text-left px-4 py-3 text-white hover:bg-gray-800 flex items-center justify-between"
+                style={{ fontSize: '14px' }}>
+                <span>History</span>
+                <span className="text-gray-500" style={{ fontSize: '12px' }}>›</span>
+              </button>
+            </div>
           )}
         </div>
-        <button onClick={onRemove} className="text-gray-700 hover:text-red-400 ml-2">✕</button>
       </div>
 
       {recommendation && (
-        <div className="bg-sky-900/20 border border-sky-800 p-2 mb-3 text-xs text-sky-300">
-          💡 <span className="pixel-font" style={{ fontSize: '13px' }}>TIP:</span> {recommendation.reason}
+        <div className="mx-4 mb-3 bg-sky-900/20 border border-sky-800 p-2 text-sky-300 rounded-lg" style={{ fontSize: '12px' }}>
+          💡 {recommendation.reason}
           {recommendation.weight && ` Try ${recommendation.weight}lbs × ${recommendation.reps} reps.`}
         </div>
       )}
 
-      <div className="flex gap-2 text-xs text-gray-600 mb-2 ml-8">
-        <span className="w-20 text-center">Weight</span>
-        <span className="w-16 text-center">Reps</span>
-        <span className="flex-1">Note</span>
-      </div>
-      <div className="flex flex-col gap-2 mb-3">
+      {/* Sets */}
+      <div className="border-t border-gray-800/60">
         {(exercise.sets || []).map((set, i) => (
           <SetRow key={i} set={set} index={i} onChange={s => updateSet(i, s)} onRemove={() => removeSet(i)} />
         ))}
       </div>
-      <button onClick={addSet} className="text-sky-400 hover:text-sky-300 text-xs border border-sky-900 hover:border-sky-600 px-3 py-1 transition-all" style={{ fontSize: '13px' }}>
-        + Add Set
-      </button>
+
+      {/* Add Set */}
+      <div className="px-4 py-3 border-t border-gray-800/40">
+        <button onClick={addSet}
+          className="flex items-center gap-2.5 text-sky-400 hover:text-sky-300 transition-colors font-semibold"
+          style={{ fontSize: '14px' }}>
+          <div className="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center flex-shrink-0"
+            style={{ fontSize: '16px', lineHeight: 1 }}>
+            +
+          </div>
+          Add Set
+        </button>
+      </div>
     </div>
   )
 }
@@ -441,13 +600,16 @@ export default function WorkoutLogger() {
   const [showFinish, setShowFinish] = useState(false)
   const [recommendations, setRecommendations] = useState({})
   const [previousWorkouts, setPreviousWorkouts] = useState({})
+  const [allWorkouts, setAllWorkouts] = useState([])
   const [savedWorkout, setSavedWorkout] = useState(null)
-  const [prResult, setPrResult] = useState(null)   // { count, exercises, pointsEarned }
-  const [levelUp, setLevelUp] = useState(null) // { oldLevel, newLevel, title }
+  const [prResult, setPrResult] = useState(null)
+  const [levelUp, setLevelUp] = useState(null)
   const [copied, setCopied] = useState(false)
   const [pickedUnlockClass, setPickedUnlockClass] = useState(null)
   const [unlockSaving, setUnlockSaving] = useState(false)
   const [unlockSaved, setUnlockSaved] = useState(false)
+  const [historyExercise, setHistoryExercise] = useState(null) // exercise name to show history for
+  const [replaceIdx, setReplaceIdx] = useState(null)           // index of exercise being replaced
 
   const [startTime] = useState(() => new Date())
   const [workoutStartStr, setWorkoutStartStr] = useState(() => toDatetimeLocal(new Date()))
@@ -458,6 +620,7 @@ export default function WorkoutLogger() {
   async function fetchPreviousData() {
     try {
       const data = await api.getWorkouts()
+      setAllWorkouts(data)
       const prevMap = {}
       data.forEach(w => {
         w.exercises?.forEach(ex => {
@@ -492,6 +655,21 @@ export default function WorkoutLogger() {
       setWorkoutStartStr(str)
       setWorkoutEndStr(str)
     }
+  }
+
+  function moveExercise(idx, direction) {
+    setExercises(prev => {
+      const arr = [...prev]
+      const target = idx + direction
+      if (target < 0 || target >= arr.length) return arr
+      ;[arr[idx], arr[target]] = [arr[target], arr[idx]]
+      return arr
+    })
+  }
+
+  function replaceExercise(idx, newName) {
+    setExercises(prev => prev.map((ex, i) => i === idx ? { ...ex, name: newName } : ex))
+    setReplaceIdx(null)
   }
 
   const totalSets = exercises.reduce((acc, e) => acc + (e.sets?.length || 0), 0)
@@ -606,7 +784,6 @@ export default function WorkoutLogger() {
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
     URL.revokeObjectURL(objectUrl)
 
-    // Dark gradient strip at bottom
     const stripH = Math.round(canvas.height * 0.2)
     const grad = ctx.createLinearGradient(0, canvas.height - stripH, 0, canvas.height)
     grad.addColorStop(0, 'rgba(0,0,0,0)')
@@ -615,7 +792,6 @@ export default function WorkoutLogger() {
     ctx.fillRect(0, canvas.height - stripH, canvas.width, stripH)
 
     const pad = Math.round(canvas.width * 0.04)
-    // Workout name
     const nameSize = Math.round(stripH * 0.36)
     ctx.font = `bold ${nameSize}px -apple-system, sans-serif`
     ctx.fillStyle = '#ffffff'
@@ -623,7 +799,6 @@ export default function WorkoutLogger() {
     ctx.textAlign = 'left'
     ctx.fillText(savedWorkout.name, pad, canvas.height - pad)
 
-    // Sub-line: duration + date
     const sub = []
     if (savedWorkout.duration) sub.push(`${savedWorkout.duration} min`)
     if (savedWorkout.workoutDate) {
@@ -636,7 +811,6 @@ export default function WorkoutLogger() {
       ctx.fillText(sub.join(' · '), pad, canvas.height - pad - nameSize - 4)
     }
 
-    // XPFIT branding — top right
     const brandSize = Math.round(canvas.width * 0.038)
     ctx.font = `bold ${brandSize}px -apple-system, sans-serif`
     ctx.fillStyle = 'rgba(255,255,255,0.85)'
@@ -644,15 +818,12 @@ export default function WorkoutLogger() {
     ctx.textAlign = 'right'
     ctx.fillText('XPFIT', canvas.width - pad, pad)
 
-    // Draw active pet in bottom-left corner if user has one
     const petId = profile?.active_pet
     async function drawPetAndExport() {
       if (petId) {
         const petImg = new Image()
         petImg.src = '/pets.png'
         await new Promise(resolve => { petImg.onload = resolve; petImg.onerror = resolve })
-
-        // Spritesheet: 1024×1536, 2 cols × 3 rows, 512×512 per cell
         const petDefs = {
           angel_cat:  { col: 0,   row: 0 },
           dragon:     { col: 1,   row: 0 },
@@ -669,7 +840,6 @@ export default function WorkoutLogger() {
           ctx.drawImage(petImg, sx, sy, 512, 512, margin, canvas.height - petSize - margin, petSize, petSize)
         }
       }
-
       canvas.toBlob(async blob => {
         const file = new File([blob], 'workout.jpg', { type: 'image/jpeg' })
         if (navigator.share && navigator.canShare?.({ files: [file] })) {
@@ -685,9 +855,7 @@ export default function WorkoutLogger() {
     drawPetAndExport()
   }
 
-  const startTimeStr = startTime.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) +
-    ' ' + startTime.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toLowerCase()
-
+  // ─── Level Up Screen ─────────────────────────────────────────────────────────
   if (levelUp) {
     const currentUnlocked = profile?.unlocked_classes || ['warrior', 'mage']
     const lockedClasses = CLASSES.filter(c => !currentUnlocked.includes(c))
@@ -707,7 +875,6 @@ export default function WorkoutLogger() {
     return (
       <div className="max-w-md mx-auto px-4 py-12 flex flex-col items-center text-center">
         <div className="pixel-card p-8 w-full" style={{ background: 'linear-gradient(135deg, #001d3d, #0a1628)', borderColor: '#38bdf8' }}>
-
           <div className="pixel-font text-yellow-400 mb-2" style={{ fontSize: '13px', letterSpacing: '3px' }}>LEVEL UP!</div>
           <div className="fantasy-font text-white mb-1" style={{ fontSize: '48px' }}>{levelUp.newLevel}</div>
           <div className="pixel-font text-sky-400 mb-6" style={{ fontSize: '14px' }}>{levelUp.title}</div>
@@ -759,11 +926,11 @@ export default function WorkoutLogger() {
     )
   }
 
+  // ─── Saved Workout Screen ─────────────────────────────────────────────────────
   if (savedWorkout) {
     return (
       <div className="max-w-md mx-auto px-4 py-12 flex flex-col items-center text-center">
         <div className="pixel-card p-8 w-full">
-
           <h2 className="fantasy-font text-green-400 mb-1" style={{ fontSize: '24px' }}>Workout Done!</h2>
           <p className="text-gray-400 mb-2" style={{ fontSize: '13px' }}>{savedWorkout.name}</p>
           <p className="pixel-font text-sky-400 mb-2" style={{ fontSize: '12px' }}>+{savedWorkout.xp} XP earned</p>
@@ -809,29 +976,49 @@ export default function WorkoutLogger() {
     )
   }
 
+  // ─── Main Logger UI ───────────────────────────────────────────────────────────
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 pb-32">
 
-      {/* Header */}
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="pixel-font text-sky-400" style={{ fontSize: '14px' }}>Log Workout</h1>
-        <div className="text-right">
-          <div className="pixel-font text-gray-500 mb-0.5" style={{ fontSize: '13px' }}>STARTED</div>
-          <div className="text-white" style={{ fontSize: '12px' }}>{startTimeStr}</div>
+      {/* ── Top card: name + times ── */}
+      <div className="pixel-card mb-5" style={{ padding: 0, overflow: 'hidden' }}>
+        <div className="px-4 pt-4 pb-3">
+          <input
+            type="text"
+            placeholder="Workout name..."
+            value={workoutName}
+            onChange={e => setWorkoutName(e.target.value)}
+            className="w-full bg-transparent text-white font-bold focus:outline-none"
+            style={{ fontSize: '20px' }}
+          />
+        </div>
+        <div className="border-t border-gray-800/60">
+          <label className="flex items-center justify-between px-4 py-3 border-b border-gray-800/40 cursor-pointer hover:bg-white/[0.02] transition-colors">
+            <span className="text-white" style={{ fontSize: '14px' }}>Start Time</span>
+            <input
+              type="datetime-local"
+              value={workoutStartStr}
+              onChange={e => setWorkoutStartStr(e.target.value)}
+              className="bg-transparent text-gray-400 focus:outline-none focus:text-sky-400 text-right"
+              style={{ fontSize: '13px' }}
+            />
+          </label>
+          <label className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-white/[0.02] transition-colors">
+            <span className="text-white" style={{ fontSize: '14px' }}>End Time</span>
+            <input
+              type="datetime-local"
+              value={workoutEndStr}
+              onChange={e => setWorkoutEndStr(e.target.value)}
+              className="bg-transparent text-gray-400 focus:outline-none focus:text-sky-400 text-right"
+              style={{ fontSize: '13px' }}
+            />
+          </label>
         </div>
       </div>
 
-      {/* Workout name */}
-      <div className="pixel-card p-4 mb-5">
-        <input type="text" placeholder="Workout name (e.g. Push Day, Leg Day...)"
-          value={workoutName} onChange={e => setWorkoutName(e.target.value)}
-          className="w-full bg-transparent text-white text-lg border-b-2 border-gray-700 pb-2 focus:border-sky-500 outline-none" />
-      </div>
-
-      {/* Exercise cards */}
+      {/* ── Exercises ── */}
       {exercises.length === 0 ? (
         <div className="text-center py-10 mb-5 glass-row">
-
           <p className="text-gray-500 mb-4">No exercises yet</p>
           <div className="flex gap-3 justify-center flex-wrap">
             <button onClick={() => setShowPicker(true)}
@@ -847,10 +1034,19 @@ export default function WorkoutLogger() {
       ) : (
         <>
           {exercises.map((ex, i) => (
-            <ExerciseCard key={`${ex.name}-${i}`} exercise={ex} index={i}
+            <ExerciseCard
+              key={`${ex.name}-${i}`}
+              exercise={ex}
               onChange={e => setExercises(prev => prev.map((x, idx) => idx === i ? e : x))}
               onRemove={() => setExercises(prev => prev.filter((_, idx) => idx !== i))}
-              recommendation={recommendations[ex.name]} />
+              onMoveUp={() => moveExercise(i, -1)}
+              onMoveDown={() => moveExercise(i, 1)}
+              onReplace={() => setReplaceIdx(i)}
+              onShowHistory={() => setHistoryExercise(ex.name)}
+              recommendation={recommendations[ex.name]}
+              isFirst={i === 0}
+              isLast={i === exercises.length - 1}
+            />
           ))}
           <div className="flex gap-2 mb-5">
             <button onClick={() => setShowPicker(true)}
@@ -865,21 +1061,23 @@ export default function WorkoutLogger() {
         </>
       )}
 
-      {/* Notes */}
+      {/* ── Photo ── */}
       <div className="pixel-card p-4 mb-3">
-        <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '12px' }}>NOTES</label>
-        <textarea placeholder="How did it go? Any PRs? How you felt..." value={notes} onChange={e => setNotes(e.target.value)}
-          rows={3} className="w-full bg-black/40 border border-gray-700 text-white px-3 py-2 resize-none focus:border-sky-500 outline-none" />
-      </div>
-
-      {/* Photo */}
-      <div className="pixel-card p-4 mb-5">
         <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '12px' }}>ADD PHOTO</label>
         <input type="file" accept="image/*" onChange={e => setPhotoFile(e.target.files[0])} className="text-gray-400 text-sm" />
         {photoFile && <p className="text-green-400 text-xs mt-1">Selected: {photoFile.name}</p>}
       </div>
 
-      {/* Sticky finish bar — on mobile, push above the 56px bottom nav */}
+      {/* ── Notes ── */}
+      <div className="pixel-card p-4 mb-5">
+        <label className="pixel-font text-gray-400 block mb-2" style={{ fontSize: '12px' }}>NOTES</label>
+        <textarea placeholder="How did it go? Any PRs? How you felt..."
+          value={notes} onChange={e => setNotes(e.target.value)}
+          rows={3} className="w-full bg-transparent text-white resize-none focus:outline-none"
+          style={{ fontSize: '14px' }} />
+      </div>
+
+      {/* ── Sticky finish bar ── */}
       <div className="fixed left-0 right-0 z-40 border-t border-sky-900/60 px-4 py-4 md:bottom-0"
         style={{ bottom: '56px', background: 'linear-gradient(to top, #0d0d1a, #12122288)' }}>
         <div className="max-w-2xl mx-auto flex items-center justify-between gap-4">
@@ -903,44 +1101,37 @@ export default function WorkoutLogger() {
         </div>
       </div>
 
-      {/* Exercise picker modal */}
-      {showPicker && (
+      {/* ── Modals ── */}
+      {showPicker && replaceIdx === null && (
         <ExercisePicker onSelect={addExercise} onClose={() => setShowPicker(false)} />
       )}
-
-      {/* Paste import modal */}
+      {replaceIdx !== null && (
+        <ExercisePicker
+          onSelect={name => replaceExercise(replaceIdx, name)}
+          onClose={() => setReplaceIdx(null)}
+        />
+      )}
       {showPaste && (
         <PasteImportModal onImport={importExercises} onClose={() => setShowPaste(false)} />
       )}
+      {historyExercise && (
+        <HistoryModal
+          exerciseName={historyExercise}
+          allWorkouts={allWorkouts}
+          onClose={() => setHistoryExercise(null)}
+        />
+      )}
 
-      {/* Finish confirmation modal */}
+      {/* ── Finish confirmation modal ── */}
       {showFinish && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ background: 'rgba(0,0,0,0.85)' }}>
           <div className="pixel-card w-full max-w-sm p-6" style={{ background: '#0d0d1f' }}>
-            <h2 className="pixel-font text-sky-400 mb-5 text-center" style={{ fontSize: '12px' }}>
-              CONFIRM WORKOUT TIME
-            </h2>
-            <div className="mb-3">
-              <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '13px' }}>START</div>
-              <input
-                type="datetime-local"
-                value={workoutStartStr}
-                onChange={e => setWorkoutStartStr(e.target.value)}
-                className="glass-input w-full"
-                style={{ fontSize: '13px' }}
-              />
-            </div>
-            <div className="mb-5">
-              <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '13px' }}>END</div>
-              <input
-                type="datetime-local"
-                value={workoutEndStr}
-                onChange={e => setWorkoutEndStr(e.target.value)}
-                className="glass-input w-full"
-                style={{ fontSize: '13px' }}
-              />
-            </div>
+            <h2 className="pixel-font text-sky-400 mb-1 text-center" style={{ fontSize: '12px' }}>FINISH WORKOUT</h2>
+            <p className="text-white font-bold text-center mb-1" style={{ fontSize: '16px' }}>{workoutName}</p>
+            <p className="text-gray-500 text-center mb-5" style={{ fontSize: '13px' }}>
+              {exercises.length} exercises · {totalSets} sets · +{xpPreview} XP
+            </p>
             <div className="flex gap-3">
               <button onClick={() => setShowFinish(false)}
                 className="flex-1 py-3 glass-option text-gray-400 hover:text-white transition-all" style={{ fontSize: '13px' }}>
