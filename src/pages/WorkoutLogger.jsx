@@ -23,6 +23,7 @@ const MUSCLE_GROUPS = [
     id: 'arms',
     label: 'Arms',
     exercises: [
+      'Isolated Bicep Curl', 'Isolated Hammer Curl',
       'Barbell Curl', 'Dumbbell Curl', 'Hammer Curl', 'Preacher Curl',
       'Cable Curl', 'Concentration Curl', 'Incline Dumbbell Curl',
       'Tricep Pushdown', 'Skull Crusher', 'Overhead Tricep Extension',
@@ -415,7 +416,7 @@ function ExercisePicker({ onSelect, onClose, customExercises = {}, usageCounts =
 }
 
 // ─── Set Row ──────────────────────────────────────────────────────────────────
-function SetRow({ set, index, onChange, onRemove }) {
+function SetRow({ set, index, onChange, onRemove, isIsolated }) {
   const [showMenu, setShowMenu] = useState(false)
   const menuRef = useRef(null)
 
@@ -428,29 +429,47 @@ function SetRow({ set, index, onChange, onRemove }) {
     return () => document.removeEventListener('mousedown', handleClick)
   }, [showMenu])
 
+  const inputCls = 'bg-transparent text-white w-full focus:outline-none font-semibold'
+
   return (
-    <div className="flex items-center gap-3 px-4 py-2.5 border-b border-gray-800/40 last:border-b-0">
+    <div className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-800/40 last:border-b-0">
       {/* Circled number */}
       <div className="w-7 h-7 rounded-full border border-gray-600 flex items-center justify-center flex-shrink-0">
         <span className="text-gray-400 font-semibold" style={{ fontSize: '12px' }}>{index + 1}</span>
       </div>
 
-      {/* Lb */}
-      <div className="flex-1 min-w-0">
-        <div className="text-gray-500" style={{ fontSize: '11px' }}>Lb</div>
-        <input type="number" value={set.weight || ''} placeholder="—"
-          onChange={e => onChange({ ...set, weight: e.target.value })}
-          className="bg-transparent text-white w-full focus:outline-none font-semibold"
-          style={{ fontSize: '15px' }} />
-      </div>
+      {isIsolated ? (
+        <>
+          {/* Left */}
+          <div className="flex-1 min-w-0">
+            <div className="text-blue-400 font-semibold" style={{ fontSize: '10px' }}>LEFT lb</div>
+            <input type="number" value={set.weightLeft || ''} placeholder="—"
+              onChange={e => onChange({ ...set, weightLeft: e.target.value })}
+              className={inputCls} style={{ fontSize: '15px' }} />
+          </div>
+          {/* Right */}
+          <div className="flex-1 min-w-0">
+            <div className="text-orange-400 font-semibold" style={{ fontSize: '10px' }}>RIGHT lb</div>
+            <input type="number" value={set.weightRight || ''} placeholder="—"
+              onChange={e => onChange({ ...set, weightRight: e.target.value })}
+              className={inputCls} style={{ fontSize: '15px' }} />
+          </div>
+        </>
+      ) : (
+        <div className="flex-1 min-w-0">
+          <div className="text-gray-500" style={{ fontSize: '11px' }}>Lb</div>
+          <input type="number" value={set.weight || ''} placeholder="—"
+            onChange={e => onChange({ ...set, weight: e.target.value })}
+            className={inputCls} style={{ fontSize: '15px' }} />
+        </div>
+      )}
 
       {/* Reps */}
       <div className="flex-1 min-w-0">
         <div className="text-gray-500" style={{ fontSize: '11px' }}>Reps</div>
         <input type="number" value={set.reps || ''} placeholder="—"
           onChange={e => onChange({ ...set, reps: e.target.value })}
-          className="bg-transparent text-white w-full focus:outline-none font-semibold"
-          style={{ fontSize: '15px' }} />
+          className={inputCls} style={{ fontSize: '15px' }} />
       </div>
 
       {/* Notes */}
@@ -531,7 +550,9 @@ function HistoryModal({ exerciseName, allWorkouts, onClose }) {
                       <span className="text-gray-400 font-semibold" style={{ fontSize: '11px' }}>{j + 1}</span>
                     </div>
                     <span className="text-white font-semibold" style={{ fontSize: '14px' }}>
-                      {s.weight || '—'} lbs × {s.reps || '—'}
+                      {s.weightLeft !== undefined
+                        ? `L ${s.weightLeft || '—'} / R ${s.weightRight || '—'} lbs × ${s.reps || '—'}`
+                        : `${s.weight || '—'} lbs × ${s.reps || '—'}`}
                     </span>
                     {s.note && <span className="text-gray-500" style={{ fontSize: '12px' }}>— {s.note}</span>}
                   </div>
@@ -545,10 +566,15 @@ function HistoryModal({ exerciseName, allWorkouts, onClose }) {
   )
 }
 
+function isIsolatedExercise(name) {
+  return name.toLowerCase().includes('isolated')
+}
+
 // ─── Exercise Card ────────────────────────────────────────────────────────────
 function ExerciseCard({ exercise, onChange, onRemove, onMoveUp, onMoveDown, onReplace, onShowHistory, recommendation, isFirst, isLast }) {
   const [showMenu, setShowMenu] = useState(false)
   const menuRef = useRef(null)
+  const isolated = isIsolatedExercise(exercise.name)
 
   useEffect(() => {
     if (!showMenu) return
@@ -561,7 +587,10 @@ function ExerciseCard({ exercise, onChange, onRemove, onMoveUp, onMoveDown, onRe
 
   function addSet() {
     const lastSet = exercise.sets?.[exercise.sets.length - 1]
-    onChange({ ...exercise, sets: [...(exercise.sets || []), { weight: lastSet?.weight || '', reps: lastSet?.reps || '' }] })
+    const newSet = isolated
+      ? { weightLeft: lastSet?.weightLeft || '', weightRight: lastSet?.weightRight || '', reps: lastSet?.reps || '' }
+      : { weight: lastSet?.weight || '', reps: lastSet?.reps || '' }
+    onChange({ ...exercise, sets: [...(exercise.sets || []), newSet] })
   }
   function updateSet(i, set) {
     const sets = [...(exercise.sets || [])]
@@ -631,7 +660,7 @@ function ExerciseCard({ exercise, onChange, onRemove, onMoveUp, onMoveDown, onRe
       {/* Sets */}
       <div className="border-t border-gray-800/60">
         {(exercise.sets || []).map((set, i) => (
-          <SetRow key={i} set={set} index={i} onChange={s => updateSet(i, s)} onRemove={() => removeSet(i)} />
+          <SetRow key={i} set={set} index={i} onChange={s => updateSet(i, s)} onRemove={() => removeSet(i)} isIsolated={isolated} />
         ))}
       </div>
 

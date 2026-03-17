@@ -32,7 +32,10 @@ router.post('/', upload.single('photo'), async (req, res) => {
   for (const pw of prevWorkouts) {
     for (const ex of JSON.parse(pw.exercises || '[]')) {
       for (const set of (ex.sets || [])) {
-        const score = parseFloat(set.weight || 0) * Math.max(1, parseInt(set.reps || 1))
+        const w = set.weightLeft !== undefined
+          ? Math.max(parseFloat(set.weightLeft || 0), parseFloat(set.weightRight || 0))
+          : parseFloat(set.weight || 0)
+        const score = w * Math.max(1, parseInt(set.reps || 1))
         if (score > 0 && (!prevBests[ex.name] || score > prevBests[ex.name])) {
           prevBests[ex.name] = score
         }
@@ -42,7 +45,12 @@ router.post('/', upload.single('photo'), async (req, res) => {
   const prExercises = []
   for (const ex of exercises) {
     if (!ex.sets?.length) continue
-    const maxScore = Math.max(...ex.sets.map(s => parseFloat(s.weight || 0) * Math.max(1, parseInt(s.reps || 1))))
+    const maxScore = Math.max(...ex.sets.map(s => {
+      const w = s.weightLeft !== undefined
+        ? Math.max(parseFloat(s.weightLeft || 0), parseFloat(s.weightRight || 0))
+        : parseFloat(s.weight || 0)
+      return w * Math.max(1, parseInt(s.reps || 1))
+    }))
     if (prevBests[ex.name] !== undefined && maxScore > prevBests[ex.name]) {
       prExercises.push(ex.name)
     }

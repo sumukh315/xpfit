@@ -6,6 +6,15 @@ function formatDate(str) {
   return new Date(str).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
 }
 
+// Photo URLs may be stored as relative paths (/uploads/...) from when SERVER_URL wasn't set.
+// Prepend the API origin so they resolve correctly from the Vercel frontend.
+const API_ORIGIN = import.meta.env.VITE_API_URL || ''
+function resolvePhotoUrl(url) {
+  if (!url) return null
+  if (url.startsWith('/')) return `${API_ORIGIN}${url}`
+  return url
+}
+
 function workoutDate(w) {
   return w.start_time || w.created_at
 }
@@ -103,14 +112,14 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete, onPhotoAdde
   const [deleting, setDeleting] = useState(false)
   const [photoFile, setPhotoFile] = useState(null)
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
-  const [currentPhotoUrl, setCurrentPhotoUrl] = useState(workout.photo_url || null)
+  const [currentPhotoUrl, setCurrentPhotoUrl] = useState(resolvePhotoUrl(workout.photo_url))
 
   async function handleAddPhoto() {
     if (!photoFile) return
     setUploadingPhoto(true)
     try {
       const { photo_url } = await api.addWorkoutPhoto(workout.id, photoFile)
-      setCurrentPhotoUrl(photo_url)
+      setCurrentPhotoUrl(resolvePhotoUrl(photo_url))
       setPhotoFile(null)
       onPhotoAdded(workout.id, photo_url)
     } catch (e) { alert('Upload failed: ' + e.message) }
@@ -409,7 +418,7 @@ export default function WorkoutLogs() {
                         </div>
                         <div className="flex flex-col items-end gap-1 flex-shrink-0 ml-4">
                           <span className="pixel-font text-sky-400" style={{ fontSize: '13px' }}>+{w.xp_earned || 0} XP</span>
-                          {w.photo_url && (
+                          {resolvePhotoUrl(w.photo_url) && (
                             <span className="text-gray-600 text-xs">📷 photo</span>
                           )}
                         </div>
