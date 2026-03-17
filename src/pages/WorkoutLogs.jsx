@@ -248,7 +248,7 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete, onPhotoAdde
             </div>
             <div className="flex items-center gap-3 ml-4 flex-shrink-0">
               {!editing && (
-                <button onClick={startEdit} className="text-gray-500 hover:text-sky-400 transition-colors pixel-font" style={{ fontSize: '12px' }}>Edit</button>
+                <button onClick={startEdit} className="pixel-btn bg-sky-900 border-sky-700 text-sky-300 px-3 py-1" style={{ fontSize: '12px' }}>Edit</button>
               )}
               <button onClick={onClose} className="text-gray-500 hover:text-white text-xl">✕</button>
             </div>
