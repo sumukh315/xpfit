@@ -16,6 +16,7 @@ import ColorPreview from './pages/ColorPreview'
 import FontPreview from './pages/FontPreview'
 import WorkoutLogs from './pages/WorkoutLogs'
 import Shop from './pages/Shop'
+import BgPreview from './pages/BgPreview'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -63,6 +64,7 @@ function AppRoutes() {
         <ProtectedRoute><AuthLayout><Social /></AuthLayout></ProtectedRoute>
       } />
       <Route path="/style-preview" element={<StylePreview />} />
+      <Route path="/bg-preview" element={<BgPreview />} />
       <Route path="/font-preview" element={<FontPreview />} />
       <Route path="/color-preview" element={<ColorPreview />} />
       <Route path="/profile" element={
