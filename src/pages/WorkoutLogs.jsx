@@ -236,9 +236,9 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete, onPhotoAdde
   return (
     <>
       <div className="fixed inset-0 z-40 flex items-end sm:items-center justify-center p-2 sm:p-4"
-        style={{ background: 'rgba(0,0,0,0.85)' }}
+        style={{ background: 'rgba(0,0,0,0.85)', paddingTop: '64px' }}
         onClick={e => e.target === e.currentTarget && onClose()}>
-        <div className="pixel-card w-full max-w-lg flex flex-col" style={{ background: '#0d0d1f', maxHeight: '90vh' }}>
+        <div className="pixel-card w-full max-w-lg flex flex-col" style={{ background: '#0d0d1f', maxHeight: 'calc(100vh - 80px)' }}>
 
           {/* Header */}
           <div className="p-4 border-b border-gray-800 flex justify-between items-start">
