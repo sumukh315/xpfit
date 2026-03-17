@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { api } from '../lib/api'
 import {
-  ScatterChart, Scatter, BarChart, Bar, Cell,
+  ComposedChart, Line, BarChart, Bar, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts'
 
@@ -220,31 +220,37 @@ export default function Progress() {
 
                 {exerciseHistory.length > 0 ? (
                   <ResponsiveContainer width="100%" height={220}>
-                    <ScatterChart margin={{ top: 10, right: 15, bottom: 0, left: 0 }}>
+                    <ComposedChart data={exerciseHistory} margin={{ top: 10, right: 15, bottom: 0, left: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#1e2a3a" />
                       <XAxis
                         dataKey="dateLabel"
-                        type="category"
                         tick={{ fill: '#6b7280', fontSize: 10 }}
                         interval="preserveStartEnd"
                       />
                       <YAxis
-                        dataKey="weight"
                         tick={{ fill: '#6b7280', fontSize: 10 }}
                         unit=" lbs"
                         width={55}
                       />
-                      <Tooltip content={<DotTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
-                      <Scatter data={exerciseHistory} shape={(props) => {
-                        const { cx, cy, payload } = props
-                        return (
-                          <g>
-                            <circle cx={cx} cy={cy} r={6} fill={payload.color} fillOpacity={0.9} />
-                            <circle cx={cx} cy={cy} r={10} fill={payload.color} fillOpacity={0.15} />
-                          </g>
-                        )
-                      }} />
-                    </ScatterChart>
+                      <Tooltip content={<DotTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} wrapperStyle={{ background: 'transparent', border: 'none', boxShadow: 'none' }} />
+                      <Line
+                        dataKey="weight"
+                        stroke={groupColor}
+                        strokeWidth={2}
+                        strokeOpacity={0.5}
+                        dot={(props) => {
+                          const { cx, cy, payload } = props
+                          if (!cx || !cy) return null
+                          return (
+                            <g key={payload.dateTs}>
+                              <circle cx={cx} cy={cy} r={6} fill={payload.color} fillOpacity={0.9} />
+                              <circle cx={cx} cy={cy} r={10} fill={payload.color} fillOpacity={0.15} />
+                            </g>
+                          )
+                        }}
+                        activeDot={false}
+                      />
+                    </ComposedChart>
                   </ResponsiveContainer>
                 ) : (
                   <p className="text-gray-500 text-center py-6" style={{ fontSize: '12px' }}>
@@ -281,7 +287,7 @@ export default function Progress() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#1e2a3a" vertical={false} />
                   <XAxis dataKey="group" tick={{ fill: '#6b7280', fontSize: 10 }} />
                   <YAxis tick={{ fill: '#6b7280', fontSize: 10 }} allowDecimals={false} />
-                  <Tooltip content={<BarTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
+                  <Tooltip content={<BarTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} wrapperStyle={{ background: 'transparent', border: 'none', boxShadow: 'none' }} />
                   <Bar dataKey="sets" radius={[4, 4, 0, 0]}>
                     {weeklySetsByGroup.map((entry, i) => (
                       <Cell key={i} fill={entry.color} />

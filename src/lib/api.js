@@ -47,6 +47,7 @@ export const api = {
     return request('/workouts', { method: 'POST', body: form })
   },
   importWorkouts: (workouts) => request('/workouts/import', { method: 'POST', body: { workouts } }),
+  updateWorkout: (id, data) => request(`/workouts/${id}`, { method: 'PATCH', body: data }),
   deleteWorkout: (id) => request(`/workouts/${id}`, { method: 'DELETE' }),
   addWorkoutPhoto: (id, photoFile) => {
     const form = new FormData()

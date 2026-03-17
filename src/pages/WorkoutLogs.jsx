@@ -105,8 +105,15 @@ function PhotoLightbox({ url, workoutName, discordWebhook, onClose }) {
   )
 }
 
+function toLocalDatetimeValue(isoStr) {
+  if (!isoStr) return ''
+  const d = new Date(isoStr)
+  const pad = n => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
 // ─── Workout Detail Modal ─────────────────────────────────────────────────────
-function WorkoutDetail({ workout, discordWebhook, onClose, onDelete, onPhotoAdded }) {
+function WorkoutDetail({ workout, discordWebhook, onClose, onDelete, onPhotoAdded, onUpdate }) {
   const [lightboxUrl, setLightboxUrl] = useState(null)
   const [copied, setCopied] = useState(false)
   const [discordSent, setDiscordSent] = useState(false)
@@ -114,6 +121,60 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete, onPhotoAdde
   const [photoFile, setPhotoFile] = useState(null)
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
   const [currentPhotoUrl, setCurrentPhotoUrl] = useState(resolvePhotoUrl(workout.photo_url))
+  const [editing, setEditing] = useState(false)
+  const [editData, setEditData] = useState(null)
+  const [saving, setSaving] = useState(false)
+
+  function startEdit() {
+    setEditData({
+      name: workout.name,
+      exercises: (workout.exercises || []).map(ex => ({
+        ...ex,
+        sets: (ex.sets || []).map(s => ({ ...s })),
+      })),
+      notes: workout.notes || '',
+      start_time: workout.start_time || '',
+      end_time: workout.end_time || '',
+    })
+    setEditing(true)
+  }
+
+  function updateExName(i, val) {
+    setEditData(prev => {
+      const exs = [...prev.exercises]
+      exs[i] = { ...exs[i], name: val }
+      return { ...prev, exercises: exs }
+    })
+  }
+
+  function updateSet(ei, si, field, val) {
+    setEditData(prev => ({
+      ...prev,
+      exercises: prev.exercises.map((ex, i) =>
+        i !== ei ? ex : {
+          ...ex,
+          sets: ex.sets.map((s, j) => j !== si ? s : { ...s, [field]: val }),
+        }
+      ),
+    }))
+  }
+
+  async function saveEdit() {
+    setSaving(true)
+    try {
+      const payload = {
+        name: editData.name,
+        exercises: editData.exercises,
+        notes: editData.notes,
+        start_time: editData.start_time ? new Date(editData.start_time).toISOString() : undefined,
+        end_time: editData.end_time ? new Date(editData.end_time).toISOString() : undefined,
+      }
+      await api.updateWorkout(workout.id, payload)
+      onUpdate(workout.id, payload)
+      setEditing(false)
+    } catch (e) { alert('Save failed: ' + e.message) }
+    finally { setSaving(false) }
+  }
 
   async function handleAddPhoto() {
     if (!photoFile) return
@@ -185,7 +246,12 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete, onPhotoAdde
               <h2 className="text-white font-medium" style={{ fontSize: '16px' }}>{workout.name}</h2>
               <p className="text-gray-400 text-xs mt-0.5">{formatDate(workoutDate(workout))}</p>
             </div>
-            <button onClick={onClose} className="text-gray-500 hover:text-white text-xl ml-4 flex-shrink-0">✕</button>
+            <div className="flex items-center gap-3 ml-4 flex-shrink-0">
+              {!editing && (
+                <button onClick={startEdit} className="text-gray-500 hover:text-sky-400 transition-colors pixel-font" style={{ fontSize: '12px' }}>Edit</button>
+              )}
+              <button onClick={onClose} className="text-gray-500 hover:text-white text-xl">✕</button>
+            </div>
           </div>
 
           {/* Scrollable content */}
@@ -205,8 +271,40 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete, onPhotoAdde
               ))}
             </div>
 
-            {/* Time info */}
-            {(workout.start_time || workout.duration_minutes) && (
+            {/* Time info / edit */}
+            {editing ? (
+              <div className="flex flex-col gap-2">
+                <div className="pixel-font text-gray-400" style={{ fontSize: '11px' }}>WORKOUT NAME</div>
+                <input
+                  value={editData.name}
+                  onChange={e => setEditData(prev => ({ ...prev, name: e.target.value }))}
+                  className="glass-input w-full"
+                  style={{ fontSize: '13px' }}
+                />
+                <div className="grid grid-cols-2 gap-2 mt-1">
+                  <div>
+                    <div className="pixel-font text-gray-400 mb-1" style={{ fontSize: '11px' }}>START TIME</div>
+                    <input
+                      type="datetime-local"
+                      value={toLocalDatetimeValue(editData.start_time)}
+                      onChange={e => setEditData(prev => ({ ...prev, start_time: e.target.value }))}
+                      className="glass-input w-full"
+                      style={{ fontSize: '12px', colorScheme: 'dark' }}
+                    />
+                  </div>
+                  <div>
+                    <div className="pixel-font text-gray-400 mb-1" style={{ fontSize: '11px' }}>END TIME</div>
+                    <input
+                      type="datetime-local"
+                      value={toLocalDatetimeValue(editData.end_time)}
+                      onChange={e => setEditData(prev => ({ ...prev, end_time: e.target.value }))}
+                      className="glass-input w-full"
+                      style={{ fontSize: '12px', colorScheme: 'dark' }}
+                    />
+                  </div>
+                </div>
+              </div>
+            ) : (workout.start_time || workout.duration_minutes) && (
               <div className="flex gap-4 glass-row p-3 text-xs text-gray-400">
                 {workout.start_time && <span>Start: {formatTime(workout.start_time)}</span>}
                 {workout.end_time && <span>End: {formatTime(workout.end_time)}</span>}
@@ -218,22 +316,57 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete, onPhotoAdde
             <div>
               <div className="pixel-font text-gray-400 mb-3" style={{ fontSize: '12px' }}>EXERCISES</div>
               <div className="flex flex-col gap-3">
-                {(workout.exercises || []).map((ex, i) => (
-                  <div key={i} className="bg-black/40 border border-gray-800 p-3">
-                    <div className="text-white font-medium mb-2" style={{ fontSize: '13px' }}>{ex.name}</div>
-                    <div className="flex flex-col gap-1">
-                      {(ex.sets || []).map((set, j) => (
-                        <div key={j} className="flex items-center gap-3 text-xs">
-                          <span className="text-gray-500 w-5">{j + 1}</span>
-                          <span className="text-gray-300">{set.weight} lbs</span>
-                          <span className="text-gray-500">×</span>
-                          <span className="text-gray-300">{set.reps} reps</span>
-                          {set.note && <span className="text-gray-500 italic">— {set.note}</span>}
-                        </div>
-                      ))}
+                {editing ? (
+                  (editData.exercises || []).map((ex, i) => (
+                    <div key={i} className="bg-black/40 border border-gray-800 p-3">
+                      <input
+                        value={ex.name}
+                        onChange={e => updateExName(i, e.target.value)}
+                        className="glass-input w-full mb-2"
+                        style={{ fontSize: '13px' }}
+                      />
+                      <div className="flex flex-col gap-1.5">
+                        {(ex.sets || []).map((set, j) => (
+                          <div key={j} className="flex items-center gap-2 text-xs">
+                            <span className="text-gray-500 w-5">{j + 1}</span>
+                            <input
+                              value={set.weight ?? ''}
+                              onChange={e => updateSet(i, j, 'weight', e.target.value)}
+                              className="glass-input text-center"
+                              style={{ fontSize: '12px', width: '64px' }}
+                              placeholder="lbs"
+                            />
+                            <span className="text-gray-500">×</span>
+                            <input
+                              value={set.reps ?? ''}
+                              onChange={e => updateSet(i, j, 'reps', e.target.value)}
+                              className="glass-input text-center"
+                              style={{ fontSize: '12px', width: '56px' }}
+                              placeholder="reps"
+                            />
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  (workout.exercises || []).map((ex, i) => (
+                    <div key={i} className="bg-black/40 border border-gray-800 p-3">
+                      <div className="text-white font-medium mb-2" style={{ fontSize: '13px' }}>{ex.name}</div>
+                      <div className="flex flex-col gap-1">
+                        {(ex.sets || []).map((set, j) => (
+                          <div key={j} className="flex items-center gap-3 text-xs">
+                            <span className="text-gray-500 w-5">{j + 1}</span>
+                            <span className="text-gray-300">{set.weight} lbs</span>
+                            <span className="text-gray-500">×</span>
+                            <span className="text-gray-300">{set.reps} reps</span>
+                            {set.note && <span className="text-gray-500 italic">— {set.note}</span>}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 
@@ -310,15 +443,26 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete, onPhotoAdde
           </div>
 
           {/* Footer */}
-          <div className="p-4 border-t border-gray-800 flex justify-between items-center">
-            <button onClick={handleDelete} disabled={deleting}
-              className="text-gray-600 hover:text-red-400 transition-colors text-sm disabled:opacity-40">
-              {deleting ? 'Deleting...' : 'Delete Workout'}
-            </button>
-            <button onClick={onClose}
-              className="pixel-btn bg-sky-800 border-sky-600 text-white px-5 py-2" style={{ fontSize: '12px' }}>
-              Close
-            </button>
+          <div className="p-4 border-t border-gray-800 flex justify-between items-center gap-2">
+            {editing ? (
+              <>
+                <button onClick={() => setEditing(false)} className="pixel-btn bg-gray-800 border-gray-600 text-gray-300 px-4 py-2 flex-1" style={{ fontSize: '12px' }}>Cancel</button>
+                <button onClick={saveEdit} disabled={saving} className="pixel-btn bg-green-700 border-green-500 text-white px-5 py-2 flex-1 disabled:opacity-40" style={{ fontSize: '12px' }}>
+                  {saving ? 'Saving...' : 'Save Changes'}
+                </button>
+              </>
+            ) : (
+              <>
+                <button onClick={handleDelete} disabled={deleting}
+                  className="text-gray-600 hover:text-red-400 transition-colors text-sm disabled:opacity-40">
+                  {deleting ? 'Deleting...' : 'Delete Workout'}
+                </button>
+                <button onClick={onClose}
+                  className="pixel-btn bg-sky-800 border-sky-600 text-white px-5 py-2" style={{ fontSize: '12px' }}>
+                  Close
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -360,6 +504,11 @@ export default function WorkoutLogs() {
   async function handleDelete(id) {
     setWorkouts(prev => prev.filter(w => w.id !== id))
     await refreshProfile()
+  }
+
+  function handleUpdate(id, data) {
+    setWorkouts(prev => prev.map(w => w.id === id ? { ...w, ...data } : w))
+    setSelected(prev => prev?.id === id ? { ...prev, ...data } : prev)
   }
 
   function handlePhotoAdded(id, photo_url) {
@@ -456,6 +605,7 @@ export default function WorkoutLogs() {
           onClose={() => setSelected(null)}
           onDelete={handleDelete}
           onPhotoAdded={handlePhotoAdded}
+          onUpdate={handleUpdate}
         />
       )}
     </div>

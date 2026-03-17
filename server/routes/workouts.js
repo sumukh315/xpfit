@@ -84,6 +84,33 @@ router.post('/', upload.single('photo'), async (req, res) => {
   res.json({ ...parseWorkout(workout), pr_points_earned: prPointsEarned, pr_exercises: prExercises })
 })
 
+router.patch('/:id', async (req, res) => {
+  const { name, exercises, notes, start_time, end_time } = req.body
+  const { rows } = await pool.query(
+    'SELECT id FROM workouts WHERE id = $1 AND user_id = $2',
+    [req.params.id, req.user.id]
+  )
+  if (!rows[0]) return res.status(404).json({ error: 'Not found' })
+  await pool.query(
+    `UPDATE workouts SET
+      name = COALESCE($1, name),
+      exercises = COALESCE($2, exercises),
+      notes = COALESCE($3, notes),
+      start_time = COALESCE($4, start_time),
+      end_time = COALESCE($5, end_time)
+    WHERE id = $6`,
+    [
+      name ?? null,
+      exercises !== undefined ? JSON.stringify(exercises) : null,
+      notes ?? null,
+      start_time ?? null,
+      end_time ?? null,
+      req.params.id,
+    ]
+  )
+  res.json({ ok: true })
+})
+
 router.patch('/:id/photo', upload.single('photo'), async (req, res) => {
   const { rows } = await pool.query(
     'SELECT id FROM workouts WHERE id = $1 AND user_id = $2',
