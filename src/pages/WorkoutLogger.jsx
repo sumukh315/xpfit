@@ -219,7 +219,7 @@ function PasteImportModal({ onImport, onClose }) {
         {!preview ? (
           <div className="p-4 flex flex-col gap-3 flex-1">
             <p className="text-gray-400" style={{ fontSize: '12px' }}>
-              Paste your workout from Rep Count, Notes, or any format.
+              Paste your workout from Notes or any format.
             </p>
             <textarea
               autoFocus
@@ -1152,7 +1152,7 @@ export default function WorkoutLogger() {
             </button>
             <button onClick={() => setShowPaste(true)}
               className="pixel-btn bg-gray-800 border-gray-600 text-white px-8 py-3" style={{ fontSize: '13px' }}>
-              Paste from App
+              Paste from Notes
             </button>
           </div>
         </div>
