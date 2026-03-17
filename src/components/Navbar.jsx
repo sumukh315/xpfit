@@ -91,11 +91,11 @@ export default function Navbar() {
             return (
               <Link key={item.path} to={item.path}
                 className="flex-1 flex flex-col items-center justify-center py-3 no-underline transition-all relative"
-                style={{ minHeight: '56px' }}>
+                style={{ minHeight: '56px', minWidth: 0 }}>
                 <span style={{ fontSize: '16px', lineHeight: 1, color: active ? '#67e8f9' : '#4b5563' }}>
                   {item.icon}
                 </span>
-                <span style={{ fontSize: '12px', marginTop: '3px', color: active ? '#67e8f9' : '#4b5563', fontFamily: 'Outfit', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                <span style={{ fontSize: '10px', marginTop: '3px', color: active ? '#67e8f9' : '#4b5563', fontFamily: 'Outfit', fontWeight: 600, letterSpacing: '0.02em', textTransform: 'uppercase', overflow: 'hidden', maxWidth: '100%', textAlign: 'center' }}>
                   {item.label}
                 </span>
                 {active && (
