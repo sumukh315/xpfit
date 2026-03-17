@@ -92,11 +92,26 @@ function PhotoLightbox({ url, workoutName, discordWebhook, onClose }) {
 }
 
 // ─── Workout Detail Modal ─────────────────────────────────────────────────────
-function WorkoutDetail({ workout, discordWebhook, onClose, onDelete }) {
+function WorkoutDetail({ workout, discordWebhook, onClose, onDelete, onPhotoAdded }) {
   const [lightboxUrl, setLightboxUrl] = useState(null)
   const [copied, setCopied] = useState(false)
   const [discordSent, setDiscordSent] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [photoFile, setPhotoFile] = useState(null)
+  const [uploadingPhoto, setUploadingPhoto] = useState(false)
+  const [currentPhotoUrl, setCurrentPhotoUrl] = useState(workout.photo_url || null)
+
+  async function handleAddPhoto() {
+    if (!photoFile) return
+    setUploadingPhoto(true)
+    try {
+      const { photo_url } = await api.addWorkoutPhoto(workout.id, photoFile)
+      setCurrentPhotoUrl(photo_url)
+      setPhotoFile(null)
+      onPhotoAdded(workout.id, photo_url)
+    } catch (e) { alert('Upload failed: ' + e.message) }
+    finally { setUploadingPhoto(false) }
+  }
 
   const totalSets = (workout.exercises || []).reduce((a, e) => a + (e.sets?.length || 0), 0)
 
@@ -219,26 +234,46 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete }) {
             )}
 
             {/* Photo */}
-            {workout.photo_url && (
-              <div>
-                <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '12px' }}>WORKOUT PHOTO</div>
+            <div>
+              <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '12px' }}>WORKOUT PHOTO</div>
+              {currentPhotoUrl ? (
                 <div className="relative">
                   <img
-                    src={workout.photo_url}
+                    src={currentPhotoUrl}
                     alt="Workout"
                     className="w-full rounded border border-gray-800 cursor-pointer hover:opacity-90 transition-opacity"
                     style={{ maxHeight: '280px', objectFit: 'cover' }}
-                    onClick={() => setLightboxUrl(workout.photo_url)}
+                    onClick={() => setLightboxUrl(currentPhotoUrl)}
                   />
                   <button
-                    onClick={() => setLightboxUrl(workout.photo_url)}
+                    onClick={() => setLightboxUrl(currentPhotoUrl)}
                     className="absolute bottom-2 right-2 bg-black/70 text-white px-3 py-1 border border-gray-600 hover:border-sky-500 transition-all"
                     style={{ fontSize: '13px' }}>
                     View & Share Photo
                   </button>
                 </div>
-              </div>
-            )}
+              ) : (
+                <div className="glass-row p-3 flex flex-col gap-3">
+                  <p className="text-gray-500" style={{ fontSize: '12px' }}>No photo attached. Add one now:</p>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={e => setPhotoFile(e.target.files[0])}
+                    className="text-gray-400"
+                    style={{ fontSize: '12px' }}
+                  />
+                  {photoFile && (
+                    <button
+                      onClick={handleAddPhoto}
+                      disabled={uploadingPhoto}
+                      className="pixel-btn bg-sky-700 border-sky-500 text-white py-2 disabled:opacity-40"
+                      style={{ fontSize: '12px' }}>
+                      {uploadingPhoto ? 'Uploading...' : 'Upload Photo'}
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* Share workout text */}
             <div>
@@ -311,6 +346,10 @@ export default function WorkoutLogs() {
   async function handleDelete(id) {
     setWorkouts(prev => prev.filter(w => w.id !== id))
     await refreshProfile()
+  }
+
+  function handlePhotoAdded(id, photo_url) {
+    setWorkouts(prev => prev.map(w => w.id === id ? { ...w, photo_url } : w))
   }
 
   // Group by month
@@ -399,6 +438,7 @@ export default function WorkoutLogs() {
           discordWebhook={profile?.discord_webhook}
           onClose={() => setSelected(null)}
           onDelete={handleDelete}
+          onPhotoAdded={handlePhotoAdded}
         />
       )}
     </div>

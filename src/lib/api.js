@@ -48,6 +48,11 @@ export const api = {
   },
   importWorkouts: (workouts) => request('/workouts/import', { method: 'POST', body: { workouts } }),
   deleteWorkout: (id) => request(`/workouts/${id}`, { method: 'DELETE' }),
+  addWorkoutPhoto: (id, photoFile) => {
+    const form = new FormData()
+    form.append('photo', photoFile)
+    return request(`/workouts/${id}/photo`, { method: 'PATCH', body: form })
+  },
 
   // Profiles
   updateProfile: (data) => request('/profiles/me', { method: 'PATCH', body: data }),
