@@ -3,7 +3,7 @@ import { api } from '../lib/api'
 
 export default function CoachModal({ onClose }) {
   const [messages, setMessages] = useState([
-    { role: 'coach', text: "Hey! I'm your gym coach 💪 Ask me anything — how to use a machine, form tips, or snap a photo and I'll take a look!" }
+    { role: 'coach', text: "Hello young trainer! I have been training heroes like you for centuries, and I applaud your journey. Ask me anything." }
   ])
   const [input, setInput] = useState('')
   const [image, setImage] = useState(null) // { base64, mimeType, preview }
@@ -62,7 +62,7 @@ export default function CoachModal({ onClose }) {
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-sky-900/40">
           <div>
-            <h2 className="pixel-font text-sky-400" style={{ fontSize: '13px' }}>Gym Coach</h2>
+            <h2 className="pixel-font text-sky-400" style={{ fontSize: '13px' }}>Personal Trainer</h2>
             <p className="text-gray-500" style={{ fontSize: '11px' }}>Ask about form, machines, or send a photo</p>
           </div>
           <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors text-xl leading-none">×</button>
