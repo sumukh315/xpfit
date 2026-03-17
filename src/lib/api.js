@@ -70,4 +70,6 @@ export const api = {
   getPendingRequests: () => request('/social/pending'),
   sendFriendRequest: (id) => request(`/social/request/${id}`, { method: 'POST' }),
   acceptFriendRequest: (id) => request(`/social/accept/${id}`, { method: 'POST' }),
+  getFriendFriends: (userId) => request(`/social/friends/${userId}`),
+  sendFeedback: (data) => request('/feedback', { method: 'POST', body: data }),
 }

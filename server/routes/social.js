@@ -74,6 +74,20 @@ router.get('/suggested', async (req, res) => {
   })))
 })
 
+router.get('/friends/:userId', async (req, res) => {
+  const { rows } = await pool.query(
+    `SELECT u.id, u.username, u.total_xp, u.character, u.active_pet
+     FROM friendships f
+     JOIN users u ON u.id = f.friend_id
+     WHERE f.user_id = $1 AND f.status = 'accepted'`,
+    [req.params.userId]
+  )
+  res.json(rows.map(u => ({
+    ...u,
+    character: JSON.parse(u.character || '{}'),
+  })))
+})
+
 router.post('/accept/:userId', async (req, res) => {
   await pool.query(
     `UPDATE friendships SET status = 'accepted' WHERE user_id = $1 AND friend_id = $2`,

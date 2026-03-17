@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { useEffect, useRef } from 'react'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import Navbar from './components/Navbar'
 import Landing from './pages/Landing'
@@ -17,6 +18,108 @@ import FontPreview from './pages/FontPreview'
 import WorkoutLogs from './pages/WorkoutLogs'
 import Shop from './pages/Shop'
 import BgPreview from './pages/BgPreview'
+
+function PlexusBg() {
+  const canvasRef = useRef(null)
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    const N = 26
+    const SPEED = 0.3
+    const MAXD = 240
+    const MAXD2 = MAXD * MAXD
+    const COLORS = [
+      '#67e8f9','#38bdf8','#67e8f9','#38bdf8','#a78bfa','#67e8f9',
+      '#38bdf8','#e2e8f0','#67e8f9','#38bdf8','#e63946','#67e8f9',
+      '#c084fc','#38bdf8','#67e8f9','#38bdf8','#f472b6','#38bdf8',
+      '#67e8f9','#a78bfa','#38bdf8','#67e8f9','#38bdf8','#67e8f9',
+      '#38bdf8','#c084fc',
+    ]
+    const SIZES = COLORS.map((_, i) => i % 9 === 0 ? 3 : i % 4 === 0 ? 2 : 1.5)
+    let W, H, pts, raf
+
+    function resize() {
+      W = canvas.width = window.innerWidth
+      H = canvas.height = window.innerHeight
+      pts = Array.from({ length: N }, () => ({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * SPEED * 2,
+        vy: (Math.random() - 0.5) * SPEED * 2,
+      }))
+    }
+
+    function frame() {
+      ctx.clearRect(0, 0, W, H)
+      for (let i = 0; i < N; i++) {
+        const p = pts[i]
+        p.x += p.vx; p.y += p.vy
+        if (p.x < -20) p.vx = Math.abs(p.vx)
+        if (p.x > W + 20) p.vx = -Math.abs(p.vx)
+        if (p.y < -20) p.vy = Math.abs(p.vy)
+        if (p.y > H + 20) p.vy = -Math.abs(p.vy)
+      }
+      // triangles (behind lines)
+      for (let i = 0; i < N - 2; i++) {
+        for (let j = i + 1; j < N - 1; j++) {
+          const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y
+          if (dx * dx + dy * dy > MAXD2) continue
+          for (let k = j + 1; k < N; k++) {
+            const dx2 = pts[i].x - pts[k].x, dy2 = pts[i].y - pts[k].y
+            if (dx2 * dx2 + dy2 * dy2 > MAXD2) continue
+            const dx3 = pts[j].x - pts[k].x, dy3 = pts[j].y - pts[k].y
+            if (dx3 * dx3 + dy3 * dy3 > MAXD2) continue
+            const d1 = Math.sqrt(dx * dx + dy * dy)
+            const d2 = Math.sqrt(dx2 * dx2 + dy2 * dy2)
+            const d3 = Math.sqrt(dx3 * dx3 + dy3 * dy3)
+            const a = (1 - Math.max(d1, d2, d3) / MAXD) * 0.07
+            ctx.beginPath()
+            ctx.moveTo(pts[i].x, pts[i].y)
+            ctx.lineTo(pts[j].x, pts[j].y)
+            ctx.lineTo(pts[k].x, pts[k].y)
+            ctx.closePath()
+            ctx.fillStyle = `rgba(56,189,248,${a})`
+            ctx.fill()
+          }
+        }
+      }
+      // edges
+      for (let i = 0; i < N; i++) {
+        for (let j = i + 1; j < N; j++) {
+          const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y
+          const d2 = dx * dx + dy * dy
+          if (d2 > MAXD2) continue
+          const d = Math.sqrt(d2)
+          const a = (1 - d / MAXD) * 0.6
+          ctx.beginPath()
+          ctx.moveTo(pts[i].x, pts[i].y)
+          ctx.lineTo(pts[j].x, pts[j].y)
+          ctx.strokeStyle = `rgba(103,232,249,${a})`
+          ctx.lineWidth = 0.7
+          ctx.stroke()
+        }
+      }
+      // nodes
+      for (let i = 0; i < N; i++) {
+        const p = pts[i], r = SIZES[i], col = COLORS[i]
+        const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 6)
+        g.addColorStop(0, col + '55')
+        g.addColorStop(1, col + '00')
+        ctx.beginPath(); ctx.arc(p.x, p.y, r * 6, 0, Math.PI * 2)
+        ctx.fillStyle = g; ctx.fill()
+        ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2)
+        ctx.fillStyle = col; ctx.fill()
+      }
+      raf = requestAnimationFrame(frame)
+    }
+
+    resize(); frame()
+    window.addEventListener('resize', resize)
+    return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', resize) }
+  }, [])
+  return <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
+}
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -99,44 +202,7 @@ export default function App() {
           <div className="bg-orb bg-orb-3" />
           <div className="bg-orb bg-orb-4" />
           <div className="bg-orb bg-orb-5" />
-          {/* Constellation overlay */}
-          <svg className="constellation-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice"
-            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
-            {/* Lines */}
-            {[
-              [2,8],[8,14],[14,19],[19,25],[3,9],[9,15],[15,21],[0,5],[5,11],[11,17],[17,23],
-              [1,6],[6,13],[13,20],[20,26],[4,10],[10,16],[16,22],[22,27],[7,12],[12,18],[18,24],
-              [8,9],[14,15],[19,21],[5,6],[11,13],[17,20],[23,26],[2,3],[25,27],[0,1],[16,17],
-            ].map(([a,b],i) => {
-              const pts = [
-                [8,12],[22,5],[38,18],[55,8],[72,15],[88,22],[15,30],[30,38],[48,32],[62,25],
-                [78,35],[92,42],[5,50],[20,55],[35,62],[52,48],[68,58],[82,45],[95,62],[10,70],
-                [28,75],[45,68],[60,78],[75,65],[90,72],[18,85],[40,88],[58,80],[72,90],[88,82],
-              ]
-              const [x1,y1] = pts[a] || [0,0]
-              const [x2,y2] = pts[b] || [0,0]
-              return (
-                <line key={i} x1={x1} y1={y1} x2={x2} y2={y2}
-                  stroke="rgba(103,232,249,1)" strokeWidth="0.15"
-                  className={`constellation-line constellation-line-${(i%5)+1}`} />
-              )
-            })}
-            {/* Stars */}
-            {[
-              [8,12,1.2,'star-a'],[22,5,0.8,'star-b'],[38,18,1.5,'star-c'],[55,8,0.9,'star-d'],
-              [72,15,1.1,'star-e'],[88,22,0.7,'star-f'],[15,30,1.3,'star-a'],[30,38,0.8,'star-b'],
-              [48,32,1.0,'star-c'],[62,25,1.4,'star-d'],[78,35,0.7,'star-e'],[92,42,1.2,'star-f'],
-              [5,50,0.9,'star-a'],[20,55,1.1,'star-b'],[35,62,1.6,'star-c'],[52,48,0.8,'star-d'],
-              [68,58,1.0,'star-e'],[82,45,1.3,'star-f'],[95,62,0.7,'star-a'],[10,70,1.1,'star-b'],
-              [28,75,0.9,'star-c'],[45,68,1.4,'star-d'],[60,78,0.8,'star-e'],[75,65,1.2,'star-f'],
-              [90,72,1.0,'star-a'],[18,85,0.7,'star-b'],[40,88,1.3,'star-c'],[58,80,0.9,'star-d'],
-              [72,90,1.1,'star-e'],[88,82,0.8,'star-f'],
-            ].map(([x,y,r,cls],i) => (
-              <circle key={i} cx={x} cy={y} r={r}
-                fill={i%7===0 ? '#a78bfa' : i%5===0 ? '#6ab04c' : i%3===0 ? '#e63946' : '#e2e8f0'}
-                className={`constellation-star ${cls}`} />
-            ))}
-          </svg>
+          <PlexusBg />
         </div>
         <div className="flex flex-col min-h-screen" style={{ position: 'relative', zIndex: 1 }}>
           <div className="flex-1">

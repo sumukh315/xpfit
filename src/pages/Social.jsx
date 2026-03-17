@@ -31,6 +31,7 @@ export default function Social() {
   const [selectedFriend, setSelectedFriend] = useState(null)
   const [friendWorkouts, setFriendWorkouts] = useState([])
   const [friendLastWorkout, setFriendLastWorkout] = useState({})
+  const [friendFriends, setFriendFriends] = useState([])
   const [expandedWorkout, setExpandedWorkout] = useState(null)
   const [lightboxPhoto, setLightboxPhoto] = useState(null)
 
@@ -100,7 +101,9 @@ export default function Social() {
 
   async function viewFriend(friend) {
     setSelectedFriend(friend)
+    setFriendFriends([])
     try { setFriendWorkouts(await api.getFriendWorkouts(friend.id)) } catch (e) { console.error(e) }
+    try { setFriendFriends(await api.getFriendFriends(friend.id)) } catch (e) { console.error(e) }
   }
 
   async function saveDiscordWebhook() {
@@ -215,6 +218,44 @@ export default function Social() {
             </div>
           )}
         </div>
+        {/* Friends of this friend */}
+        {(() => {
+          const myFriendIds = new Set(friends.map(f => f.id))
+          const pendingIds = new Set(pending.map(p => p.id))
+          const strangers = friendFriends.filter(u =>
+            u.id !== profile?.id && !myFriendIds.has(u.id) && !pendingIds.has(u.id)
+          )
+          if (strangers.length === 0) return null
+          return (
+            <div className="pixel-card p-4 mt-4">
+              <h3 className="pixel-font text-sky-400 mb-4" style={{ fontSize: '13px' }}>
+                {selectedFriend.username}'s Friends
+              </h3>
+              <div className="flex flex-col gap-2">
+                {strangers.map(u => {
+                  const { level } = getLevelFromXP(u.total_xp || 0)
+                  const charOpts = u.character || { gender: 'male', charClass: 'warrior' }
+                  return (
+                    <div key={u.id} className="flex items-center justify-between p-2 glass-row">
+                      <div className="flex items-center gap-3">
+                        <PixelCharacter options={charOpts} scale={0.35} />
+                        <div>
+                          <div className="text-white text-sm">{u.username}</div>
+                          <div className="pixel-font text-sky-400" style={{ fontSize: '12px' }}>Level {level}</div>
+                        </div>
+                      </div>
+                      <button onClick={() => sendRequest(u.id, u.username)}
+                        className="pixel-btn bg-green-800 border-green-600 text-white px-3 py-1" style={{ fontSize: '12px' }}>
+                        + Add
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )
+        })()}
+
         {lightboxPhoto && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
             style={{ background: 'rgba(0,0,0,0.95)' }}

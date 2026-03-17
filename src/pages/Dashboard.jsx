@@ -77,15 +77,15 @@ export default function Dashboard() {
           <div className="flex gap-4 mt-4 justify-center md:justify-start">
             <div className="text-center">
               <div className="pixel-font text-yellow-400" style={{ fontSize: '14px' }}>{profile?.points || 0}</div>
-              <div className="text-gray-500 text-xs">Points</div>
+              <div className="text-gray-400 text-xs">Points</div>
             </div>
             <div className="text-center">
               <div className="pixel-font text-orange-400" style={{ fontSize: '14px' }}>{streak}</div>
-              <div className="text-gray-500 text-xs">Day Streak</div>
+              <div className="text-gray-400 text-xs">Day Streak</div>
             </div>
             <div className="text-center">
               <div className="pixel-font text-green-400" style={{ fontSize: '14px' }}>{weekStats.workouts}</div>
-              <div className="text-gray-500 text-xs">This Week</div>
+              <div className="text-gray-400 text-xs">This Week</div>
             </div>
           </div>
         </div>
@@ -96,7 +96,7 @@ export default function Dashboard() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
         {[
           { label: 'Total Workouts', value: recentWorkouts.length },
           { label: 'Sets This Week', value: weekStats.sets },
@@ -105,10 +105,18 @@ export default function Dashboard() {
         ].map(stat => (
           <div key={stat.label} className="pixel-card p-4 text-center">
             <div className="pixel-font text-white" style={{ fontSize: '16px' }}>{stat.value}</div>
-            <div className="text-gray-500 text-xs mt-1">{stat.label}</div>
+            <div className="text-gray-400 text-xs mt-1">{stat.label}</div>
           </div>
         ))}
       </div>
+
+      <Link to="/progress" className="pixel-card p-4 mb-6 flex items-center justify-between no-underline hover:border-sky-600 transition-all group" style={{ display: 'flex' }}>
+        <div>
+          <div className="pixel-font text-sky-400" style={{ fontSize: '13px' }}>Progress &amp; Stats</div>
+          <div className="text-gray-400 text-xs mt-1">Charts, PRs, and muscle group breakdown</div>
+        </div>
+        <span className="text-sky-400 group-hover:text-sky-300 text-lg">→</span>
+      </Link>
 
       {recommendations.length > 0 && (
         <div className="pixel-card p-4 mb-6" style={{ borderColor: '#0369a1' }}>
@@ -132,7 +140,10 @@ export default function Dashboard() {
       <div className="pixel-card p-4">
         <div className="flex justify-between items-center mb-4">
           <h2 className="pixel-font text-sky-400" style={{ fontSize: '13px' }}>Recent Workouts</h2>
-          <Link to="/progress" className="text-sky-400 hover:text-sky-300 text-sm">View All →</Link>
+          <div className="flex items-center gap-4">
+            <Link to="/progress" className="text-gray-400 hover:text-sky-300 text-sm no-underline">View Stats →</Link>
+            <Link to="/logs" className="text-sky-400 hover:text-sky-300 text-sm no-underline">View All →</Link>
+          </div>
         </div>
         {recentWorkouts.length === 0 ? (
           <div className="text-center py-8">
@@ -147,7 +158,7 @@ export default function Dashboard() {
               <div key={w.id} className="flex items-center justify-between p-3 glass-row">
                 <Link to="/logs" className="flex-1 min-w-0 no-underline hover:opacity-80 transition-opacity">
                   <div className="text-white font-medium">{w.name}</div>
-                  <div className="text-gray-500 text-xs">
+                  <div className="text-gray-400 text-xs">
                     {new Date(w.created_at).toLocaleDateString()} · {w.exercises?.length || 0} exercises
                   </div>
                 </Link>

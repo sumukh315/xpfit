@@ -8,6 +8,7 @@ import authRoutes from './routes/auth.js'
 import workoutRoutes from './routes/workouts.js'
 import profileRoutes from './routes/profiles.js'
 import socialRoutes from './routes/social.js'
+import feedbackRoutes from './routes/feedback.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const app = express()
@@ -48,5 +49,6 @@ app.use('/api/auth', authRoutes)
 app.use('/api/workouts', workoutRoutes)
 app.use('/api/profiles', profileRoutes)
 app.use('/api/social', socialRoutes)
+app.use('/api/feedback', feedbackRoutes)
 
 app.listen(PORT, () => console.log(`XPFit server running on http://localhost:${PORT}`))

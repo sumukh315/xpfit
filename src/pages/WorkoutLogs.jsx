@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { api } from '../lib/api'
 
@@ -199,7 +200,7 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete, onPhotoAdde
               ].map(s => (
                 <div key={s.label} className="bg-black/40 border border-gray-800 p-3 text-center">
                   <div className={`pixel-font ${s.color}`} style={{ fontSize: '14px' }}>{s.value}</div>
-                  <div className="text-gray-600 text-xs mt-1">{s.label}</div>
+                  <div className="text-gray-400 text-xs mt-1">{s.label}</div>
                 </div>
               ))}
             </div>
@@ -215,7 +216,7 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete, onPhotoAdde
 
             {/* Exercises */}
             <div>
-              <div className="pixel-font text-gray-500 mb-3" style={{ fontSize: '12px' }}>EXERCISES</div>
+              <div className="pixel-font text-gray-400 mb-3" style={{ fontSize: '12px' }}>EXERCISES</div>
               <div className="flex flex-col gap-3">
                 {(workout.exercises || []).map((ex, i) => (
                   <div key={i} className="bg-black/40 border border-gray-800 p-3">
@@ -223,9 +224,9 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete, onPhotoAdde
                     <div className="flex flex-col gap-1">
                       {(ex.sets || []).map((set, j) => (
                         <div key={j} className="flex items-center gap-3 text-xs">
-                          <span className="text-gray-600 w-5">{j + 1}</span>
+                          <span className="text-gray-500 w-5">{j + 1}</span>
                           <span className="text-gray-300">{set.weight} lbs</span>
-                          <span className="text-gray-600">×</span>
+                          <span className="text-gray-500">×</span>
                           <span className="text-gray-300">{set.reps} reps</span>
                           {set.note && <span className="text-gray-500 italic">— {set.note}</span>}
                         </div>
@@ -239,7 +240,7 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete, onPhotoAdde
             {/* Notes */}
             {workout.notes && (
               <div>
-                <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '12px' }}>NOTES</div>
+                <div className="pixel-font text-gray-400 mb-2" style={{ fontSize: '12px' }}>NOTES</div>
                 <div className="bg-black/40 border border-gray-800 p-3 text-gray-300" style={{ fontSize: '13px', lineHeight: '1.6' }}>
                   {workout.notes}
                 </div>
@@ -248,7 +249,7 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete, onPhotoAdde
 
             {/* Photo */}
             <div>
-              <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '12px' }}>WORKOUT PHOTO</div>
+              <div className="pixel-font text-gray-400 mb-2" style={{ fontSize: '12px' }}>WORKOUT PHOTO</div>
               {currentPhotoUrl ? (
                 <div className="relative">
                   <img
@@ -267,7 +268,7 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete, onPhotoAdde
                 </div>
               ) : (
                 <div className="glass-row p-3 flex flex-col gap-3">
-                  <p className="text-gray-500" style={{ fontSize: '12px' }}>No photo attached. Add one now:</p>
+                  <p className="text-gray-400" style={{ fontSize: '12px' }}>No photo attached. Add one now:</p>
                   <input
                     type="file"
                     accept="image/*"
@@ -290,7 +291,7 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete, onPhotoAdde
 
             {/* Share workout text */}
             <div>
-              <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '12px' }}>SHARE WORKOUT</div>
+              <div className="pixel-font text-gray-400 mb-2" style={{ fontSize: '12px' }}>SHARE WORKOUT</div>
               <div className="flex gap-2 flex-wrap">
                 <button onClick={handleDiscordShare}
                   className="flex-1 pixel-btn bg-indigo-800 border-indigo-600 text-white py-2" style={{ fontSize: '12px' }}>
@@ -377,7 +378,10 @@ export default function WorkoutLogs() {
     <div className="max-w-2xl mx-auto px-4 py-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="pixel-font text-sky-400" style={{ fontSize: '14px' }}>Workout Log</h1>
-        <span className="text-gray-600 text-xs">{workouts.length} workouts total</span>
+        <div className="flex items-center gap-4">
+          <Link to="/progress" className="text-sky-400 hover:text-sky-300 text-sm no-underline">Stats →</Link>
+          <span className="text-gray-400 text-xs">{workouts.length} workouts</span>
+        </div>
       </div>
 
       {loading ? (
@@ -391,7 +395,7 @@ export default function WorkoutLogs() {
         <div className="flex flex-col gap-6">
           {Object.entries(grouped).map(([month, monthWorkouts]) => (
             <div key={month}>
-              <div className="pixel-font text-gray-600 mb-3 pb-1 border-b border-gray-800" style={{ fontSize: '12px' }}>
+              <div className="pixel-font text-gray-400 mb-3 pb-1 border-b border-gray-800" style={{ fontSize: '12px' }}>
                 {month.toUpperCase()} · {monthWorkouts.length} WORKOUT{monthWorkouts.length !== 1 ? 'S' : ''}
               </div>
               <div className="flex flex-col gap-2">
@@ -412,14 +416,14 @@ export default function WorkoutLogs() {
                             {formatDate(workoutDate(w))}
                             {w.duration_minutes ? ` · ${w.duration_minutes} min` : ''}
                           </div>
-                          <div className="text-gray-500 text-xs mt-1">
+                          <div className="text-gray-400 text-xs mt-1">
                             {w.exercises?.length || 0} exercises · {totalSets} sets
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-1 flex-shrink-0 ml-4">
                           <span className="pixel-font text-sky-400" style={{ fontSize: '13px' }}>+{w.xp_earned || 0} XP</span>
                           {resolvePhotoUrl(w.photo_url) && (
-                            <span className="text-gray-600 text-xs">📷 photo</span>
+                            <span className="text-gray-400 text-xs">📷 photo</span>
                           )}
                         </div>
                       </div>

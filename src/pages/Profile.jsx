@@ -19,6 +19,30 @@ export default function Profile() {
   const [savingDiscord, setSavingDiscord] = useState(false)
   const [discordSaved, setDiscordSaved] = useState(false)
 
+  // Feedback state
+  const [feedbackEmail, setFeedbackEmail] = useState('')
+  const [feedbackMessage, setFeedbackMessage] = useState('')
+  const [sendingFeedback, setSendingFeedback] = useState(false)
+  const [feedbackSent, setFeedbackSent] = useState(false)
+  const [feedbackError, setFeedbackError] = useState('')
+
+  async function sendFeedback() {
+    if (!feedbackMessage.trim()) return
+    setSendingFeedback(true)
+    setFeedbackError('')
+    try {
+      await api.sendFeedback({ email: feedbackEmail, message: feedbackMessage })
+      setFeedbackSent(true)
+      setFeedbackEmail('')
+      setFeedbackMessage('')
+      setTimeout(() => setFeedbackSent(false), 4000)
+    } catch (e) {
+      setFeedbackError('Failed to send. Try again.')
+    } finally {
+      setSendingFeedback(false)
+    }
+  }
+
   async function saveDiscordWebhook() {
     setSavingDiscord(true)
     setDiscordSaved(false)
@@ -221,6 +245,38 @@ export default function Profile() {
             Remove webhook
           </button>
         )}
+      </div>
+
+      {/* Feedback */}
+      <div className="pixel-card p-5 mt-6">
+        <h2 className="pixel-font text-sky-400 mb-1" style={{ fontSize: '13px' }}>Send Feedback</h2>
+        <p className="text-gray-400 mb-4" style={{ fontSize: '12px' }}>Have a suggestion or found a bug? Let us know.</p>
+        <div className="flex flex-col gap-3">
+          <input
+            type="email"
+            value={feedbackEmail}
+            onChange={e => setFeedbackEmail(e.target.value)}
+            placeholder="Your email (optional)"
+            className="glass-input"
+            style={{ fontSize: '13px' }}
+          />
+          <textarea
+            value={feedbackMessage}
+            onChange={e => setFeedbackMessage(e.target.value)}
+            placeholder="Your message..."
+            rows={4}
+            className="glass-input"
+            style={{ fontSize: '13px', resize: 'vertical' }}
+          />
+          {feedbackError && <p className="text-red-400 text-xs">{feedbackError}</p>}
+          <button
+            onClick={sendFeedback}
+            disabled={sendingFeedback || !feedbackMessage.trim()}
+            className="pixel-btn bg-sky-800 border-sky-600 text-white py-2 disabled:opacity-40"
+            style={{ fontSize: '13px' }}>
+            {sendingFeedback ? 'Sending...' : feedbackSent ? 'Sent! Thanks!' : 'Send Feedback'}
+          </button>
+        </div>
       </div>
     </div>
   )

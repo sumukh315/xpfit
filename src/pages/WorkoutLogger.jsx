@@ -17,6 +17,10 @@ const MUSCLE_GROUPS = [
       'Leg Extension', 'Hip Thrust', 'Glute Bridge', 'Lunge',
       'Walking Lunge', 'Step-Up', 'Calf Raise', 'Seated Calf Raise',
       'Sumo Deadlift', 'Box Jump',
+      'Hip Adductor', 'Hip Abductor',
+      'Cable Kickback', 'Donkey Kick', 'Fire Hydrant', 'Frog Pump',
+      'Single Leg Hip Thrust', 'Banded Squat', 'Curtsy Lunge',
+      'Reverse Hyperextension', 'Cable Pull Through',
     ],
   },
   {

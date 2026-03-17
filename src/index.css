@@ -152,34 +152,6 @@ body {
   animation: orb-drift-5 25s ease-in-out infinite;
 }
 
-/* ── Constellation ── */
-@keyframes star-a { 0%,100%{opacity:.25} 50%{opacity:1}   }
-@keyframes star-b { 0%,100%{opacity:.4}  50%{opacity:.9}  }
-@keyframes star-c { 0%,100%{opacity:.15} 50%{opacity:.85} }
-@keyframes star-d { 0%,100%{opacity:.35} 50%{opacity:1}   }
-@keyframes star-e { 0%,100%{opacity:.2}  50%{opacity:.75} }
-@keyframes star-f { 0%,100%{opacity:.5}  50%{opacity:1}   }
-
-@keyframes line-1 { 0%,100%{opacity:.04} 50%{opacity:.2}  }
-@keyframes line-2 { 0%,100%{opacity:.06} 50%{opacity:.18} }
-@keyframes line-3 { 0%,100%{opacity:.02} 50%{opacity:.14} }
-@keyframes line-4 { 0%,100%{opacity:.05} 50%{opacity:.22} }
-@keyframes line-5 { 0%,100%{opacity:.03} 50%{opacity:.16} }
-
-.constellation-star { animation-duration: 3s; animation-timing-function: ease-in-out; animation-iteration-count: infinite; }
-.star-a { animation-name: star-a; animation-duration: 3.2s; }
-.star-b { animation-name: star-b; animation-duration: 4.1s; animation-delay: 0.8s; }
-.star-c { animation-name: star-c; animation-duration: 2.8s; animation-delay: 1.4s; }
-.star-d { animation-name: star-d; animation-duration: 5.0s; animation-delay: 0.3s; }
-.star-e { animation-name: star-e; animation-duration: 3.7s; animation-delay: 2.1s; }
-.star-f { animation-name: star-f; animation-duration: 4.5s; animation-delay: 1.0s; }
-
-.constellation-line { animation-timing-function: ease-in-out; animation-iteration-count: infinite; }
-.constellation-line-1 { animation-name: line-1; animation-duration: 5s; }
-.constellation-line-2 { animation-name: line-2; animation-duration: 7s; animation-delay: 1s; }
-.constellation-line-3 { animation-name: line-3; animation-duration: 6s; animation-delay: 2s; }
-.constellation-line-4 { animation-name: line-4; animation-duration: 8s; animation-delay: 0.5s; }
-.constellation-line-5 { animation-name: line-5; animation-duration: 5.5s; animation-delay: 1.5s; }
 
 /* ── Fonts ── */
 .pixel-font {

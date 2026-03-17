@@ -69,13 +69,15 @@ router.post('/forgot-password', async (req, res) => {
   const siteUrl = process.env.SITE_URL || 'http://localhost:5173'
   const resetLink = `${siteUrl}/reset-password?token=${token}`
 
-  if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+  const gmailUser = process.env.GMAIL_USER || process.env.EMAIL_USER
+  const gmailPass = process.env.GMAIL_PASS || process.env.EMAIL_PASS
+  if (gmailUser && gmailPass) {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
-      auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+      auth: { user: gmailUser, pass: gmailPass },
     })
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: gmailUser,
       to: email,
       subject: 'XPFit — Reset Your Password',
       html: `<p>Click below to reset your password. This link expires in 1 hour.</p><p><a href="${resetLink}">${resetLink}</a></p>`,
