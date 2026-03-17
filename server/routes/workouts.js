@@ -13,7 +13,7 @@ router.use(requireAuth)
 
 router.get('/', async (req, res) => {
   const { rows } = await pool.query(
-    'SELECT * FROM workouts WHERE user_id = $1 ORDER BY created_at DESC LIMIT 50',
+    'SELECT * FROM workouts WHERE user_id = $1 ORDER BY COALESCE(start_time, created_at) DESC LIMIT 50',
     [req.user.id]
   )
   res.json(rows.map(parseWorkout))

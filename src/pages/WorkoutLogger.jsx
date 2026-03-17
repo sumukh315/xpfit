@@ -450,14 +450,8 @@ export default function WorkoutLogger() {
   const [unlockSaved, setUnlockSaved] = useState(false)
 
   const [startTime] = useState(() => new Date())
-  const [endTime, setEndTime] = useState(() => {
-    const now = new Date()
-    const pad = n => String(n).padStart(2, '0')
-    return `${pad(now.getHours())}:${pad(now.getMinutes())}`
-  })
-  const [importedDate, setImportedDate] = useState(null)
-  const [importedStartStr, setImportedStartStr] = useState('')
-  const [importedEndStr, setImportedEndStr] = useState('')
+  const [workoutStartStr, setWorkoutStartStr] = useState(() => toDatetimeLocal(new Date()))
+  const [workoutEndStr, setWorkoutEndStr] = useState(() => toDatetimeLocal(new Date()))
 
   useEffect(() => { fetchPreviousData() }, [])
 
@@ -494,10 +488,9 @@ export default function WorkoutLogger() {
   function importExercises(parsed, date) {
     setExercises(prev => [...prev, ...parsed])
     if (date) {
-      setImportedDate(date)
       const str = toDatetimeLocal(date)
-      setImportedStartStr(str)
-      setImportedEndStr(str)
+      setWorkoutStartStr(str)
+      setWorkoutEndStr(str)
     }
   }
 
@@ -525,20 +518,11 @@ export default function WorkoutLogger() {
   async function handleSave() {
     if (!workoutName.trim()) return alert('Give your workout a name!')
 
-    let effectiveStart, effectiveEnd, durationMins
-
-    if (importedDate) {
-      effectiveStart = importedStartStr ? new Date(importedStartStr) : importedDate
-      effectiveEnd = importedEndStr ? new Date(importedEndStr) : importedDate
-      durationMins = effectiveEnd > effectiveStart ? Math.round((effectiveEnd - effectiveStart) / 60000) : null
-    } else {
-      const [hours, mins] = endTime.split(':').map(Number)
-      effectiveEnd = new Date()
-      effectiveEnd.setHours(hours, mins, 0, 0)
-      if (effectiveEnd < startTime) effectiveEnd.setDate(effectiveEnd.getDate() + 1)
-      effectiveStart = startTime
-      durationMins = Math.round((effectiveEnd - effectiveStart) / 60000)
-    }
+    const effectiveStart = new Date(workoutStartStr)
+    const effectiveEnd = new Date(workoutEndStr)
+    const durationMins = effectiveEnd > effectiveStart
+      ? Math.round((effectiveEnd - effectiveStart) / 60000)
+      : null
 
     setSaving(true)
     setShowFinish(false)
@@ -832,14 +816,8 @@ export default function WorkoutLogger() {
       <div className="flex justify-between items-center mb-4">
         <h1 className="pixel-font text-sky-400" style={{ fontSize: '14px' }}>Log Workout</h1>
         <div className="text-right">
-          <div className="pixel-font text-gray-500 mb-0.5" style={{ fontSize: '13px' }}>
-            {importedDate ? 'WORKOUT DATE' : 'STARTED'}
-          </div>
-          <div className={importedDate ? 'text-yellow-400' : 'text-white'} style={{ fontSize: '12px' }}>
-            {importedDate
-              ? importedDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
-              : startTimeStr}
-          </div>
+          <div className="pixel-font text-gray-500 mb-0.5" style={{ fontSize: '13px' }}>STARTED</div>
+          <div className="text-white" style={{ fontSize: '12px' }}>{startTimeStr}</div>
         </div>
       </div>
 
@@ -916,9 +894,7 @@ export default function WorkoutLogger() {
           <button onClick={() => {
             if (!workoutName.trim()) return alert('Give your workout a name!')
             if (exercises.length === 0) return
-            const now = new Date()
-            const pad = n => String(n).padStart(2, '0')
-            setEndTime(`${pad(now.getHours())}:${pad(now.getMinutes())}`)
+            setWorkoutEndStr(toDatetimeLocal(new Date()))
             setShowFinish(true)
           }} disabled={saving || exercises.length === 0}
             className="pixel-btn bg-green-700 border-green-500 text-white px-6 py-3 flex-shrink-0 disabled:opacity-40" style={{ fontSize: '13px' }}>
@@ -943,48 +919,28 @@ export default function WorkoutLogger() {
           style={{ background: 'rgba(0,0,0,0.85)' }}>
           <div className="pixel-card w-full max-w-sm p-6" style={{ background: '#0d0d1f' }}>
             <h2 className="pixel-font text-sky-400 mb-5 text-center" style={{ fontSize: '12px' }}>
-              {importedDate ? 'CONFIRM WORKOUT TIME' : 'CONFIRM END TIME'}
+              CONFIRM WORKOUT TIME
             </h2>
-            {importedDate ? (
-              <>
-                <div className="mb-3">
-                  <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '13px' }}>START</div>
-                  <input
-                    type="datetime-local"
-                    value={importedStartStr}
-                    onChange={e => setImportedStartStr(e.target.value)}
-                    className="glass-input w-full"
-                    style={{ fontSize: '13px' }}
-                  />
-                </div>
-                <div className="mb-5">
-                  <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '13px' }}>END</div>
-                  <input
-                    type="datetime-local"
-                    value={importedEndStr}
-                    onChange={e => setImportedEndStr(e.target.value)}
-                    className="glass-input w-full"
-                    style={{ fontSize: '13px' }}
-                  />
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="mb-2">
-                  <div className="pixel-font text-gray-500 mb-1" style={{ fontSize: '13px' }}>START</div>
-                  <div className="text-gray-300" style={{ fontSize: '13px' }}>{startTimeStr}</div>
-                </div>
-                <div className="mb-5">
-                  <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '13px' }}>END</div>
-                  <input
-                    type="time"
-                    value={endTime}
-                    onChange={e => setEndTime(e.target.value)}
-                    className="glass-input w-full text-lg"
-                  />
-                </div>
-              </>
-            )}
+            <div className="mb-3">
+              <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '13px' }}>START</div>
+              <input
+                type="datetime-local"
+                value={workoutStartStr}
+                onChange={e => setWorkoutStartStr(e.target.value)}
+                className="glass-input w-full"
+                style={{ fontSize: '13px' }}
+              />
+            </div>
+            <div className="mb-5">
+              <div className="pixel-font text-gray-500 mb-2" style={{ fontSize: '13px' }}>END</div>
+              <input
+                type="datetime-local"
+                value={workoutEndStr}
+                onChange={e => setWorkoutEndStr(e.target.value)}
+                className="glass-input w-full"
+                style={{ fontSize: '13px' }}
+              />
+            </div>
             <div className="flex gap-3">
               <button onClick={() => setShowFinish(false)}
                 className="flex-1 py-3 glass-option text-gray-400 hover:text-white transition-all" style={{ fontSize: '13px' }}>

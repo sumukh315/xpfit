@@ -6,13 +6,17 @@ function formatDate(str) {
   return new Date(str).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
 }
 
+function workoutDate(w) {
+  return w.start_time || w.created_at
+}
+
 function formatTime(str) {
   if (!str) return null
   return new Date(str).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toLowerCase()
 }
 
 function buildShareText(workout) {
-  const date = new Date(workout.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  const date = new Date(workoutDate(workout)).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
   const lines = [date, '']
   ;(workout.exercises || []).forEach(ex => {
     lines.push(ex.name)
@@ -31,7 +35,7 @@ function PhotoLightbox({ url, workoutName, discordWebhook, onClose }) {
   const [discordSent, setDiscordSent] = useState(false)
 
   async function handleNativeShare() {
-    const shareText = `Check out my workout photo!\n${window.location.origin}${url}`
+    const shareText = `Check out my workout photo!\n${url}`
     if (navigator.share) {
       try { await navigator.share({ title: workoutName, text: shareText }) } catch (_) {}
     } else {
@@ -42,7 +46,7 @@ function PhotoLightbox({ url, workoutName, discordWebhook, onClose }) {
   }
 
   async function handleCopy() {
-    await navigator.clipboard.writeText(`${window.location.origin}${url}`)
+    await navigator.clipboard.writeText(url)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -53,7 +57,7 @@ function PhotoLightbox({ url, workoutName, discordWebhook, onClose }) {
       await fetch(discordWebhook, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: `**${workoutName}**\n${window.location.origin}${url}` }),
+        body: JSON.stringify({ content: `**${workoutName}**\n${url}` }),
       })
       setDiscordSent(true)
       setTimeout(() => setDiscordSent(false), 2000)
@@ -169,7 +173,7 @@ function WorkoutDetail({ workout, discordWebhook, onClose, onDelete, onPhotoAdde
           <div className="p-4 border-b border-gray-800 flex justify-between items-start">
             <div>
               <h2 className="text-white font-medium" style={{ fontSize: '16px' }}>{workout.name}</h2>
-              <p className="text-gray-500 text-xs mt-0.5">{formatDate(workout.created_at)}</p>
+              <p className="text-gray-400 text-xs mt-0.5">{formatDate(workoutDate(workout))}</p>
             </div>
             <button onClick={onClose} className="text-gray-500 hover:text-white text-xl ml-4 flex-shrink-0">✕</button>
           </div>
@@ -352,9 +356,9 @@ export default function WorkoutLogs() {
     setWorkouts(prev => prev.map(w => w.id === id ? { ...w, photo_url } : w))
   }
 
-  // Group by month
+  // Group by month using start_time when available
   const grouped = workouts.reduce((acc, w) => {
-    const key = new Date(w.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+    const key = new Date(workoutDate(w)).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
     if (!acc[key]) acc[key] = []
     acc[key].push(w)
     return acc
@@ -395,11 +399,11 @@ export default function WorkoutLogs() {
                           <div className="text-white font-medium group-hover:text-sky-300 transition-colors" style={{ fontSize: '14px' }}>
                             {w.name}
                           </div>
-                          <div className="text-gray-500 text-xs mt-1">
-                            {formatDate(w.created_at)}
+                          <div className="text-gray-400 text-xs mt-1">
+                            {formatDate(workoutDate(w))}
                             {w.duration_minutes ? ` · ${w.duration_minutes} min` : ''}
                           </div>
-                          <div className="text-gray-600 text-xs mt-1">
+                          <div className="text-gray-500 text-xs mt-1">
                             {w.exercises?.length || 0} exercises · {totalSets} sets
                           </div>
                         </div>
@@ -414,12 +418,12 @@ export default function WorkoutLogs() {
                       {w.exercises?.length > 0 && (
                         <div className="mt-2 flex flex-wrap gap-1">
                           {w.exercises.slice(0, 4).map((ex, i) => (
-                            <span key={i} className="text-gray-600 glass-row px-2 py-0.5" style={{ fontSize: '13px' }}>
+                            <span key={i} className="text-gray-400 glass-row px-2 py-0.5" style={{ fontSize: '13px' }}>
                               {ex.name}
                             </span>
                           ))}
                           {w.exercises.length > 4 && (
-                            <span className="text-gray-700" style={{ fontSize: '13px' }}>+{w.exercises.length - 4} more</span>
+                            <span className="text-gray-500" style={{ fontSize: '13px' }}>+{w.exercises.length - 4} more</span>
                           )}
                         </div>
                       )}
