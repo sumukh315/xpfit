@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { api } from '../lib/api'
 import XPBar from './XPBar'
 import PixelCharacter from './PixelCharacter'
 
@@ -15,37 +14,8 @@ const navItems = [
 ]
 
 export default function Navbar() {
-  const { profile, logout } = useAuth()
+  const { profile } = useAuth()
   const location = useLocation()
-  const navigate = useNavigate()
-  const [requests, setRequests] = useState([])
-  const [showRequests, setShowRequests] = useState(false)
-  const popupRef = useRef(null)
-
-  useEffect(() => {
-    if (profile) fetchRequests()
-  }, [profile])
-
-  useEffect(() => {
-    function handleClick(e) {
-      if (popupRef.current && !popupRef.current.contains(e.target)) setShowRequests(false)
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [])
-
-  async function fetchRequests() {
-    try { setRequests(await api.getFriendRequests()) } catch (_) {}
-  }
-
-  async function acceptRequest(id) {
-    try { await api.acceptFriendRequest(id); fetchRequests() } catch (_) {}
-  }
-
-  function handleLogout() {
-    logout()
-    navigate('/login')
-  }
 
   const charOptions = profile?.character || { gender: 'male', charClass: 'warrior' }
 
@@ -76,56 +46,23 @@ export default function Navbar() {
           </div>
 
           {/* Right side */}
-          <div className="flex items-center gap-3">
-
-            {/* Friend requests */}
-            <div className="relative" ref={popupRef}>
-              <button onClick={() => setShowRequests(v => !v)}
-                className="relative text-gray-400 hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-white/5 text-sm font-medium">
-                Requests
-                {requests.length > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs">
-                    {requests.length}
-                  </span>
-                )}
-              </button>
-              {showRequests && (
-                <div className="absolute right-0 top-full mt-2 w-64 pixel-card z-50 p-3" style={{ background: 'rgba(5,10,20,0.95)' }}>
-                  <p className="font-semibold text-yellow-400 mb-3 text-sm">Friend Requests</p>
-                  {requests.length === 0 ? (
-                    <p className="text-gray-500 text-sm">No pending requests</p>
-                  ) : (
-                    <div className="flex flex-col gap-2">
-                      {requests.map(u => (
-                        <div key={u.id} className="flex items-center justify-between glass-row p-2">
-                          <Link to="/social" onClick={() => setShowRequests(false)}
-                            className="text-white text-sm hover:text-sky-300 no-underline">{u.username}</Link>
-                          <button onClick={() => acceptRequest(u.id)}
-                            className="pixel-btn bg-green-800 border-green-600 text-white px-3 py-1 text-xs">
-                            Accept
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* XP bar — desktop only */}
+          <div className="hidden md:flex items-center gap-3">
+            {/* XP bar */}
             <div className="hidden lg:flex flex-col items-end gap-1 w-36">
               <XPBar totalXP={profile?.total_xp || 0} />
             </div>
-
-            <div className="hidden md:flex items-center gap-2">
-              <span className="text-yellow-400 font-semibold text-sm">{profile?.points || 0} pts</span>
-              <PixelCharacter options={charOptions} scale={0.3} />
-            </div>
-
-            <button onClick={handleLogout}
-              className="hidden md:block text-gray-500 hover:text-red-400 transition-colors text-sm px-3 py-2 rounded-lg hover:bg-white/5">
-              Exit
-            </button>
+            <span className="text-yellow-400 font-semibold text-sm">{profile?.points || 0} pts</span>
+            {/* Circular avatar */}
+            <Link to="/profile" className="no-underline" style={{ display: 'flex' }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: '50%',
+                overflow: 'hidden', border: '2px solid rgba(103,232,249,0.3)',
+                background: 'rgba(5,10,30,0.8)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <PixelCharacter options={charOptions} scale={0.22} />
+              </div>
+            </Link>
           </div>
         </div>
       </nav>

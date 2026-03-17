@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { api } from '../lib/api'
 import { getLevelFromXP, getLevelTitle } from '../lib/xpSystem'
@@ -10,7 +10,8 @@ import { CLASSES, CLASS_INFO } from '../lib/pixelCharacter'
 import { PETS } from '../lib/pets'
 
 export default function Profile() {
-  const { profile, refreshProfile } = useAuth()
+  const { profile, refreshProfile, logout } = useAuth()
+  const navigate = useNavigate()
   const [editing, setEditing] = useState(false)
   const [character, setCharacter] = useState(profile?.character || {})
   const [saving, setSaving] = useState(false)
@@ -80,9 +81,15 @@ export default function Profile() {
       <h1 className="pixel-font text-sky-400 mb-6" style={{ fontSize: '14px' }}>Profile</h1>
 
       <div className="pixel-card p-6 mb-6 flex flex-col md:flex-row gap-6 items-center relative">
-        <Link to="/progress" className="absolute top-4 right-4 text-sky-400 hover:text-sky-300 no-underline pixel-font" style={{ fontSize: '12px' }}>
-          View Stats →
-        </Link>
+        <div className="absolute top-4 right-4 flex items-center gap-3">
+          <Link to="/progress" className="text-sky-400 hover:text-sky-300 no-underline pixel-font" style={{ fontSize: '12px' }}>
+            View Stats →
+          </Link>
+          <button onClick={() => { logout(); navigate('/login') }}
+            className="text-gray-500 hover:text-red-400 transition-colors pixel-font" style={{ fontSize: '12px' }}>
+            Log Out
+          </button>
+        </div>
         <div className="flex flex-col items-center gap-3">
           <div className="pixel-card p-5 glow-purple">
             <PixelCharacter options={displayChar} scale={1} />
