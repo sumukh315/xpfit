@@ -295,17 +295,15 @@ function PasteImportModal({ onImport, onClose }) {
 
 // ─── Exercise Picker Modal ────────────────────────────────────────────────────
 function ExercisePicker({ onSelect, onClose, customExercises = {}, usageCounts = {}, onAddCustomExercise }) {
-  const [activeGroup, setActiveGroup] = useState('legs')
+  const [activeGroup, setActiveGroup] = useState(null) // null = category list view
   const [search, setSearch] = useState('')
   const [addingCustom, setAddingCustom] = useState(false)
   const [customName, setCustomName] = useState('')
   const [hiddenExercises, setHiddenExercises] = useState(
     () => JSON.parse(localStorage.getItem('xpfit_hidden_exercises') || '{}')
   )
-  const inputRef = useRef(null)
   const customInputRef = useRef(null)
 
-  useEffect(() => { inputRef.current?.focus() }, [])
   useEffect(() => { if (addingCustom) customInputRef.current?.focus() }, [addingCustom])
 
   const group = MUSCLE_GROUPS.find(g => g.id === activeGroup)
@@ -327,17 +325,16 @@ function ExercisePicker({ onSelect, onClose, customExercises = {}, usageCounts =
   const groupDefault = sortByUsage(group?.exercises || []).filter(e => !groupHidden.includes(e))
   const allForGroup = [...groupCustom, ...groupDefault.filter(e => !groupCustom.includes(e))]
 
-  const allExercises = search
+  const searchResults = search
     ? (() => {
         const all = MUSCLE_GROUPS.flatMap(g => [
           ...(customExercises[g.id] || []),
           ...g.exercises.filter(e => !(customExercises[g.id] || []).includes(e) && !(hiddenExercises[g.id] || []).includes(e)),
         ])
         const unique = [...new Set(all)]
-        const matched = unique.filter(e => e.toLowerCase().includes(search.toLowerCase()))
-        return sortByUsage(matched)
+        return sortByUsage(unique.filter(e => e.toLowerCase().includes(search.toLowerCase())))
       })()
-    : allForGroup
+    : []
 
   function handleAddCustom() {
     const name = customName.trim()
@@ -349,91 +346,133 @@ function ExercisePicker({ onSelect, onClose, customExercises = {}, usageCounts =
     onClose()
   }
 
+  const showingSearch = search.length > 0
+  const showingGroup = !showingSearch && activeGroup !== null
+
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
       style={{ background: 'rgba(0,0,0,0.8)' }}
       onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="pixel-card w-full max-w-lg" style={{ background: '#12121e', maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
+      <div className="pixel-card w-full max-w-lg" style={{ background: '#12121e', maxHeight: '82vh', display: 'flex', flexDirection: 'column' }}>
+
+        {/* Header */}
         <div className="p-4 border-b border-gray-800 flex items-center gap-3">
-          <input ref={inputRef} type="text" placeholder="Search exercises..."
-            value={search} onChange={e => setSearch(e.target.value)}
-            className="flex-1 bg-black/40 border border-gray-700 text-white px-3 py-2 focus:border-sky-500 outline-none"
-            style={{ fontSize: '13px' }} />
-          <button onClick={onClose} className="text-gray-500 hover:text-white text-xl px-2">✕</button>
+          {showingGroup && (
+            <button onClick={() => { setActiveGroup(null); setAddingCustom(false) }}
+              className="text-sky-400 hover:text-sky-300 transition-colors flex-shrink-0 px-1"
+              style={{ fontSize: '18px' }}>‹</button>
+          )}
+          <div className="flex-1 flex items-center gap-2 bg-black/40 border border-gray-700 px-3 py-2 focus-within:border-sky-500"
+            style={{ borderRadius: '6px' }}>
+            <span className="text-gray-500" style={{ fontSize: '14px' }}>⌕</span>
+            <input type="text" placeholder="Search Exercises"
+              value={search} onChange={e => { setSearch(e.target.value); if (e.target.value) setActiveGroup(null) }}
+              className="flex-1 bg-transparent text-white outline-none"
+              style={{ fontSize: '13px' }} />
+          </div>
+          <button onClick={onClose} className="text-gray-500 hover:text-white text-xl px-1 flex-shrink-0">✕</button>
         </div>
-        {!search && (
-          <div className="flex overflow-x-auto border-b border-gray-800" style={{ scrollbarWidth: 'none' }}>
-            {MUSCLE_GROUPS.map(g => (
-              <button key={g.id} onClick={() => { setActiveGroup(g.id); setAddingCustom(false) }}
-                className={`flex-shrink-0 px-4 py-3 pixel-font transition-all ${
-                  activeGroup === g.id
-                    ? 'text-sky-300 border-b-2 border-sky-500 bg-sky-900/20'
-                    : 'text-gray-500 hover:text-gray-300'
-                }`} style={{ fontSize: '12px' }}>
-                {g.label}
-              </button>
-            ))}
+
+        {/* Title row when inside a group */}
+        {showingGroup && (
+          <div className="px-4 py-2 border-b border-gray-800">
+            <span className="pixel-font text-sky-400" style={{ fontSize: '12px' }}>{group?.label}</span>
           </div>
         )}
-        <div className="overflow-y-auto flex-1 p-2">
-          {search && (
-            <p className="pixel-font text-gray-600 px-2 py-1 mb-1" style={{ fontSize: '13px' }}>
-              {allExercises.length} results
-            </p>
-          )}
-          <div className="grid grid-cols-2 gap-1">
-            {allExercises.map(name => {
-              const isCustom = (customExercises[activeGroup] || []).includes(name) ||
-                Object.values(customExercises).some(arr => arr.includes(name))
-              return (
-                <div key={name} className="flex border border-gray-800 hover:border-sky-600 transition-all group/ex">
-                  <button onClick={() => { onSelect(name); onClose() }}
-                    className="flex-1 text-left px-3 py-2.5 text-gray-300 hover:text-white flex items-center gap-1.5 min-w-0"
-                    style={{ fontSize: '12px' }}>
-                    {isCustom && <span className="text-sky-500 flex-shrink-0" style={{ fontSize: '10px' }}>★</span>}
-                    <span className="truncate">{name}</span>
-                    {usageCounts[name] > 0 && (
-                      <span className="ml-auto text-gray-600 flex-shrink-0 pl-1" style={{ fontSize: '10px' }}>{usageCounts[name]}×</span>
-                    )}
-                  </button>
-                  {!search && (
-                    <button
-                      onClick={e => { e.stopPropagation(); hideExercise(activeGroup, name) }}
-                      className="px-2 text-gray-700 hover:text-red-400 transition-colors flex-shrink-0"
-                      style={{ fontSize: '11px' }}
-                      title="Hide this exercise">
-                      ✕
-                    </button>
-                  )}
-                </div>
-              )
-            })}
-          </div>
 
-          {/* Add custom exercise */}
-          {!search && (
-            <div className="mt-3 px-1">
-              {addingCustom ? (
-                <div className="flex gap-2">
-                  <input ref={customInputRef} type="text" placeholder="Exercise name..."
-                    value={customName} onChange={e => setCustomName(e.target.value)}
-                    onKeyDown={e => e.key === 'Enter' && handleAddCustom()}
-                    className="flex-1 bg-black/40 border border-sky-700 text-white px-3 py-2 focus:outline-none"
-                    style={{ fontSize: '13px' }} />
-                  <button onClick={handleAddCustom}
-                    className="pixel-btn bg-sky-700 border-sky-500 text-white px-4" style={{ fontSize: '12px' }}>
-                    Add
-                  </button>
-                  <button onClick={() => { setAddingCustom(false); setCustomName('') }}
-                    className="text-gray-500 hover:text-white px-2" style={{ fontSize: '18px' }}>✕</button>
-                </div>
-              ) : (
-                <button onClick={() => setAddingCustom(true)}
-                  className="w-full py-2.5 border border-dashed border-gray-700 text-sky-400 hover:border-sky-600 hover:bg-sky-900/10 transition-all text-center"
-                  style={{ fontSize: '12px' }}>
-                  + Add Custom Exercise to {group?.label}
+        <div className="overflow-y-auto flex-1">
+
+          {/* Search results */}
+          {showingSearch && (
+            <div className="p-2">
+              <p className="pixel-font text-gray-600 px-2 py-1 mb-1" style={{ fontSize: '11px' }}>
+                {searchResults.length} results
+              </p>
+              <div className="grid grid-cols-2 gap-1">
+                {searchResults.map(name => {
+                  const isCustom = Object.values(customExercises).some(arr => arr.includes(name))
+                  return (
+                    <button key={name} onClick={() => { onSelect(name); onClose() }}
+                      className="text-left px-3 py-2.5 text-gray-300 hover:text-white border border-gray-800 hover:border-sky-600 transition-all flex items-center gap-1.5 min-w-0"
+                      style={{ fontSize: '12px' }}>
+                      {isCustom && <span className="text-sky-500 flex-shrink-0" style={{ fontSize: '10px' }}>★</span>}
+                      <span className="truncate">{name}</span>
+                      {usageCounts[name] > 0 && (
+                        <span className="ml-auto text-gray-600 flex-shrink-0 pl-1" style={{ fontSize: '10px' }}>{usageCounts[name]}×</span>
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Category list */}
+          {!showingSearch && !showingGroup && (
+            <div>
+              {MUSCLE_GROUPS.map((g, i) => (
+                <button key={g.id} onClick={() => setActiveGroup(g.id)}
+                  className="w-full flex items-center justify-between px-5 py-4 text-white hover:bg-sky-900/20 transition-all text-left"
+                  style={{
+                    fontSize: '15px',
+                    borderBottom: i < MUSCLE_GROUPS.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none',
+                  }}>
+                  <span>{g.label}</span>
+                  <span className="text-gray-600" style={{ fontSize: '16px' }}>›</span>
                 </button>
-              )}
+              ))}
+            </div>
+          )}
+
+          {/* Exercise list for selected group */}
+          {showingGroup && (
+            <div className="p-2">
+              <div className="grid grid-cols-2 gap-1">
+                {allForGroup.map(name => {
+                  const isCustom = (customExercises[activeGroup] || []).includes(name)
+                  return (
+                    <div key={name} className="flex border border-gray-800 hover:border-sky-600 transition-all group/ex">
+                      <button onClick={() => { onSelect(name); onClose() }}
+                        className="flex-1 text-left px-3 py-2.5 text-gray-300 hover:text-white flex items-center gap-1.5 min-w-0"
+                        style={{ fontSize: '12px' }}>
+                        {isCustom && <span className="text-sky-500 flex-shrink-0" style={{ fontSize: '10px' }}>★</span>}
+                        <span className="truncate">{name}</span>
+                        {usageCounts[name] > 0 && (
+                          <span className="ml-auto text-gray-600 flex-shrink-0 pl-1" style={{ fontSize: '10px' }}>{usageCounts[name]}×</span>
+                        )}
+                      </button>
+                      <button onClick={e => { e.stopPropagation(); hideExercise(activeGroup, name) }}
+                        className="px-2 text-gray-700 hover:text-red-400 transition-colors flex-shrink-0"
+                        style={{ fontSize: '11px' }} title="Hide this exercise">
+                        ✕
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
+              <div className="mt-3 px-1">
+                {addingCustom ? (
+                  <div className="flex gap-2">
+                    <input ref={customInputRef} type="text" placeholder="Exercise name..."
+                      value={customName} onChange={e => setCustomName(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && handleAddCustom()}
+                      className="flex-1 bg-black/40 border border-sky-700 text-white px-3 py-2 focus:outline-none"
+                      style={{ fontSize: '13px' }} />
+                    <button onClick={handleAddCustom}
+                      className="pixel-btn bg-sky-700 border-sky-500 text-white px-4" style={{ fontSize: '12px' }}>
+                      Add
+                    </button>
+                    <button onClick={() => { setAddingCustom(false); setCustomName('') }}
+                      className="text-gray-500 hover:text-white px-2" style={{ fontSize: '18px' }}>✕</button>
+                  </div>
+                ) : (
+                  <button onClick={() => setAddingCustom(true)}
+                    className="w-full py-2.5 border border-dashed border-gray-700 text-sky-400 hover:border-sky-600 hover:bg-sky-900/10 transition-all text-center"
+                    style={{ fontSize: '12px' }}>
+                    + Add Custom Exercise to {group?.label}
+                  </button>
+                )}
+              </div>
             </div>
           )}
         </div>
