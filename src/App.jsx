@@ -197,11 +197,6 @@ export default function App() {
       <AuthProvider>
         {/* Background sits outside the main stacking context so z-index works correctly */}
         <div className="bg-decor" aria-hidden="true">
-          <div className="bg-orb bg-orb-1" />
-          <div className="bg-orb bg-orb-2" />
-          <div className="bg-orb bg-orb-3" />
-          <div className="bg-orb bg-orb-4" />
-          <div className="bg-orb bg-orb-5" />
           <PlexusBg />
         </div>
         <div className="flex flex-col min-h-screen" style={{ position: 'relative', zIndex: 1 }}>

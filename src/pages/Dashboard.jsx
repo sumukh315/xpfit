@@ -28,10 +28,12 @@ export default function Dashboard() {
     }
   }
 
+  function workoutDate(w) { return w.start_time || w.created_at }
+
   function calcWeekStats(workouts) {
     const weekAgo = new Date()
     weekAgo.setDate(weekAgo.getDate() - 7)
-    const thisWeek = workouts.filter(w => new Date(w.created_at) > weekAgo)
+    const thisWeek = workouts.filter(w => new Date(workoutDate(w)) > weekAgo)
     const sets = thisWeek.reduce((acc, w) => acc + (w.exercises?.reduce((a, e) => a + (e.sets?.length || 0), 0) || 0), 0)
     setWeekStats({ workouts: thisWeek.length, sets })
   }
@@ -42,7 +44,7 @@ export default function Dashboard() {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     const dates = workouts.map(w => {
-      const d = new Date(w.created_at)
+      const d = new Date(workoutDate(w))
       d.setHours(0, 0, 0, 0)
       return d.getTime()
     })
@@ -159,7 +161,7 @@ export default function Dashboard() {
                 <Link to="/logs" className="flex-1 min-w-0 no-underline hover:opacity-80 transition-opacity">
                   <div className="text-white font-medium">{w.name}</div>
                   <div className="text-gray-400 text-xs">
-                    {new Date(w.created_at).toLocaleDateString()} · {w.exercises?.length || 0} exercises
+                    {new Date(workoutDate(w)).toLocaleDateString()} · {w.exercises?.length || 0} exercises
                   </div>
                 </Link>
                 <div className="flex items-center gap-3 flex-shrink-0 ml-3">
