@@ -1118,26 +1118,26 @@ export default function WorkoutLogger() {
           />
         </div>
         <div className="border-t border-gray-800/60">
-          <label className="flex items-center justify-between px-4 py-3 border-b border-gray-800/40 cursor-pointer hover:bg-white/[0.02] transition-colors">
-            <span className="text-white" style={{ fontSize: '14px' }}>Start Time</span>
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800/40">
+            <span className="text-gray-400" style={{ fontSize: '13px' }}>Start</span>
             <input
               type="datetime-local"
               value={workoutStartStr}
               onChange={e => setWorkoutStartStr(e.target.value)}
-              className="bg-transparent text-gray-400 focus:outline-none focus:text-sky-400 text-right"
-              style={{ fontSize: '13px' }}
+              className="glass-input text-sky-300 text-right focus:outline-none"
+              style={{ fontSize: '13px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(103,232,249,0.2)', borderRadius: 6, padding: '4px 8px', cursor: 'pointer', colorScheme: 'dark' }}
             />
-          </label>
-          <label className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-white/[0.02] transition-colors">
-            <span className="text-white" style={{ fontSize: '14px' }}>End Time</span>
+          </div>
+          <div className="flex items-center justify-between px-4 py-3">
+            <span className="text-gray-400" style={{ fontSize: '13px' }}>End</span>
             <input
               type="datetime-local"
               value={workoutEndStr}
               onChange={e => setWorkoutEndStr(e.target.value)}
-              className="bg-transparent text-gray-400 focus:outline-none focus:text-sky-400 text-right"
-              style={{ fontSize: '13px' }}
+              className="glass-input text-sky-300 text-right focus:outline-none"
+              style={{ fontSize: '13px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(103,232,249,0.2)', borderRadius: 6, padding: '4px 8px', cursor: 'pointer', colorScheme: 'dark' }}
             />
-          </label>
+          </div>
         </div>
       </div>
 
