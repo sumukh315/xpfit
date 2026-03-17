@@ -38,7 +38,7 @@ export const PETS = [
     desc: 'A mystical forest critter carrying treasures.',
     cost: 800,
     costType: 'points',
-    col: 0.5, row: 2, yAdjust: -12,
+    col: 0.5, row: 2, yAdjust: 20,
   },
 ]
 
