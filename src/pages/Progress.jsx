@@ -91,7 +91,8 @@ export default function Progress() {
   async function fetchWorkouts() {
     try {
       const data = await api.getWorkouts()
-      setWorkouts([...data].sort((a, b) => new Date(a.created_at) - new Date(b.created_at)))
+      const wDate = w => w.start_time || w.created_at
+      setWorkouts([...data].sort((a, b) => new Date(wDate(a)) - new Date(wDate(b))))
     } catch (e) { console.error(e) }
   }
 
@@ -119,13 +120,13 @@ export default function Progress() {
     const groupColor = MUSCLE_GROUPS.find(g => g.id === selectedGroup)?.color || '#38bdf8'
     return workouts
       .filter(w => {
-        if (cutoff && new Date(w.created_at) < cutoff) return false
+        if (cutoff && new Date(w.start_time || w.created_at) < cutoff) return false
         return w.exercises?.some(e => e.name === selectedExercise)
       })
       .map(w => {
         const ex = w.exercises.find(e => e.name === selectedExercise)
         const maxWeight = Math.max(...(ex.sets || []).map(s => parseFloat(s.weight) || 0))
-        const d = new Date(w.created_at)
+        const d = new Date(w.start_time || w.created_at)
         return {
           dateLabel: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
           dateTs: d.getTime(),
@@ -144,7 +145,7 @@ export default function Progress() {
     return MUSCLE_GROUPS.map(g => {
       let sets = 0
       workouts.forEach(w => {
-        const d = new Date(w.created_at)
+        const d = new Date(w.start_time || w.created_at)
         if (d >= weekStart && d < weekEnd) {
           w.exercises?.forEach(ex => {
             if (getGroupForExercise(ex.name) === g.id) sets += ex.sets?.length || 0
