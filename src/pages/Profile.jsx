@@ -252,6 +252,49 @@ export default function Profile() {
         )}
       </div>
 
+      {/* CSV Export */}
+      <div className="pixel-card p-4 mt-6">
+        <h2 className="pixel-font text-sky-400 mb-1" style={{ fontSize: '13px' }}>Export Data</h2>
+        <p className="text-gray-500 mb-4" style={{ fontSize: '13px' }}>Download all your workout history as a CSV file.</p>
+        <button
+          onClick={async () => {
+            const workouts = await api.getWorkouts()
+            const rows = [['Date', 'Workout', 'Exercise', 'Set', 'Weight', 'Reps', 'Notes']]
+            for (const w of workouts) {
+              const exercises = typeof w.exercises === 'string' ? JSON.parse(w.exercises) : (w.exercises || [])
+              if (!exercises.length) {
+                rows.push([w.created_at?.slice(0, 10) ?? '', w.name ?? '', '', '', '', '', w.notes ?? ''])
+              } else {
+                for (const ex of exercises) {
+                  const sets = ex.sets || []
+                  if (!sets.length) {
+                    rows.push([w.created_at?.slice(0, 10) ?? '', w.name ?? '', ex.name ?? '', '', '', '', w.notes ?? ''])
+                  } else {
+                    sets.forEach((s, i) => {
+                      const weight = s.weightLeft !== undefined
+                        ? `${s.weightLeft ?? ''}/${s.weightRight ?? ''}`
+                        : (s.weight ?? '')
+                      rows.push([w.created_at?.slice(0, 10) ?? '', w.name ?? '', ex.name ?? '', i + 1, weight, s.reps ?? '', i === 0 ? (w.notes ?? '') : ''])
+                    })
+                  }
+                }
+              }
+            }
+            const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')
+            const blob = new Blob([csv], { type: 'text/csv' })
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = 'xpfit-workouts.csv'
+            a.click()
+            URL.revokeObjectURL(url)
+          }}
+          className="pixel-btn bg-sky-800 border-sky-600 text-white px-4 py-2"
+          style={{ fontSize: '13px' }}>
+          Download CSV
+        </button>
+      </div>
+
       {/* Feedback */}
       <div className="pixel-card p-5 mt-6">
         <h2 className="pixel-font text-sky-400 mb-1" style={{ fontSize: '13px' }}>Send Feedback</h2>
