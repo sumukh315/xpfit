@@ -5,8 +5,23 @@ import { requireAuth } from '../middleware/auth.js'
 const router = Router()
 router.use(requireAuth)
 
+function parseProfile(u) {
+  return {
+    ...u,
+    character: JSON.parse(u.character || '{}'),
+    equipped: JSON.parse(u.equipped || '{}'),
+    inventory: JSON.parse(u.inventory || '[]'),
+    fitness_profile: JSON.parse(u.fitness_profile || '{}'),
+    unlocked_classes: JSON.parse(u.unlocked_classes || '["warrior","mage"]'),
+    owned_pets: JSON.parse(u.owned_pets || '[]'),
+  }
+}
+
 router.patch('/me', async (req, res) => {
-  const allowed = ['character', 'equipped', 'inventory', 'points', 'discord_webhook', 'fitness_profile', 'unlocked_classes']
+  const allowed = [
+    'character', 'equipped', 'inventory', 'points', 'discord_webhook',
+    'fitness_profile', 'unlocked_classes', 'owned_pets', 'active_pet', 'pr_points',
+  ]
   const updates = {}
   for (const key of allowed) {
     if (req.body[key] !== undefined) {
@@ -25,21 +40,14 @@ router.patch('/me', async (req, res) => {
 
   const { rows } = await pool.query('SELECT * FROM users WHERE id = $1', [req.user.id])
   const { password_hash, ...safe } = rows[0]
-  res.json({
-    ...safe,
-    character: JSON.parse(safe.character || '{}'),
-    equipped: JSON.parse(safe.equipped || '{}'),
-    inventory: JSON.parse(safe.inventory || '[]'),
-    fitness_profile: JSON.parse(safe.fitness_profile || '{}'),
-    unlocked_classes: JSON.parse(safe.unlocked_classes || '["warrior","mage"]'),
-  })
+  res.json(parseProfile(safe))
 })
 
 router.get('/search', async (req, res) => {
   const { q } = req.query
   if (!q) return res.json([])
   const { rows } = await pool.query(
-    `SELECT id, username, total_xp, points, character, equipped FROM users
+    `SELECT id, username, total_xp, points, pr_points, character, equipped, active_pet FROM users
      WHERE username ILIKE $1 AND id != $2 LIMIT 10`,
     [`%${q}%`, req.user.id]
   )
@@ -52,7 +60,7 @@ router.get('/search', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   const { rows } = await pool.query(
-    'SELECT id, username, total_xp, points, character, equipped FROM users WHERE id = $1',
+    'SELECT id, username, total_xp, points, pr_points, character, equipped, active_pet FROM users WHERE id = $1',
     [req.params.id]
   )
   if (!rows[0]) return res.status(404).json({ error: 'Not found' })

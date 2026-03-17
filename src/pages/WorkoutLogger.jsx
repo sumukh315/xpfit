@@ -442,6 +442,7 @@ export default function WorkoutLogger() {
   const [recommendations, setRecommendations] = useState({})
   const [previousWorkouts, setPreviousWorkouts] = useState({})
   const [savedWorkout, setSavedWorkout] = useState(null)
+  const [prResult, setPrResult] = useState(null)   // { count, exercises, pointsEarned }
   const [levelUp, setLevelUp] = useState(null) // { oldLevel, newLevel, title }
   const [copied, setCopied] = useState(false)
   const [pickedUnlockClass, setPickedUnlockClass] = useState(null)
@@ -543,7 +544,7 @@ export default function WorkoutLogger() {
     setShowFinish(false)
     const oldLevel = getLevelFromXP(profile?.total_xp || 0).level
     try {
-      await api.createWorkout({
+      const result = await api.createWorkout({
         name: workoutName, exercises, notes,
         xp_earned: xpPreview, points_earned: pointsPreview,
         photo: photoFile,
@@ -551,6 +552,9 @@ export default function WorkoutLogger() {
         end_time: effectiveEnd.toISOString(),
         duration_minutes: durationMins,
       })
+      if (result.pr_exercises?.length > 0) {
+        setPrResult({ count: result.pr_exercises.length, exercises: result.pr_exercises, pointsEarned: result.pr_points_earned })
+      }
       await refreshProfile()
       const newLevel = getLevelFromXP((profile?.total_xp || 0) + xpPreview).level
       if (newLevel > oldLevel) {
@@ -656,17 +660,45 @@ export default function WorkoutLogger() {
     ctx.textAlign = 'right'
     ctx.fillText('XPFIT', canvas.width - pad, pad)
 
-    canvas.toBlob(async blob => {
-      const file = new File([blob], 'workout.jpg', { type: 'image/jpeg' })
-      if (navigator.share && navigator.canShare?.({ files: [file] })) {
-        try { await navigator.share({ files: [file], title: savedWorkout.name }) } catch (_) {}
-      } else {
-        const a = document.createElement('a')
-        a.href = URL.createObjectURL(blob)
-        a.download = 'workout.jpg'
-        a.click()
+    // Draw active pet in bottom-left corner if user has one
+    const petId = profile?.active_pet
+    async function drawPetAndExport() {
+      if (petId) {
+        const petImg = new Image()
+        petImg.src = '/pets.png'
+        await new Promise(resolve => { petImg.onload = resolve; petImg.onerror = resolve })
+
+        // Spritesheet: 1024×1536, 2 cols × 3 rows, 512×512 per cell
+        const petDefs = {
+          angel_cat:  { col: 0,   row: 0 },
+          dragon:     { col: 1,   row: 0 },
+          hellhound:  { col: 0,   row: 1 },
+          unicorn:    { col: 1,   row: 1 },
+          shroom_pup: { col: 0.5, row: 2 },
+        }
+        const pd = petDefs[petId]
+        if (pd && petImg.complete) {
+          const petSize = Math.round(canvas.width * 0.22)
+          const sx = pd.col * 512
+          const sy = pd.row * 512
+          const margin = Math.round(canvas.width * 0.03)
+          ctx.drawImage(petImg, sx, sy, 512, 512, margin, canvas.height - petSize - margin, petSize, petSize)
+        }
       }
-    }, 'image/jpeg', 0.92)
+
+      canvas.toBlob(async blob => {
+        const file = new File([blob], 'workout.jpg', { type: 'image/jpeg' })
+        if (navigator.share && navigator.canShare?.({ files: [file] })) {
+          try { await navigator.share({ files: [file], title: savedWorkout.name }) } catch (_) {}
+        } else {
+          const a = document.createElement('a')
+          a.href = URL.createObjectURL(blob)
+          a.download = 'workout.jpg'
+          a.click()
+        }
+      }, 'image/jpeg', 0.92)
+    }
+    drawPetAndExport()
   }
 
   const startTimeStr = startTime.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) +
@@ -750,7 +782,17 @@ export default function WorkoutLogger() {
 
           <h2 className="fantasy-font text-green-400 mb-1" style={{ fontSize: '24px' }}>Workout Done!</h2>
           <p className="text-gray-400 mb-2" style={{ fontSize: '13px' }}>{savedWorkout.name}</p>
-          <p className="pixel-font text-sky-400 mb-6" style={{ fontSize: '12px' }}>+{savedWorkout.xp} XP earned</p>
+          <p className="pixel-font text-sky-400 mb-2" style={{ fontSize: '12px' }}>+{savedWorkout.xp} XP earned</p>
+          {prResult && (
+            <div className="glass-row p-3 mb-4 text-left">
+              <p className="pixel-font text-purple-400 mb-1" style={{ fontSize: '12px' }}>
+                {prResult.count} PR{prResult.count > 1 ? 's' : ''}! +{prResult.pointsEarned} PR Points
+              </p>
+              <p className="text-gray-500" style={{ fontSize: '12px' }}>
+                {prResult.exercises.join(', ')}
+              </p>
+            </div>
+          )}
 
           <p className="pixel-font text-gray-500 mb-3" style={{ fontSize: '12px' }}>SHARE YOUR WORKOUT</p>
           <div className="flex flex-col gap-3 mb-6">
@@ -859,9 +901,9 @@ export default function WorkoutLogger() {
         {photoFile && <p className="text-green-400 text-xs mt-1">Selected: {photoFile.name}</p>}
       </div>
 
-      {/* Sticky finish bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-sky-900/60 px-4 py-4"
-        style={{ background: 'linear-gradient(to top, #0d0d1a, #12122288)' }}>
+      {/* Sticky finish bar — on mobile, push above the 56px bottom nav */}
+      <div className="fixed left-0 right-0 z-40 border-t border-sky-900/60 px-4 py-4 md:bottom-0"
+        style={{ bottom: '56px', background: 'linear-gradient(to top, #0d0d1a, #12122288)' }}>
         <div className="max-w-2xl mx-auto flex items-center justify-between gap-4">
           <div>
             <div className="pixel-font text-gray-500 mb-1" style={{ fontSize: '13px' }}>YOU WILL EARN</div>

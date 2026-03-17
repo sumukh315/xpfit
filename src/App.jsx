@@ -15,6 +15,7 @@ import StylePreview from './pages/StylePreview'
 import ColorPreview from './pages/ColorPreview'
 import FontPreview from './pages/FontPreview'
 import WorkoutLogs from './pages/WorkoutLogs'
+import Shop from './pages/Shop'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -69,6 +70,9 @@ function AppRoutes() {
       } />
       <Route path="/logs" element={
         <ProtectedRoute><AuthLayout><WorkoutLogs /></AuthLayout></ProtectedRoute>
+      } />
+      <Route path="/shop" element={
+        <ProtectedRoute><AuthLayout><Shop /></AuthLayout></ProtectedRoute>
       } />
     </Routes>
   )

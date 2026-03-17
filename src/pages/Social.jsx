@@ -4,6 +4,7 @@ import { api } from '../lib/api'
 import { getLevelFromXP, getLevelTitle } from '../lib/xpSystem'
 import XPBar from '../components/XPBar'
 import PixelCharacter from '../components/PixelCharacter'
+import PetSprite from '../components/PetSprite'
 
 function daysSince(dateStr) {
   if (!dateStr) return null
@@ -142,11 +143,19 @@ export default function Social() {
           <div className="pixel-card p-4 glow-purple flex-shrink-0">
             <PixelCharacter options={charOptions} scale={0.9} />
           </div>
-          <div className="text-center sm:text-left">
-            <h2 className="pixel-font text-white mb-1" style={{ fontSize: '18px' }}>{selectedFriend.username}</h2>
+          <div className="text-center sm:text-left flex-1">
+            <div className="flex items-center gap-3 justify-center sm:justify-start mb-1">
+              <h2 className="pixel-font text-white" style={{ fontSize: '18px' }}>{selectedFriend.username}</h2>
+              {selectedFriend.active_pet && <PetSprite petId={selectedFriend.active_pet} size={40} />}
+            </div>
             <p className="pixel-font text-sky-400 mb-3" style={{ fontSize: '13px' }}>Level {level} {getLevelTitle(level)}</p>
             <XPBar totalXP={selectedFriend.total_xp || 0} />
-            <p className="text-yellow-400 font-semibold mt-2">{selectedFriend.points || 0} Points</p>
+            <div className="flex gap-4 mt-2 justify-center sm:justify-start">
+              <span className="text-yellow-400 font-semibold">{selectedFriend.points || 0} pts</span>
+              {(selectedFriend.pr_points || 0) > 0 && (
+                <span className="text-purple-400 font-semibold">{selectedFriend.pr_points} PR pts</span>
+              )}
+            </div>
           </div>
         </div>
         <div className="pixel-card p-4">

@@ -6,12 +6,12 @@ import XPBar from './XPBar'
 import PixelCharacter from './PixelCharacter'
 
 const navItems = [
-  { path: '/dashboard',   label: 'Home',     icon: '⌂' },
-  { path: '/workout/new', label: 'Workout',  icon: '+' },
-  { path: '/logs',        label: 'Logs',     icon: '≡' },
-  { path: '/progress',   label: 'Progress', icon: '↑' },
-  { path: '/social',     label: 'Friends',  icon: '♦' },
-  { path: '/profile',    label: 'Profile',  icon: '◉' },
+  { path: '/dashboard',   label: 'Home',    icon: '⌂' },
+  { path: '/workout/new', label: 'Workout', icon: '+' },
+  { path: '/logs',        label: 'Logs',    icon: '≡' },
+  { path: '/shop',        label: 'Shop',    icon: '✦' },
+  { path: '/social',      label: 'Friends', icon: '♦' },
+  { path: '/profile',     label: 'Profile', icon: '◉' },
 ]
 
 export default function Navbar() {
