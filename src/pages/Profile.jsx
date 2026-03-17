@@ -81,15 +81,9 @@ export default function Profile() {
       <h1 className="pixel-font text-sky-400 mb-6" style={{ fontSize: '14px' }}>Profile</h1>
 
       <div className="pixel-card p-6 mb-6 flex flex-col md:flex-row gap-6 items-center relative">
-        <div className="absolute top-4 right-4 flex items-center gap-3">
-          <Link to="/progress" className="text-sky-400 hover:text-sky-300 no-underline pixel-font" style={{ fontSize: '12px' }}>
-            View Stats →
-          </Link>
-          <button onClick={() => { logout(); navigate('/login') }}
-            className="text-gray-500 hover:text-red-400 transition-colors pixel-font" style={{ fontSize: '12px' }}>
-            Log Out
-          </button>
-        </div>
+        <Link to="/progress" className="absolute top-4 right-4 text-sky-400 hover:text-sky-300 no-underline pixel-font" style={{ fontSize: '12px' }}>
+          View Stats →
+        </Link>
         <div className="flex flex-col items-center gap-3">
           <div className="pixel-card p-5 glow-purple">
             <PixelCharacter options={displayChar} scale={1} />
@@ -289,6 +283,12 @@ export default function Profile() {
           </button>
         </div>
       </div>
+
+      <button onClick={() => { logout(); navigate('/login') }}
+        className="w-full mt-6 py-3 text-gray-500 hover:text-red-400 border border-gray-800 hover:border-red-900 transition-all pixel-font"
+        style={{ fontSize: '13px' }}>
+        Log Out
+      </button>
     </div>
   )
 }

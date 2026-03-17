@@ -5,10 +5,10 @@ export default function PetSprite({ petId, size = 80 }) {
   const pet = getPet(petId)
   if (!pet) return null
 
-  const bgW = 2 * size      // full sheet scaled width
-  const bgH = 3 * size      // full sheet scaled height
+  const bgW = 2 * size
+  const bgH = 3 * size
   const offsetX = -(pet.col * size)
-  const offsetY = -(pet.row * size)
+  const offsetY = -(pet.row * size) + (pet.yAdjust || 0)
 
   return (
     <div style={{
