@@ -42,7 +42,7 @@ export default function CoachModal({ onClose }) {
       })
       setMessages(prev => [...prev, { role: 'coach', text: reply }])
     } catch (e) {
-      setMessages(prev => [...prev, { role: 'coach', text: 'Sorry, I ran into an error. Try again!' }])
+      setMessages(prev => [...prev, { role: 'coach', text: `Sorry, I ran into an error: ${e.message}. Try again!` }])
     } finally {
       setLoading(false)
     }
