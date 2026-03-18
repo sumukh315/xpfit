@@ -75,7 +75,7 @@ const MUSCLE_GROUPS = [
     id: 'abs',
     label: 'Abs',
     exercises: [
-      'Crunch', 'Sit-Up', 'Bicycle Crunch', 'Russian Twist',
+      'Abdominal Crunch', 'Sit-Up', 'Bicycle Crunch', 'Russian Twist',
       'Plank', 'Side Plank', 'Leg Raise', 'Hanging Leg Raise',
       'Ab Rollout', 'Cable Crunch', 'Dragon Flag',
       'Mountain Climber', 'V-Up', 'Dead Bug',
