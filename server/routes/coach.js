@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { authenticate } from '../middleware/auth.js'
+import { requireAuth } from '../middleware/auth.js'
 
 const router = Router()
 
@@ -12,7 +12,7 @@ const SYSTEM_PROMPT = `You are an encouraging fitness coach inside the XPFit wor
 
 Keep answers concise, friendly, and practical. Use simple language — assume the user is new to the gym. If someone sends a photo, describe what you see and give specific form or equipment tips. If asked anything completely unrelated to fitness or health, politely redirect: "I'm your gym coach — ask me anything about workouts, form, or equipment!"`
 
-router.post('/', authenticate, async (req, res) => {
+router.post('/', requireAuth, async (req, res) => {
   const { message, imageBase64, imageMimeType } = req.body
   if (!message?.trim() && !imageBase64) return res.status(400).json({ error: 'Message or image required' })
 
