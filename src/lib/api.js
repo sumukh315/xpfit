@@ -73,5 +73,4 @@ export const api = {
   acceptFriendRequest: (id) => request(`/social/accept/${id}`, { method: 'POST' }),
   getFriendFriends: (userId) => request(`/social/friends/${userId}`),
   sendFeedback: (data) => request('/feedback', { method: 'POST', body: data }),
-  askCoach: (data) => request('/coach', { method: 'POST', body: data }),
 }

@@ -6,14 +6,12 @@ import { getLevelFromXP, getLevelTitle } from '../lib/xpSystem'
 import { getRecommendations } from '../lib/recommendations'
 import XPBar from '../components/XPBar'
 import PixelCharacter from '../components/PixelCharacter'
-import CoachModal from '../components/CoachModal'
 
 export default function Dashboard() {
   const { profile, refreshProfile } = useAuth()
   const [recentWorkouts, setRecentWorkouts] = useState([])
   const [weekStats, setWeekStats] = useState({ workouts: 0, sets: 0 })
   const [streak, setStreak] = useState(0)
-  const [showCoach, setShowCoach] = useState(false)
 
   useEffect(() => {
     if (profile) fetchRecentWorkouts()
@@ -126,12 +124,6 @@ export default function Dashboard() {
         <div className="pixel-card p-4 mb-6" style={{ borderColor: '#0369a1' }}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="pixel-font text-sky-400" style={{ fontSize: '13px' }}>Personalized Tips</h2>
-            <button
-              onClick={() => setShowCoach(true)}
-              className="pixel-btn bg-sky-900 border-sky-700 text-sky-300 px-3 py-1"
-              style={{ fontSize: '11px' }}>
-              Need Help? 💬
-            </button>
           </div>
           <div className="flex flex-col gap-3">
             {recommendations.map((rec, i) => (
@@ -146,7 +138,6 @@ export default function Dashboard() {
           </div>
         </div>
       )}
-      {showCoach && <CoachModal onClose={() => setShowCoach(false)} />}
 
       <div className="pixel-card p-4">
         <div className="flex justify-between items-center mb-4">

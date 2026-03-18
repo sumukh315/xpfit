@@ -65,7 +65,7 @@ const MUSCLE_GROUPS = [
     id: 'chest',
     label: 'Chest',
     exercises: [
-      'Bench Press', 'Incline Bench Press', 'Decline Bench Press',
+      'Bench Press', 'Dumbbell Chest Press', 'Incline Bench Press', 'Decline Bench Press',
       'Dumbbell Fly', 'Incline Dumbbell Fly', 'Cable Fly',
       'Push-Up', 'Chest Dip', 'Pec Deck', 'Cable Crossover',
       'Landmine Press', 'Machine Chest Press',
