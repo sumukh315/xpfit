@@ -35,7 +35,7 @@ export default function Navbar() {
           </Link>
 
           {/* Mobile avatar → Profile */}
-          <Link to="/profile" className="md:hidden no-underline ml-auto" style={{ display: 'flex' }}>
+          <Link to="/profile" className="md:hidden no-underline ml-auto">
             <div style={{
               width: 32, height: 32, borderRadius: '50%',
               overflow: 'hidden', border: '2px solid rgba(103,232,249,0.3)',
@@ -61,9 +61,9 @@ export default function Navbar() {
           </div>
 
           {/* Right side */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-2 flex-shrink-0">
             {/* XP bar */}
-            <div className="hidden lg:flex flex-col items-end gap-1 w-36">
+            <div className="hidden lg:flex flex-col items-end gap-1" style={{ width: '110px' }}>
               <XPBar totalXP={profile?.total_xp || 0} />
             </div>
             <span className="text-yellow-400 font-semibold text-sm">{profile?.points || 0} pts</span>
