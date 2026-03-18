@@ -42,7 +42,7 @@ router.post('/', requireAuth, async (req, res) => {
     const data = await response.json()
     if (!response.ok) {
       console.error('Gemini error:', data)
-      return res.status(502).json({ error: 'AI service error' })
+      return res.status(502).json({ error: `Gemini: ${data?.error?.message || data?.error?.status || JSON.stringify(data)}` })
     }
 
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry, I couldn\'t generate a response.'
